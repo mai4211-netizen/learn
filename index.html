@@ -1332,7 +1332,8 @@ window.__IELTS_DATA__ = {"core":[{"id":"core_001","line_index":1,"word":"resembl
     let reviewAnswer = '';
     let reviewLastWrongAnswer = '';
     let reviewAnswerFeedbackHtml = '';
-    let touchStartX = 0;
+    let touchStartX = null;
+    let touchSwipeBlocked = false;
     let wheelLock = false;
     let replacementByWord = new Map();
     let replacementByCoreId = new Map();
@@ -1913,12 +1914,27 @@ window.__IELTS_DATA__ = {"core":[{"id":"core_001","line_index":1,"word":"resembl
 
       document.addEventListener('touchstart', (e) => {
         if (viewMode !== 'card' && viewMode !== 'review') return;
-        if (viewMode === 'review' && e.target.closest('#review-answer-input')) return;
+        const target = e.target;
+        const shouldBlock = !!target && typeof target.closest === 'function' && (
+          target.closest('#review-answer-input')
+          || target.closest('input, textarea, select, button, [contenteditable="true"]')
+        );
+        if (shouldBlock) {
+          touchSwipeBlocked = true;
+          touchStartX = null;
+          return;
+        }
+        touchSwipeBlocked = false;
         touchStartX = e.changedTouches[0].clientX;
       }, { passive: true });
 
       document.addEventListener('touchend', (e) => {
         if (viewMode !== 'card' && viewMode !== 'review') return;
+        if (touchSwipeBlocked || touchStartX === null) {
+          touchSwipeBlocked = false;
+          touchStartX = null;
+          return;
+        }
         const endX = e.changedTouches[0].clientX;
         const delta = touchStartX - endX;
         if (viewMode === 'card') {
