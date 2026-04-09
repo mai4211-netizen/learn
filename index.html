@@ -718,6 +718,7 @@
       font-weight: 800;
       padding: 12px 14px;
       box-shadow: none;
+      touch-action: manipulation;
     }
     .review-action-row {
       display: flex;
@@ -2532,6 +2533,18 @@ window.__IELTS_DATA__ = {"core":[{"id":"core_001","line_index":1,"word":"resembl
       renderReviewCard(card, { autoplay: false });
     }
 
+    function bindReviewInputTouchGuards(answerInput) {
+      if (!answerInput) return;
+      const guardSwipe = (e) => {
+        touchSwipeBlocked = true;
+        touchStartX = null;
+        e.stopPropagation();
+      };
+      ['touchstart', 'touchmove', 'touchend', 'click'].forEach((eventName) => {
+        answerInput.addEventListener(eventName, guardSwipe, { passive: true });
+      });
+    }
+
     function renderReviewCard(card, options = {}) {
       const host = document.getElementById('review-card-container');
       if (!host) return;
@@ -2695,6 +2708,7 @@ window.__IELTS_DATA__ = {"core":[{"id":"core_001","line_index":1,"word":"resembl
           });
         }
         if (answerInput) {
+          bindReviewInputTouchGuards(answerInput);
           answerInput.addEventListener('input', (e) => {
             reviewAnswer = e.target.value;
           });
