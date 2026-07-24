@@ -1,0 +1,1684 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="雅思口语 Part 3 复习资料：题型、逻辑、通用角度、主题观点、语法、示范与计时练习。">
+  <title>雅思口语 Part 3 复习资料｜交互版</title>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #637181;
+      --blue: #235c8c;
+      --blue-deep: #173e63;
+      --blue-soft: #eaf3fa;
+      --blue-pale: #f5f9fc;
+      --teal: #247e78;
+      --gold: #b4812a;
+      --line: #d5e0e8;
+      --panel: #ffffff;
+      --bg: #f3f6f8;
+      --shadow: 0 12px 35px rgba(23, 62, 99, .09);
+      --reading-size: 17px;
+      --sidebar: 286px;
+      --topbar: 60px;
+      color-scheme: light;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: var(--reading-size);
+      line-height: 1.72;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, textarea { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible {
+      outline: 3px solid rgba(35, 92, 140, .25);
+      outline-offset: 2px;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 1000;
+      top: 8px;
+      left: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: #fff;
+      background: var(--blue-deep);
+      transform: translateY(-150%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .topbar {
+      position: fixed;
+      z-index: 50;
+      inset: 0 0 auto var(--sidebar);
+      height: var(--topbar);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 24px;
+      border-bottom: 1px solid rgba(213, 224, 232, .9);
+      background: rgba(255, 255, 255, .92);
+      backdrop-filter: blur(14px);
+    }
+    .topbar-title { min-width: 0; font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .topbar-title strong { color: var(--blue-deep); }
+    .top-actions { display: flex; align-items: center; gap: 7px; }
+    .icon-button, .text-button {
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .icon-button { width: 38px; padding: 0; font-weight: 700; }
+    .text-button { padding: 6px 11px; font-size: 13px; }
+    .icon-button:hover, .text-button:hover { border-color: #9db7cc; background: var(--blue-pale); }
+    .menu-button { display: none; }
+
+    .sidebar {
+      position: fixed;
+      z-index: 60;
+      inset: 0 auto 0 0;
+      width: var(--sidebar);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--line);
+      background: #fff;
+      box-shadow: 8px 0 32px rgba(23, 62, 99, .04);
+    }
+    .brand { padding: 24px 22px 18px; }
+    .brand-mark { width: 34px; height: 4px; margin-bottom: 15px; border-radius: 99px; background: var(--gold); }
+    .brand h1 { margin: 0; color: var(--blue-deep); font-size: 21px; line-height: 1.32; letter-spacing: -.02em; }
+    .brand p { margin: 7px 0 0; color: var(--muted); font-size: 12px; }
+
+    .search-box { position: relative; padding: 0 16px 14px; }
+    .search-box input {
+      width: 100%;
+      height: 42px;
+      padding: 0 36px 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--ink);
+      background: var(--blue-pale);
+    }
+    .search-box input::placeholder { color: #8794a0; }
+    .search-key { position: absolute; right: 27px; top: 11px; color: #8b98a4; font-size: 12px; pointer-events: none; }
+
+    .progress-wrap { padding: 0 18px 14px; }
+    .progress-label { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--muted); font-size: 12px; }
+    .progress-track { height: 6px; overflow: hidden; border-radius: 99px; background: #e6edf2; }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--teal), #5fb4a8); transition: width .25s ease; }
+
+    .nav-list { flex: 1; overflow: auto; padding: 2px 10px 18px; }
+    .nav-item {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr) 22px;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 10px;
+      border: 0;
+      border-radius: 9px;
+      text-align: left;
+      background: transparent;
+      cursor: pointer;
+    }
+    .nav-item:hover { background: var(--blue-pale); }
+    .nav-item.active { color: var(--blue-deep); background: var(--blue-soft); font-weight: 700; }
+    .nav-index { color: #96a1ab; font-size: 11px; font-variant-numeric: tabular-nums; }
+    .nav-label { overflow: hidden; font-size: 13px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-label small { display: inline-block; margin-right: 6px; padding: 1px 5px; border-radius: 5px; color: var(--teal); background: #e8f5f2; font-size: 9px; vertical-align: 1px; }
+    .global-nav { color: #315f5b; }
+    .nav-check { opacity: 0; color: var(--teal); font-size: 12px; }
+    .nav-item.reviewed .nav-check { opacity: 1; }
+
+    .sidebar-footer { padding: 13px 16px 18px; border-top: 1px solid var(--line); }
+    .practice-entry {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #b8d2e5;
+      border-radius: 10px;
+      color: var(--blue-deep);
+      background: var(--blue-soft);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .app { min-height: 100vh; margin-left: var(--sidebar); padding-top: var(--topbar); }
+    .hero {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 54px 46px 20px;
+    }
+    .eyebrow { margin: 0 0 9px; color: var(--gold); font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .hero h2 { max-width: 800px; margin: 0; color: var(--blue-deep); font-size: clamp(32px, 5vw, 54px); line-height: 1.13; letter-spacing: -.035em; }
+    .hero p { max-width: 720px; margin: 17px 0 0; color: var(--muted); font-size: 17px; }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .hero-tag { padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--blue); background: rgba(255,255,255,.8); font-size: 12px; cursor: pointer; transition: .18s ease; }
+    .hero-tag:hover { border-color: #9dbbd1; background: var(--blue-soft); transform: translateY(-1px); }
+
+    .content-shell { max-width: 980px; margin: 0 auto; padding: 16px 46px 76px; }
+    #content > h1 { display: none; }
+    .chapter { display: block; margin-bottom: 72px; scroll-margin-top: calc(var(--topbar) + 18px); animation: enter .18s ease; }
+    #content.searching .chapter { display: none; }
+    @keyframes enter { from { opacity: .3; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    .chapter-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 16px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--line);
+    }
+    .chapter-head h2 { margin: 0; color: var(--blue-deep); font-size: clamp(25px, 3.3vw, 37px); line-height: 1.24; letter-spacing: -.025em; }
+    .review-button {
+      flex: none;
+      min-width: 104px;
+      padding: 8px 11px;
+      border: 1px solid #a9c8c3;
+      border-radius: 9px;
+      color: var(--teal);
+      background: #f5fbfa;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .review-button.done { color: #fff; background: var(--teal); }
+
+    .chapter h3 { margin: 1.5em 0 .6em; color: var(--blue); font-size: 1.25em; line-height: 1.38; }
+    .chapter p { margin: .65em 0; }
+    .chapter strong { color: var(--blue-deep); }
+    .chapter blockquote {
+      margin: 18px 0;
+      padding: 12px 16px;
+      border: 1px solid #bad3e5;
+      border-left: 4px solid var(--blue);
+      border-radius: 8px;
+      color: var(--blue-deep);
+      background: var(--blue-soft);
+    }
+    .chapter ul, .chapter ol { padding-left: 1.45em; }
+    .chapter li { margin: .34em 0; }
+    .chapter li::marker { color: var(--blue); }
+
+    .chapter table {
+      width: 100%;
+      margin: 18px 0 23px;
+      border-spacing: 0;
+      border-collapse: separate;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #fff;
+      box-shadow: 0 5px 18px rgba(23, 62, 99, .05);
+      font-size: .86em;
+    }
+    .chapter th, .chapter td { padding: 10px 11px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .chapter th:last-child, .chapter td:last-child { border-right: 0; }
+    .chapter tr:last-child td { border-bottom: 0; }
+    .chapter th { color: #fff; background: var(--blue); font-size: .9em; }
+    .chapter tbody tr:nth-child(even) { background: var(--blue-pale); }
+
+    .topic-card {
+      margin: 13px 0;
+      overflow: clip;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      box-shadow: 0 5px 20px rgba(23, 62, 99, .045);
+    }
+    .topic-card summary {
+      position: relative;
+      padding: 14px 46px 14px 16px;
+      color: var(--blue);
+      font-size: 1.05em;
+      font-weight: 800;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .topic-card summary::-webkit-details-marker { display: none; }
+    .topic-card summary::after { content: "+"; position: absolute; right: 17px; top: 13px; font-size: 20px; font-weight: 400; color: var(--muted); }
+    .topic-card[open] summary { border-bottom: 1px solid var(--line); background: var(--blue-pale); }
+    .topic-card[open] summary::after { content: "−"; }
+    .topic-card-body { padding: 8px 17px 14px; }
+    .topic-card-body > :first-child { margin-top: .45em; }
+    .topic-card-body > :last-child { margin-bottom: .2em; }
+
+    .search-results { display: none; }
+    .search-results.active { display: block; }
+    .search-title { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+    .search-title h2 { margin: 0; color: var(--blue-deep); }
+    .search-title span { color: var(--muted); font-size: 13px; }
+    .result-card { width: 100%; margin: 8px 0; padding: 13px 15px; border: 1px solid var(--line); border-radius: 10px; text-align: left; background: #fff; cursor: pointer; }
+    .result-card:hover { border-color: #9cb9cf; box-shadow: var(--shadow); }
+    .result-path { margin-bottom: 5px; color: var(--blue); font-size: 12px; font-weight: 700; }
+    .result-text { color: var(--ink); font-size: 14px; line-height: 1.55; }
+    mark { padding: 0 .08em; color: inherit; background: #ffeda8; }
+
+    .practice-panel {
+      position: fixed;
+      z-index: 90;
+      inset: var(--topbar) 0 0 auto;
+      width: min(480px, 100vw);
+      padding: 24px;
+      overflow: auto;
+      border-left: 1px solid var(--line);
+      background: #fff;
+      box-shadow: -18px 0 45px rgba(23, 62, 99, .18);
+      transform: translateX(105%);
+      transition: transform .23s ease;
+    }
+    .practice-panel.open { transform: translateX(0); }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h2 { margin: 0; color: var(--blue-deep); font-size: 24px; }
+    .close-button { width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 9px; background: #fff; cursor: pointer; }
+    .practice-question { min-height: 125px; margin: 20px 0 14px; padding: 18px; border: 1px solid #b8d2e5; border-radius: 12px; color: var(--blue-deep); background: var(--blue-soft); font-size: 20px; line-height: 1.48; }
+    .timer-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .timer { display: grid; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: var(--blue-deep); background: #fff; font-size: 22px; font-variant-numeric: tabular-nums; }
+    .timer.warning { color: #a35d20; background: #fff7e8; }
+    .timer-row button { min-height: 48px; border: 1px solid var(--line); border-radius: 10px; background: #fff; cursor: pointer; }
+    .timer-row button.primary { border-color: var(--blue); color: #fff; background: var(--blue); }
+    .outline-label { display: block; margin: 20px 0 7px; color: var(--blue-deep); font-size: 13px; font-weight: 800; }
+    .practice-panel textarea { width: 100%; min-height: 190px; resize: vertical; padding: 13px; border: 1px solid var(--line); border-radius: 10px; line-height: 1.6; }
+    .outline-hint { margin-top: 7px; color: var(--muted); font-size: 12px; }
+    .overlay { position: fixed; z-index: 55; inset: 0; display: none; background: rgba(16, 26, 36, .42); }
+    .overlay.active { display: block; }
+
+    .focus-mode .chapter p { color: #596774; }
+    .focus-mode .chapter strong, .focus-mode .chapter h2, .focus-mode .chapter h3, .focus-mode .topic-card summary { color: #0d5d81; }
+    .focus-mode .chapter li::marker { color: var(--gold); }
+    .focus-mode .chapter table { box-shadow: 0 0 0 2px rgba(180,129,42,.15); }
+
+    .mobile-drawer-close { display: none; }
+
+    @media (max-width: 880px) {
+      :root { --sidebar: 0px; --reading-size: 16px; }
+      .topbar { left: 0; padding: 0 12px; }
+      .menu-button { display: inline-grid; place-items: center; }
+      .topbar-title { display: none; }
+      .sidebar { width: min(310px, 88vw); transform: translateX(-105%); transition: transform .22s ease; }
+      .sidebar.open { transform: translateX(0); }
+      .mobile-drawer-close { display: block; position: absolute; top: 16px; right: 14px; width: 36px; height: 36px; border: 0; border-radius: 8px; background: var(--blue-pale); cursor: pointer; }
+      .app { margin-left: 0; }
+      .hero { padding: 38px 20px 14px; }
+      .content-shell { padding: 14px 18px 60px; }
+      .chapter-head { align-items: flex-start; }
+      .chapter-head h2 { font-size: 27px; }
+      .review-button { min-width: auto; }
+      .chapter table { display: block; overflow-x: auto; white-space: normal; }
+      .practice-panel { top: 0; padding-top: 18px; }
+    }
+
+    @media (max-width: 560px) {
+      .top-actions .desktop-only { display: none; }
+      .hero h2 { font-size: 34px; }
+      .hero p { font-size: 15px; }
+      .chapter-head { display: block; }
+      .review-button { margin-top: 12px; }
+      .timer-row { grid-template-columns: 1fr 1fr; }
+      .timer { grid-column: 1 / -1; min-height: 55px; }
+    }
+
+    @media print {
+      :root { --reading-size: 11pt; }
+      body { background: #fff; }
+      .sidebar, .topbar, .hero, .practice-panel, .overlay, .review-button { display: none !important; }
+      .app { margin: 0; padding: 0; }
+      .content-shell { max-width: none; padding: 0; }
+      .chapter { display: block !important; break-before: page; }
+      .chapter:first-child { break-before: auto; }
+      .chapter-head { margin-top: 0; }
+      .topic-card { break-inside: avoid; box-shadow: none; }
+      .topic-card summary { border-bottom: 1px solid var(--line); }
+      .topic-card-body { display: block !important; }
+      .chapter table { break-inside: avoid; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="sidebar" id="sidebar" aria-label="章节导航">
+    <button class="mobile-drawer-close" id="drawerClose" type="button" aria-label="关闭导航">×</button>
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <h1>雅思口语 Part 3<br>复习资料</h1>
+      <p>逻辑优先 · 可说性优先</p>
+    </div>
+    <label class="search-box">
+      <span class="sr-only">搜索内容</span>
+      <input id="searchInput" type="search" placeholder="搜索题型、话题或表达" autocomplete="off">
+      <span class="search-key">⌘K</span>
+    </label>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>复习进度</span><span id="progressText">0 / 0</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <nav class="nav-list" id="navList">
+<button class="nav-item global-nav" type="button" data-target="全局工具-a-衔接方式-part-1-3-通用"><span class="nav-index">01</span><span class="nav-label"><small>全局</small>衔接方式</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item global-nav" type="button" data-target="全局工具-b-同义替换-part-1-3-通用"><span class="nav-index">02</span><span class="nav-label"><small>全局</small>同义替换</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="1-页核心"><span class="nav-index">03</span><span class="nav-label">1 页核心</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="一-7-类题型-听到问题后该做什么"><span class="nav-index">04</span><span class="nav-label">一、7 类题型</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="二-怎么展开-横向与纵向"><span class="nav-index">05</span><span class="nav-label">二、怎么展开</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="三-10-个通用角度-把零散-万能维度-合并成可用逻辑"><span class="nav-index">06</span><span class="nav-label">三、10 个通用角度</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="四-12-个主题观点库"><span class="nav-index">07</span><span class="nav-label">四、12 个主题观点库</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="五-常见比较题-先锁定同一维度"><span class="nav-index">08</span><span class="nav-label">五、常见比较题</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="六-常见利弊对象-压缩记忆版"><span class="nav-index">09</span><span class="nav-label">六、常见利弊对象</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="七-part-3-真正需要的语法"><span class="nav-index">10</span><span class="nav-label">七、Part 3 真正需要的语法</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="八-自然表达库-够用-不堆砌"><span class="nav-index">11</span><span class="nav-label">八、自然表达库</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="九-精选示范-只看逻辑-不背全文"><span class="nav-index">12</span><span class="nav-label">九、精选示范</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="十-练习与复盘方法"><span class="nav-index">13</span><span class="nav-label">十、练习与复盘方法</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="十一-覆盖题型的练习题"><span class="nav-index">14</span><span class="nav-label">十一、覆盖题型的练习题</span><span class="nav-check" aria-hidden="true">✓</span></button>
+<button class="nav-item" type="button" data-target="十二-原资料如何被合并"><span class="nav-index">15</span><span class="nav-label">十二、原资料如何被合并</span><span class="nav-check" aria-hidden="true">✓</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="practice-entry" id="openPractice" type="button">随机题 · 40 秒练习</button>
+    </div>
+  </aside>
+
+  <header class="topbar">
+    <button class="icon-button menu-button" id="menuButton" type="button" aria-label="打开章节导航">☰</button>
+    <div class="topbar-title">当前：<strong id="currentTitle">全局工具</strong></div>
+    <div class="top-actions">
+      <button class="text-button desktop-only" id="focusToggle" type="button" aria-pressed="false">重点模式</button>
+      <button class="icon-button" id="fontDown" type="button" aria-label="缩小字号">−</button>
+      <button class="icon-button" id="fontUp" type="button" aria-label="放大字号">＋</button>
+      <button class="text-button desktop-only" id="printButton" type="button">打印</button>
+    </div>
+  </header>
+
+  <div class="app">
+    <section class="hero">
+      <p class="eyebrow">IELTS Speaking</p>
+      <h2>听懂题型，选一个角度，把一条逻辑说完整。</h2>
+      <p>把 9 份资料去重、纠错并重新组织。例题只在需要示范展开方式的地方出现，不用背整篇答案。</p>
+      <div class="hero-tags" aria-label="内容概览">
+        <button class="hero-tag jump-button" type="button" data-jump="全局工具 A">Part 1–3 全局工具</button>
+        <button class="hero-tag jump-button" type="button" data-jump="7 类题型">7 类题型</button>
+        <button class="hero-tag jump-button" type="button" data-jump="10 个通用角度">10 个通用角度</button>
+        <button class="hero-tag jump-button" type="button" data-jump="12 个主题观点库">12 个主题观点库</button>
+        <button class="hero-tag" id="heroPractice" type="button">随机计时练习</button>
+      </div>
+    </section>
+
+    <main class="content-shell" id="main">
+      <section class="search-results" id="searchResults" aria-live="polite">
+        <div class="search-title"><h2>搜索结果</h2><span id="resultCount"></span></div>
+        <div id="resultList"></div>
+      </section>
+      <article id="content">
+<h2 id="全局工具-a衔接方式part-13-通用">全局工具 A｜衔接方式（Part 1–3 通用）</h2>
+<h3 id="使用原则先自然再变化">使用原则：先自然，再变化</h3>
+<p>衔接词的功能是让听者看懂关系，不是展示词汇量。日常口语里，<strong>and / also / but / because / so / then</strong> 本来就是主力。每次只选一个最准确的关系，不要在一句话里堆 <em>moreover, furthermore, additionally</em>。</p>
+<table>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>第一选择：最自然</th>
+<th>需要变化时</th>
+<th>慎用或不建议</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>补充</td>
+<td>and, also, besides</td>
+<td>what's more, in addition</td>
+<td>moreover, furthermore（偏书面）</td>
+</tr>
+<tr class="even">
+<td>转折</td>
+<td>but, while, however</td>
+<td>whereas, by contrast, that said</td>
+<td>conversely（容易用错逻辑）</td>
+</tr>
+<tr class="odd">
+<td>原因</td>
+<td>because, since</td>
+<td>mainly because, one reason is that</td>
+<td>owing to the fact that, for the reason that（冗长）</td>
+</tr>
+<tr class="even">
+<td>结果</td>
+<td>so, which means</td>
+<td>as a result, this can lead to</td>
+<td>consequently（口语中通常没必要）</td>
+</tr>
+<tr class="odd">
+<td>举例</td>
+<td>for example, like</td>
+<td>a common example is, especially</td>
+<td>notably（偏正式）</td>
+</tr>
+<tr class="even">
+<td>相似</td>
+<td>similarly, in the same way</td>
+<td>both A and B…</td>
+<td>equally（很多语境不自然）</td>
+</tr>
+<tr class="odd">
+<td>目的</td>
+<td>to, so that</td>
+<td>in order to</td>
+<td>lest, for the purpose of（生硬或过时）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="开场表态">开场表态</h3>
+<ul>
+<li>明确肯定：Definitely. / I think so. / Yes, in most cases.</li>
+<li>委婉否定：Not really. / Probably not. / I don't think so.</li>
+<li>部分同意：To some extent, yes. / Kind of, but…</li>
+<li>分情况：It depends. If…, I tend to…; but if…, I usually…</li>
+<li>暂时没想法：I'm not completely sure, but I'd imagine…</li>
+</ul>
+<p>Part 1 可以更直接、更个人化；Part 3 再补一层原因或条件。不要每次都用 <em>As a matter of fact</em> 或 <em>To be honest</em> 开头。</p>
+<h3 id="原因结果与让步">原因、结果与让步</h3>
+<ul>
+<li>The main reason is that…</li>
+<li>One reason is that…</li>
+<li>I mainly do it because…</li>
+<li>This means… / So… / As a result,…</li>
+<li>That said,… / However, that doesn't mean…</li>
+</ul>
+<p>不建议把简单原因包装成 <em>The primary factor behind my preference is that…</em>。这类句子语法可以，但背诵感强，而且会拖慢开口。</p>
+<h3 id="时间推进part-2-最常用">时间推进：Part 2 最常用</h3>
+<ul>
+<li>开始：At first… / To start with…</li>
+<li>下一步：Then… / After that… / A little later…</li>
+<li>同时：Meanwhile,… / While I was…, my friend was…</li>
+<li>最后：Eventually… / In the end… / Finally…</li>
+<li>长期变化：Over time… / As time went by… / Since then…</li>
+<li>偶尔：occasionally / from time to time / every now and then</li>
+</ul>
+<p>注意：<em>subsequently</em> 并不是“适合 Part 3 的高级替换”，而是偏正式的时间连接。讲个人经历时，<em>then</em> 和 <em>after that</em> 往往更自然。</p>
+<h3 id="偏好与分情况选择">偏好与分情况选择</h3>
+<ul>
+<li>I prefer A to B.</li>
+<li>I prefer to do A rather than do B.</li>
+<li>I'd rather choose A than B.</li>
+<li>I'm more likely to choose A because…</li>
+<li>It depends on the situation. For…, I prefer A; but for…, I usually choose B.</li>
+</ul>
+<p>易错：不是笼统的 <em>I prefer A rather than B</em>。名词比较用 <strong>prefer A to B</strong>；动作比较用 <strong>prefer to do A rather than do B</strong>。</p>
+<h3 id="频率与习惯">频率与习惯</h3>
+<ul>
+<li>经常：usually / often / quite often / on a regular basis</li>
+<li>偶尔：sometimes / occasionally / once in a while</li>
+<li>很少：rarely / hardly ever / only when…</li>
+<li>过去习惯：I used to… / When I was younger, I would often…</li>
+</ul>
+<p>避免重复：<em>I tend to… on a regular basis</em> 和 <em>I frequently… whenever I have free time</em> 容易把两个频率表达叠在一起。保留一个就够。</p>
+<h3 id="经历补充">经历补充</h3>
+<ul>
+<li>Yes, I have. I once…</li>
+<li>The last time I… was…</li>
+<li>At first…, but later I realised…</li>
+<li>What made it memorable was that…</li>
+<li>It made me feel…, which is why…</li>
+</ul>
+<p><em>I've had the experience of…</em> 通常比 <em>I've done it a few times</em> 更僵硬。优先使用简单表达。</p>
+<h2 id="全局工具-b同义替换part-13-通用">全局工具 B｜同义替换（Part 1–3 通用）</h2>
+<h3 id="替换原则不是越高级越好">替换原则：不是越“高级”越好</h3>
+<p>同义词很少完全同义。复习时要同时记住三个信息：强度、语气和使用对象。基础词如果已经准确，不需要强行替换；同一答案自然换一次即可。</p>
+<h3 id="1-like--enjoy">1. Like / Enjoy</h3>
+<table>
+<thead>
+<tr class="header">
+<th>表达</th>
+<th>语气与边界</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>I like… / I enjoy…</td>
+<td>最中性、最稳，不需要刻意避开</td>
+</tr>
+<tr class="even">
+<td>I'm really into…</td>
+<td>自然口语；表示很感兴趣</td>
+</tr>
+<tr class="odd">
+<td>I'm a big fan of…</td>
+<td>自然口语；适合活动、作品、人物或事物</td>
+</tr>
+<tr class="even">
+<td>I'm quite keen on…</td>
+<td>稍偏英式；表示喜欢或热衷</td>
+</tr>
+<tr class="odd">
+<td>I'm quite fond of…</td>
+<td>语气温和，常带长期好感</td>
+</tr>
+<tr class="even">
+<td>I'm hooked on…</td>
+<td>接近“上瘾、停不下来”，强度高，不能只当 like</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-dislike">2. Dislike</h3>
+<table>
+<thead>
+<tr class="header">
+<th>表达</th>
+<th>语气与边界</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>I don't really like…</td>
+<td>温和、通用</td>
+</tr>
+<tr class="even">
+<td>I'm not a big fan of…</td>
+<td>自然委婉</td>
+</tr>
+<tr class="odd">
+<td>I'm not really into…</td>
+<td>对某种活动或兴趣不着迷</td>
+</tr>
+<tr class="even">
+<td>It's not my cup of tea.</td>
+<td>口语化；表示“不合我口味”</td>
+</tr>
+<tr class="odd">
+<td>I can't stand…</td>
+<td>很强，表示“受不了”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-popular--common">3. Popular / Common</h3>
+<table>
+<thead>
+<tr class="header">
+<th>表达</th>
+<th>语气与边界</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>popular / common</td>
+<td>最通用；两者分别强调“受欢迎”和“常见”</td>
+</tr>
+<tr class="even">
+<td>widespread</td>
+<td>强调分布广、现象普遍，不等于受欢迎</td>
+</tr>
+<tr class="odd">
+<td>a hit among…</td>
+<td>在某一群体中很成功、很受欢迎</td>
+</tr>
+<tr class="even">
+<td>all the rage</td>
+<td>一时非常流行，带潮流感</td>
+</tr>
+<tr class="odd">
+<td>a dime a dozen</td>
+<td>数量多且不稀罕，带贬义；不能只当 common</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4-important">4. Important</h3>
+<table>
+<thead>
+<tr class="header">
+<th>表达</th>
+<th>语气与边界</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>important</td>
+<td>最自然的通用词</td>
+</tr>
+<tr class="even">
+<td>essential</td>
+<td>必不可少</td>
+</tr>
+<tr class="odd">
+<td>crucial</td>
+<td>对结果至关重要</td>
+</tr>
+<tr class="even">
+<td>play a vital role in…</td>
+<td>在某个过程里发挥关键作用</td>
+</tr>
+<tr class="odd">
+<td>a top priority</td>
+<td>需要优先处理的事项；不是所有 important 都能替换</td>
+</tr>
+</tbody>
+</table>
+<h3 id="5-change">5. Change</h3>
+<ul>
+<li>change a lot：最自然。</li>
+<li>evolve over time：逐渐演变。</li>
+<li>undergo major changes：经历较大的变化，稍正式。</li>
+<li>be completely different from what it used to be：强调今昔差异。</li>
+</ul>
+<p><em>undergo dramatic changes</em> 只有变化确实巨大时才成立，不要把普通变化都说成“翻天覆地”。</p>
+<h3 id="6-relaxing">6. Relaxing</h3>
+<ul>
+<li>relaxing：通用。</li>
+<li>calming：让情绪平静。</li>
+<li>soothing：舒缓，常用于音乐、声音、气氛。</li>
+<li>a good way to unwind：帮助人在忙碌后放松。</li>
+<li>stress-relieving：减压的，常修饰 activity / effect。</li>
+</ul>
+<h3 id="7-difficult--hard">7. Difficult / Hard</h3>
+<ul>
+<li>difficult / hard：通用。</li>
+<li>tricky：有点棘手，需要技巧或判断。</li>
+<li>tough：过程艰难、要求高。</li>
+<li>challenging：有难度，但可能带来成长，语气不一定负面。</li>
+</ul>
+<h3 id="8-interesting--fun">8. Interesting / Fun</h3>
+<ul>
+<li>interesting：通用。</li>
+<li>engaging：让人持续投入注意力。</li>
+<li>fascinating：非常吸引人，引发好奇。</li>
+<li>captivating：强烈吸引注意，常用于故事、表演或风景。</li>
+<li>amusing：好笑、逗人，不等于所有“有趣”。</li>
+</ul>
+<h3 id="9-beautiful">9. Beautiful</h3>
+<ul>
+<li>beautiful：通用。</li>
+<li>stunning：非常漂亮、令人惊艳。</li>
+<li>picturesque：风景如画，常用于地方和景色。</li>
+<li>breathtaking：美得令人震撼，强度很高。</li>
+</ul>
+<h3 id="10-busy">10. Busy</h3>
+<ul>
+<li>busy：最通用。</li>
+<li>have a hectic schedule：日程紧、节奏忙乱。</li>
+<li>be snowed under with work：工作堆积很多，口语化。</li>
+<li>be up to my neck in work：忙得不可开交，较口语，强度高。</li>
+</ul>
+<h3 id="最小替换策略">最小替换策略</h3>
+<p>一段回答只做一两处准确替换：</p>
+<ul>
+<li>I like walking because it is relaxing.</li>
+<li>I'm quite fond of walking because it helps me unwind after work.</li>
+</ul>
+<p>第二句更具体，不是因为词更难，而是 <strong>fond of</strong> 表示稳定喜好，<strong>unwind after work</strong> 说明了“如何放松”。</p>
+<h2 id="1-页核心">1 页核心</h2>
+<h3 id="part-3-到底考什么">Part 3 到底考什么</h3>
+<p>Part 3 不是知识竞赛，也没有标准立场。考官主要听四件事：有没有直接回答、观点能否解释、逻辑能否继续、语言是否自然清楚。</p>
+<h3 id="默认回答结构">默认回答结构</h3>
+<p><strong>Answer → Reason → Optional move</strong></p>
+<ol type="1">
+<li>Answer：先给结论，不绕题。</li>
+<li>Reason：解释为什么，通常只选一个主要原因。</li>
+<li>Optional move：按需要补例子、结果、对比或条件；不必每项都说。</li>
+</ol>
+<p>原资料中的 AREA 可以保留为检查工具，但不要机械说满四步：</p>
+<table>
+<thead>
+<tr class="header">
+<th>步骤</th>
+<th>功能</th>
+<th>是否必需</th>
+<th>自然表达</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A — Answer</td>
+<td>直接回答</td>
+<td>必需</td>
+<td>I think… / Probably, yes. / Not necessarily.</td>
+</tr>
+<tr class="even">
+<td>R — Reason</td>
+<td>解释主要原因</td>
+<td>通常必需</td>
+<td>Mainly because… / One reason is that…</td>
+</tr>
+<tr class="odd">
+<td>E — Example</td>
+<td>举一个常见情境</td>
+<td>可选</td>
+<td>For example… / A common example is…</td>
+</tr>
+<tr class="even">
+<td>A/X — Alternative / Result</td>
+<td>让步、条件或结果</td>
+<td>可选</td>
+<td>However… / It depends on… / As a result…</td>
+</tr>
+</tbody>
+</table>
+<h3 id="长度控制">长度控制</h3>
+<ul>
+<li>短答：2–3 句，约 15–25 秒。适合问题简单或已经答得完整。</li>
+<li>标准答：3–5 句，约 25–40 秒。大多数题用这一档。</li>
+<li>延伸答：约 40–50 秒。只在题目宽、逻辑确实需要展开时使用。</li>
+</ul>
+<p>不要为了时间说 3–5 个长句。更稳的做法是：一句只承担一个功能，短句为主，适当使用 because、which、while、so。</p>
+<h3 id="开口前的-10-秒思路">开口前的 10 秒思路</h3>
+<ol type="1">
+<li>这是什么题型？</li>
+<li>题目里的抽象词能拆成什么？</li>
+<li>我只说哪一个主角度？</li>
+<li>是横向比较，还是纵向深挖？</li>
+</ol>
+<p>一句口诀：<strong>题目宽就拆，理由浅就深；能说清就停。</strong></p>
+<h2 id="一7-类题型听到问题后该做什么">一、7 类题型：听到问题后该做什么</h2>
+<table>
+<thead>
+<tr class="header">
+<th>题型</th>
+<th>常见问法</th>
+<th>最短逻辑</th>
+<th>容易跑偏的地方</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>观点 / 重要性</td>
+<td>Do you think…? Is it important…?</td>
+<td>立场 → 原因 → 条件或结果</td>
+<td>只说 Yes/No；重复题干</td>
+</tr>
+<tr class="even">
+<td>原因</td>
+<td>Why do people…? What causes…?</td>
+<td>主要原因 → 机制 → 结果</td>
+<td>罗列很多原因，却没有解释</td>
+</tr>
+<tr class="odd">
+<td>利弊 / 影响</td>
+<td>What are the benefits and drawbacks…? How does X affect…?</td>
+<td>一项主要好处 → 一项主要问题；或只深挖题目要求的一边</td>
+<td>每边列三点，全部停在关键词</td>
+</tr>
+<tr class="even">
+<td>比较</td>
+<td>What are the differences between A and B?</td>
+<td>先定同一比较维度 → A → B → 差异来源</td>
+<td>A 说价格，B 说情感，比较维度不一致</td>
+</tr>
+<tr class="odd">
+<td>变化</td>
+<td>How has X changed? Compared with the past…?</td>
+<td>过去 → 现在 → 变化原因 / 影响</td>
+<td>只描述现在；时态不切换</td>
+</tr>
+<tr class="even">
+<td>预测</td>
+<td>Will…? How will… change?</td>
+<td>可能性判断 → 依据 → 保留条件</td>
+<td>说得过于绝对；把预测当事实</td>
+</tr>
+<tr class="odd">
+<td>解决问题</td>
+<td>How can…? What should… do?</td>
+<td>措施 → 为什么有效 → 预期结果</td>
+<td>只说 government should do something</td>
+</tr>
+</tbody>
+</table>
+<h3 id="各题型的自然骨架">各题型的自然骨架</h3>
+<p><strong>观点</strong></p>
+<p>I think it is important, mainly because…<br />
+That said, it depends on…</p>
+<p><strong>原因</strong></p>
+<p>I think the main reason is…<br />
+This means…<br />
+So…</p>
+<p><strong>利弊</strong></p>
+<p>The main benefit is…<br />
+The downside is…<br />
+So it really depends on how…</p>
+<p><strong>比较</strong></p>
+<p>The main difference is…<br />
+A tends to…, while B is more likely to…<br />
+That probably comes from…</p>
+<p><strong>变化</strong></p>
+<p>In the past, people used to…<br />
+Now, they are more likely to…<br />
+This change is mainly due to…</p>
+<p><strong>预测</strong></p>
+<p>I'd imagine that…<br />
+If…, it is likely that…<br />
+But I don't think… will disappear completely.</p>
+<p><strong>解决问题</strong></p>
+<p>One practical way would be to…<br />
+This would…<br />
+As a result,…</p>
+<h3 id="例比较题只比较一个维度">例：比较题只比较一个维度</h3>
+<p><strong>What are the differences between old and young people when using apps?</strong></p>
+<p>Young people tend to use a wider range of apps, especially for entertainment and social media. Older people are more likely to use them for practical purposes, such as messaging family members or checking the weather. I think this mainly comes from their different lifestyles and levels of familiarity with technology.</p>
+<h2 id="二怎么展开横向与纵向">二、怎么展开：横向与纵向</h2>
+<h3 id="1-横向展开把宽题拆开">1. 横向展开：把宽题拆开</h3>
+<p>适合题目范围很大、一个结论无法覆盖全部情况时。常用拆法：</p>
+<ul>
+<li>人群：children / young adults / working people / older people</li>
+<li>时间：past / present / future</li>
+<li>场景：online / face-to-face；urban / rural；work / home</li>
+<li>利益相关者：individuals / businesses / government / local communities</li>
+<li>层面：economic / social / environmental / psychological</li>
+</ul>
+<p>横向展开不是“再找一个随机理由”，而是在同一问题下换一个清晰维度。</p>
+<h3 id="2-纵向展开把一个理由说透">2. 纵向展开：把一个理由说透</h3>
+<p>最稳的因果链：</p>
+<p><strong>现象 / 原因 → 它如何影响人 → 最终结果</strong></p>
+<p>可以连续问自己：</p>
+<ul>
+<li>What：真正的问题是什么？</li>
+<li>How / Why：它通过什么过程产生影响？</li>
+<li>Result：最后带来什么结果？</li>
+</ul>
+<h3 id="例纵向深挖不强行举例">例：纵向深挖，不强行举例</h3>
+<p><strong>Why is it difficult for some people to relax?</strong></p>
+<p>I think it is mainly because of work pressure. Many people still receive messages and emails after work, so the boundary between work and personal life becomes blurred. Even when they have free time, they feel that they should stay available. As a result, they find it hard to switch off mentally.</p>
+<h3 id="3-什么时候组合两种方法">3. 什么时候组合两种方法</h3>
+<p>只有当题目既宽又需要深度时，先横向选范围，再纵向说透其中一点。例如先区分学生和上班族，再只深挖上班族的信息过载。不要同时展开三类人、四条因果链。</p>
+<h2 id="三10-个通用角度把零散万能维度合并成可用逻辑">三、10 个通用角度：把零散“万能维度”合并成可用逻辑</h2>
+<h3 id="1-效率与可及性-efficiency--accessibility">1. 效率与可及性 Efficiency &amp; Accessibility</h3>
+<p>常见话题：科技、交通、购物、App、远程工作、线上服务。</p>
+<p>核心链：减少步骤 / 打破距离限制 → 节省时间和精力 → 提高效率。</p>
+<p>核心表达：save time and effort；make something easier to access；work or study remotely；improve efficiency；at the touch of a button。</p>
+<p>边界：不要说 <em>break the limit of space</em>。更自然的是 <em>remove geographical barriers</em> 或 <em>stay connected across long distances</em>。</p>
+<h3 id="2-成本与实用性-cost--practicality">2. 成本与实用性 Cost &amp; Practicality</h3>
+<p>常见话题：消费、课程、职业、政府支出、住房、交通。</p>
+<p>核心链：预算有限 → 比较价格、耐用性和长期回报 → 选择更实际的方案。</p>
+<p>核心表达：affordable；cost-effective；a financial burden；practical value；a long-term investment；worth the money。</p>
+<h3 id="3-压力补偿与休息-pressure--recovery">3. 压力、补偿与休息 Pressure &amp; Recovery</h3>
+<p>常见话题：娱乐、购物、运动、旅行、工作习惯。</p>
+<p>核心链：竞争 / 工作负担 → 焦虑或疲惫 → 寻找放松、奖励或逃离日常的方式。</p>
+<p>核心表达：work pressure；feel overwhelmed；unwind after a long day；take a break；escape from the daily routine；burnout。</p>
+<p>边界：<em>decompress</em> 能理解，但日常口语用 <em>unwind</em> 或 <em>switch off</em> 更自然。</p>
+<h3 id="4-身心健康与平衡-health--well-being">4. 身心健康与平衡 Health &amp; Well-being</h3>
+<p>常见话题：锻炼、饮食、睡眠、户外活动、城市生活、课程设置。</p>
+<p>核心链：习惯影响身体和情绪 → 影响精力、专注与长期健康 → 需要可持续的平衡。</p>
+<p>核心表达：physical and mental well-being；lead an active lifestyle；improve sleep quality；reduce the risk of disease；maintain a work-life balance。</p>
+<h3 id="5-社交连接与沟通-social-connection">5. 社交连接与沟通 Social Connection</h3>
+<p>常见话题：朋友、社交媒体、团队、公共空间、家庭、跨文化交流。</p>
+<p>核心链：互动 → 建立信任与归属感 → 获得陪伴、支持或合作效率。</p>
+<p>核心表达：emotional support；a sense of belonging；build trust；face-to-face interaction；body language；broaden one's social circle。</p>
+<h3 id="6-身份地位与消费-identity--consumerism">6. 身份、地位与消费 Identity &amp; Consumerism</h3>
+<p>常见话题：品牌、奢侈品、流行趋势、明星代言、社交媒体。</p>
+<p>核心链：同伴和公众目光 → 希望融入或展示自我 → 跟风、购买或经营线上形象。</p>
+<p>核心表达：fit in；peer influence；social recognition；status symbol；self-image；stimulate the desire to buy；over-consumption。</p>
+<p>边界：不能把所有消费都归因于“炫耀”。先考虑功能、价格和真实需求，再判断身份因素是否成立。</p>
+<h3 id="7-学习成长与个人品质-learning--growth">7. 学习、成长与个人品质 Learning &amp; Growth</h3>
+<p>常见话题：教育、终身学习、科学、职业、领导力、成功。</p>
+<p>核心链：兴趣与实践 → 形成技能、独立思考或韧性 → 适应未来变化。</p>
+<p>核心表达：curiosity；hands-on practice；critical thinking；lifelong learning；adapt to change；perseverance；step outside one's comfort zone。</p>
+<h3 id="8-情感记忆与文化-emotion--heritage">8. 情感、记忆与文化 Emotion &amp; Heritage</h3>
+<p>常见话题：旧物、传统节日、家庭食物、老建筑、礼物、家乡。</p>
+<p>核心链：物品或习俗承载记忆 → 连接家庭与文化根源 → 产生情感价值并被传承。</p>
+<p>核心表达：sentimental value；emotional attachment；bring back memories；cultural identity；pass traditions down；collective memory。</p>
+<h3 id="9-年龄成长环境与需求-generation--life-stage">9. 年龄、成长环境与需求 Generation &amp; Life Stage</h3>
+<p>常见话题：年轻人与老年人、App、娱乐、工作、住房、建议。</p>
+<p>核心链：成长环境和人生阶段不同 → 技术熟悉度、价值观和现实需求不同 → 行为偏好不同。</p>
+<p>常用对比：young people — novelty, convenience, self-expression；older people — stability, practicality, comfort, experience。</p>
+<p>边界：这是趋势，不是绝对事实。多用 <em>tend to</em>、<em>are more likely to</em>、<em>in many cases</em>。</p>
+<h3 id="10-公共利益政府与环境-public-interest">10. 公共利益、政府与环境 Public Interest</h3>
+<p>常见话题：法律、公共服务、环境、城市规划、教育、医疗。</p>
+<p>核心链：个人行为会影响他人 → 需要规则、基础设施或公共教育 → 提高安全、公平和长期可持续性。</p>
+<p>核心表达：public safety；fair access；public services；raise awareness；protect future generations；sustainable development；regulation。</p>
+<h2 id="四12-个主题观点库">四、12 个主题观点库</h2>
+<h3 id="1-法律规则与行为规范">1. 法律、规则与行为规范</h3>
+<p>先拆词：法律内容、执行方式、法律系统、新型违法行为。</p>
+<ul>
+<li>为什么需要：maintain order → reduce conflict → improve safety。</li>
+<li>为什么不遵守：lack of awareness；weak enforcement；personal convenience；peer influence。</li>
+<li>怎么改善：clear explanation；role models；education；reasonable rewards or punishment。</li>
+<li>科技的双向影响：digital records improve efficiency；cybercrime and online fraud create new legal challenges。</li>
+</ul>
+<p>可用表达：follow rules；protect people's rights；act as a deterrent；lead by example；develop self-discipline。</p>
+<p>注意：<em>set a deterrent</em> 不自然，应说 <em>act as a deterrent</em>。惩罚也不要直接说成唯一方案；教育通常更有长期效果。</p>
+<h3 id="2-教育学习与成长">2. 教育、学习与成长</h3>
+<p>先拆词：学校、教师、学生、考试、学习方式、课程内容。</p>
+<ul>
+<li>兴趣：enjoy the subject → stay engaged → practise voluntarily → learn faster。</li>
+<li>实践：repetition and hands-on activities → turn knowledge into usable skills。</li>
+<li>科技：online resources improve access and flexibility；但需要 self-discipline。</li>
+<li>终身学习：work changes quickly → workers update skills → remain competitive。</li>
+<li>儿童学得快：curiosity；more time；less fear of mistakes；greater brain plasticity。</li>
+</ul>
+<p>核心表达：stay engaged；learning environment；hands-on practice；online resources；lifelong learning；update one's skills。</p>
+<h3 id="3-科技ai-与社交媒体">3. 科技、AI 与社交媒体</h3>
+<ul>
+<li>好处：save time；automate repetitive tasks；access information；communicate across distance。</li>
+<li>风险：overreliance；privacy concerns；misinformation；information overload；job displacement。</li>
+<li>AI 学习：可帮助解释材料和整理思路；不能替代独立判断。</li>
+<li>社交媒体：保持联系和获取信息；但可能减少面对面互动，带来比较焦虑和低自尊。</li>
+</ul>
+<p>核心判断：科技不是天然好或坏，关键在于使用方式、对象和控制程度。</p>
+<h3 id="例带让步的观点题">例：带让步的观点题</h3>
+<p><strong>Do you think students are overly reliant on AI?</strong></p>
+<p>To some extent, yes. AI helps students find information quickly and can explain difficult ideas in a simpler way. However, some students ask it for answers before trying to solve a problem themselves. If that becomes a habit, their critical thinking may gradually weaken. So AI should support learning rather than replace thinking.</p>
+<h3 id="4-朋友人际关系与沟通">4. 朋友、人际关系与沟通</h3>
+<ul>
+<li>建立友谊：shared interests；similar experiences；frequent contact。</li>
+<li>维持友谊：trust；honesty；responsiveness；empathy。</li>
+<li>友谊功能：companionship；emotional support；advice；shared memories。</li>
+<li>关系变化：different life stages；work pressure；family responsibilities；growing apart。</li>
+<li>线上与线下：线上方便；线下能看到语气、表情和身体语言，情感信息更完整。</li>
+</ul>
+<h3 id="5-团队合作与领导力">5. 团队合作与领导力</h3>
+<ul>
+<li>团队优势：share the workload；combine different strengths；gain diverse perspectives；develop communication skills。</li>
+<li>团队问题：conflicting ideas；unequal contribution；slow decision-making。</li>
+<li>好领导：communicate goals clearly；listen；make decisions；assign tasks fairly；take responsibility。</li>
+<li>激励方式：specific feedback；recognition；reasonable rewards；clear direction。</li>
+</ul>
+<h3 id="6-商业工作与成功">6. 商业、工作与成功</h3>
+<ul>
+<li>成功因素：market demand；good management；innovation；financial planning；adaptation；persistence。</li>
+<li>失败原因：poor planning；lack of funding；strong competition；resistance to change；wrong decisions。</li>
+<li>创业动机：autonomy；income potential；passion；learning multiple skills。</li>
+<li>职业选择：interest improves motivation；但也要考虑 training, stability and career prospects。</li>
+</ul>
+<p>不要把成功只归因于努力。努力必须通过市场需求、资源、决策和时机才能转化成结果。</p>
+<h3 id="7-旅游城市与建筑">7. 旅游、城市与建筑</h3>
+<ul>
+<li>旅游动机：relaxation；cultural experience；learning；family bonding。</li>
+<li>旅游对地方：jobs and local spending；cultural promotion；同时可能有 congestion, pollution and pressure on local life。</li>
+<li>城市优势：jobs；education；healthcare；public transport；entertainment。</li>
+<li>城市问题：high cost of living；crowding；pollution；fast pace of life。</li>
+<li>高层建筑：save land；central location；modern facilities；但可能缺少空间、隐私或社区感。</li>
+<li>旅游计划：research → compare cost and location → book in advance → reduce uncertainty。</li>
+</ul>
+<h3 id="8-环境保护">8. 环境保护</h3>
+<ul>
+<li>为什么：public health；biodiversity；future generations；long-term sustainability。</li>
+<li>个人：reduce waste；recycle；use public transport；consume less。</li>
+<li>学校：build habits early；explain consequences；organise practical activities。</li>
+<li>政府：regulation；public transport；waste systems；incentives；enforcement。</li>
+</ul>
+<p>不要只说“提高意识”。要补一句意识如何变成行为，例如清晰分类设施让回收更容易。</p>
+<h3 id="9-媒体视频与广告">9. 媒体、视频与广告</h3>
+<ul>
+<li>视频：sound + images → easier to understand；convenient and engaging；但容易形成短注意力和信息过载。</li>
+<li>广告功能：inform consumers；build brand awareness；fund free media content。</li>
+<li>广告问题：misleading claims；repetition；privacy-based targeting；over-consumption。</li>
+<li>明星代言：attract attention；borrow trust from fans；不等于产品质量更好。</li>
+</ul>
+<h3 id="10-年轻人与老年人">10. 年轻人与老年人</h3>
+<p>比较时优先从四个来源解释：成长环境、价值观、生活需求、科技熟悉度。</p>
+<ul>
+<li>年轻人：exposed to more information；adaptable；seek novelty and self-expression；value speed and convenience。</li>
+<li>老年人：more life experience；value stability and practicality；may prefer comfort and quiet；可能面临 technology barriers。</li>
+<li>老年人的积极作用：advice；emotional support；cultural continuity。</li>
+<li>风险：不要把所有老人描述成保守、孤独或不会用科技。</li>
+</ul>
+<h3 id="11-家庭与儿童教育">11. 家庭与儿童教育</h3>
+<ul>
+<li>家长作用：guidance；emotional support；values；role modelling；financial support。</li>
+<li>儿童成长：independence；confidence；responsibility；communication；decision-making。</li>
+<li>支持理想：encouragement keeps children motivated；realistic advice prevents blind decisions。</li>
+<li>规则教育：explain the reason；lead by example；use consequences consistently。</li>
+</ul>
+<h3 id="12-生活习惯体育与节日食物">12. 生活习惯、体育与节日食物</h3>
+<ul>
+<li>早起 / 准时：preparation；time management；reliability；但无意义的过早到达会浪费时间。</li>
+<li>体育：physical health；stress relief；social interaction；community or national identity。</li>
+<li>看现场比赛：crowd atmosphere；shared excitement；connection with other fans。</li>
+<li>节日食物：family gathering；cultural identity；collective memory；special atmosphere。</li>
+</ul>
+<h2 id="五常见比较题先锁定同一维度">五、常见比较题：先锁定同一维度</h2>
+<table>
+<thead>
+<tr class="header">
+<th>领域</th>
+<th>A</th>
+<th>B</th>
+<th>最自然的差异来源</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>城市 vs 农村交通</td>
+<td>network extensive, efficient, crowded</td>
+<td>limited service, cars often necessary</td>
+<td>population density and infrastructure</td>
+</tr>
+<tr class="even">
+<td>过去 vs 现在交通</td>
+<td>walking, bicycles, fewer options</td>
+<td>high-speed rail, ride-hailing, mobile navigation</td>
+<td>technology and urban growth</td>
+</tr>
+<tr class="odd">
+<td>年轻 vs 老年休闲</td>
+<td>energetic, social, novelty-seeking</td>
+<td>lower-impact, familiar, quieter</td>
+<td>health, routine and interests</td>
+</tr>
+<tr class="even">
+<td>过去 vs 现在娱乐</td>
+<td>face-to-face activities, traditional games</td>
+<td>short videos, games, streaming</td>
+<td>device access and convenience</td>
+</tr>
+<tr class="odd">
+<td>线上 vs 线下学习</td>
+<td>flexible, accessible, needs self-discipline</td>
+<td>immediate feedback, social interaction</td>
+<td>location and level of supervision</td>
+</tr>
+<tr class="even">
+<td>实体店 vs 电商</td>
+<td>try products, receive them immediately</td>
+<td>wider choice, price comparison, reviews</td>
+<td>physical experience vs convenience</td>
+</tr>
+<tr class="odd">
+<td>城市 vs 小地方工作</td>
+<td>more opportunities and competition</td>
+<td>lower pressure, often fewer choices</td>
+<td>local economy and cost of living</td>
+</tr>
+<tr class="even">
+<td>过去 vs 现在沟通</td>
+<td>slower and more expensive</td>
+<td>instant and global</td>
+<td>internet and smartphones</td>
+</tr>
+</tbody>
+</table>
+<p>比较题的句法核心：<strong>A tends to…, while B is more likely to…</strong>。先说同一维度，再解释原因，不必把所有差异说完。</p>
+<h2 id="六常见利弊对象压缩记忆版">六、常见利弊对象：压缩记忆版</h2>
+<table>
+<thead>
+<tr class="header">
+<th>对象</th>
+<th>可用优点</th>
+<th>可用问题</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>儿童</td>
+<td>curiosity, creativity, quick learning, social development</td>
+<td>limited self-control, peer influence, online vulnerability</td>
+</tr>
+<tr class="even">
+<td>老年人</td>
+<td>experience, advice, emotional support, cultural knowledge</td>
+<td>health limits, loneliness, technology barriers</td>
+</tr>
+<tr class="odd">
+<td>全球化</td>
+<td>cultural exchange, jobs, investment, wider choice</td>
+<td>cultural homogenisation, pressure on local businesses</td>
+</tr>
+<tr class="even">
+<td>社交媒体</td>
+<td>instant communication, information access, networking</td>
+<td>misinformation, privacy risk, addiction, comparison anxiety</td>
+</tr>
+<tr class="odd">
+<td>大城市</td>
+<td>public services, education, jobs, transport</td>
+<td>high living costs, pollution, crowding, stress</td>
+</tr>
+<tr class="even">
+<td>广告</td>
+<td>product information, brand discovery, support for free content</td>
+<td>misleading claims, over-consumption, privacy concerns</td>
+</tr>
+</tbody>
+</table>
+<p>回答利弊题时不需要把表格全部背出。选最相关的一项好处和一项问题，各解释一步即可。</p>
+<h2 id="七part-3-真正需要的语法">七、Part 3 真正需要的语法</h2>
+<h3 id="1-名词性从句用于把观点说完整">1. 名词性从句：用于把观点说完整</h3>
+<ul>
+<li><strong>What matters most is whether…</strong>：最关键的是是否……</li>
+<li><strong>The main reason why… is that…</strong>：主要原因是……</li>
+<li><strong>The problem is that…</strong>：问题在于……</li>
+<li><strong>It depends on whether / who / where…</strong>：取决于是否 / 谁 / 哪里……</li>
+<li><strong>This shows how important… is.</strong>：这说明……有多重要。</li>
+</ul>
+<p>不要为了“升级”每题都用名词性从句。一个答案中自然出现一次已经足够。</p>
+<h3 id="2-比较结构">2. 比较结构</h3>
+<ul>
+<li>A tends to…, while B is more likely to…</li>
+<li>Compared with the past, people now…</li>
+<li>The main difference is that…</li>
+<li>A is more…, whereas B usually…</li>
+</ul>
+<h3 id="3-预测与保留语气">3. 预测与保留语气</h3>
+<ul>
+<li>may / might / could</li>
+<li>be likely to / be unlikely to</li>
+<li>tend to / in many cases</li>
+<li>I'd imagine that…</li>
+<li>It depends on how quickly…</li>
+</ul>
+<p>Part 3 谈社会群体时，保留语气比绝对断言更准确。</p>
+<h3 id="4-因果与结果">4. 因果与结果</h3>
+<ul>
+<li>because…</li>
+<li>which means…</li>
+<li>so…</li>
+<li>as a result…</li>
+<li>this can lead to…</li>
+</ul>
+<p>一个句子不要连续塞入 because + which + so。拆成两句通常更自然。</p>
+<h3 id="5-让步与限定">5. 让步与限定</h3>
+<ul>
+<li>That said,…</li>
+<li>However, that doesn't mean…</li>
+<li>To some extent,…</li>
+<li>It depends on the situation.</li>
+<li>This is especially true for…</li>
+</ul>
+<h3 id="6-高频错误修正">6. 高频错误修正</h3>
+<table>
+<thead>
+<tr class="header">
+<th>不稳或错误</th>
+<th>更自然 / 正确</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>What I like it is…</td>
+<td>What I like is… / What I like about it is…</td>
+</tr>
+<tr class="even">
+<td>The reason why… is because…</td>
+<td>The reason why… is that… / …because…</td>
+</tr>
+<tr class="odd">
+<td>I don't know whether to I buy it.</td>
+<td>I don't know whether to buy it.</td>
+</tr>
+<tr class="even">
+<td>I learned how communication.</td>
+<td>I learned how to communicate.</td>
+</tr>
+<tr class="odd">
+<td>break the limit of space</td>
+<td>remove geographical barriers</td>
+</tr>
+<tr class="even">
+<td>set a deterrent</td>
+<td>act as a deterrent</td>
+</tr>
+<tr class="odd">
+<td>low-esteem</td>
+<td>low self-esteem</td>
+</tr>
+<tr class="even">
+<td>over dependence</td>
+<td>overdependence / relying too much on…</td>
+</tr>
+<tr class="odd">
+<td>practical utilities</td>
+<td>practical value / usefulness</td>
+</tr>
+<tr class="even">
+<td>feedbacks / advices</td>
+<td>feedback / advice</td>
+</tr>
+</tbody>
+</table>
+<h2 id="八自然表达库够用不堆砌">八、自然表达库：够用，不堆砌</h2>
+<h3 id="直接回答">直接回答</h3>
+<p>I think so, mainly because…<br />
+Probably, yes.<br />
+Not necessarily.<br />
+To some extent, yes.<br />
+It really depends on…</p>
+<h3 id="解释原因">解释原因</h3>
+<p>The main reason is…<br />
+One possible reason is…<br />
+This is mainly because…<br />
+That probably comes from…</p>
+<h3 id="结果">结果</h3>
+<p>So…<br />
+As a result,…<br />
+This means…<br />
+Over time, this can lead to…</p>
+<h3 id="对比与让步">对比与让步</h3>
+<p>By contrast,…<br />
+While A…, B…<br />
+That said,…<br />
+However, that doesn't mean…</p>
+<h3 id="例子只在需要时使用">例子：只在需要时使用</h3>
+<p>For example,…<br />
+A common example is…<br />
+This is often the case when…</p>
+<h3 id="建议少用的背诵感表达">建议少用的“背诵感”表达</h3>
+<table>
+<thead>
+<tr class="header">
+<th>原表达</th>
+<th>建议替换</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>This phenomenon can be largely attributed to…</td>
+<td>This is mainly because…</td>
+</tr>
+<tr class="even">
+<td>It exerts a profound influence on…</td>
+<td>It has a major impact on…</td>
+</tr>
+<tr class="odd">
+<td>There is a striking difference…</td>
+<td>The main difference is…</td>
+</tr>
+<tr class="even">
+<td>It is a double-edged sword.</td>
+<td>It has clear benefits, but it also creates problems.</td>
+</tr>
+<tr class="odd">
+<td>From a cognitive / economic perspective…</td>
+<td>One possible benefit is… / Economically,…</td>
+</tr>
+</tbody>
+</table>
+<p>这些表达并非语法错误，但频繁使用会显得书面、模板化，也更容易拖长句子。</p>
+<h2 id="九精选示范只看逻辑不背全文">九、精选示范：只看逻辑，不背全文</h2>
+<h3 id="1-解决问题how-can-schools-encourage-students-to-take-more-interest-in-science">1. 解决问题｜How can schools encourage students to take more interest in science?</h3>
+<p>Schools could make science more practical. Students often lose interest when they only memorise terms and formulas. Simple experiments can show how scientific ideas work in real life. This may make the subject feel more relevant and easier to remember.</p>
+<p>逻辑：措施 → 当前问题 → 机制 → 结果。</p>
+<h3 id="2-利弊what-are-the-advantages-and-disadvantages-of-online-shopping">2. 利弊｜What are the advantages and disadvantages of online shopping?</h3>
+<p>The main advantage is convenience, because people can compare products and prices without travelling to a shop. However, they cannot always judge the quality from photos. This can lead to disappointment or unnecessary returns. So it is useful, but not ideal for every type of product.</p>
+<p>逻辑：一个好处 → 一个问题 → 限定结论。</p>
+<h3 id="3-预测will-robots-replace-teachers-in-the-future">3. 预测｜Will robots replace teachers in the future?</h3>
+<p>I think robots may take over some routine teaching tasks, such as checking exercises or explaining basic facts. They can do these jobs quickly and consistently. However, teachers also motivate students and respond to their emotions. Because of that, I don't think human teachers will be fully replaced.</p>
+<p>逻辑：部分会 → 为什么 → 不会完全替代 → 为什么。</p>
+<h3 id="4-规则do-you-think-school-rules-are-important">4. 规则｜Do you think school rules are important?</h3>
+<p>Yes, as long as the rules are reasonable. They help create a safe and organised learning environment. For instance, rules about attendance and classroom behaviour can reduce distractions. However, schools should also explain why a rule exists instead of expecting students to obey it blindly.</p>
+<p>逻辑：有条件的立场 → 好处 → 例子 → 限定。</p>
+<h3 id="5-广告why-are-many-advertisements-endorsed-by-celebrities">5. 广告｜Why are many advertisements endorsed by celebrities?</h3>
+<p>Mainly because celebrities attract attention. Fans may trust a product more simply because a celebrity recommends it. That can make the advertisement easier to remember and may increase sales. However, an endorsement does not prove that the product is good.</p>
+<p>逻辑：原因 → 心理机制 → 商业结果 → 反向限定。</p>
+<h2 id="十练习与复盘方法">十、练习与复盘方法</h2>
+<h3 id="每题的准备纸只写-4-行">每题的准备纸只写 4 行</h3>
+<ol type="1">
+<li>Type：题型</li>
+<li>Answer：一句结论</li>
+<li>Chain：原因 → 机制 → 结果</li>
+<li>Optional：例子 / 对比 / 条件，四选一</li>
+</ol>
+<h3 id="15-分钟练习法">15 分钟练习法</h3>
+<ol type="1">
+<li>随机选 3 题，每题用 10 秒列关键词。</li>
+<li>第一次录音，不看全文，控制在 25–40 秒。</li>
+<li>回听时只找一个最影响理解的问题：跑题、逻辑断裂、句子过长或语法错误。</li>
+<li>修改关键词，再录一次。不要整篇重写。</li>
+</ol>
+<h3 id="自检清单">自检清单</h3>
+<ul>
+<li>第一两句是否已经回答问题？</li>
+<li>每个观点后是否至少有一步解释？</li>
+<li>比较题是否使用同一维度？</li>
+<li>社会群体是否用了 tend to / may 等保留语气？</li>
+<li>是否把个人经历误当成普遍结论？</li>
+<li>例子是否真的推进逻辑，而不是重复观点？</li>
+<li>句子是否短到能自然说完？</li>
+<li>说清楚后是否及时停下？</li>
+</ul>
+<h2 id="十一覆盖题型的练习题">十一、覆盖题型的练习题</h2>
+<h3 id="观点--重要性">观点 / 重要性</h3>
+<ol type="1">
+<li>Is it important for children to learn how to cooperate with others?</li>
+<li>Should the government be responsible for protecting old buildings?</li>
+</ol>
+<h3 id="原因">原因</h3>
+<ol start="3" type="1">
+<li>Why do people buy things they do not need?</li>
+<li>Why do some people find it difficult to maintain a work-life balance?</li>
+</ol>
+<h3 id="利弊--影响">利弊 / 影响</h3>
+<ol start="5" type="1">
+<li>What are the advantages and disadvantages of being a famous child?</li>
+<li>What positive and negative effects does social media have on friendship?</li>
+</ol>
+<h3 id="比较">比较</h3>
+<ol start="7" type="1">
+<li>What are the differences between online and face-to-face communication?</li>
+<li>How are transport systems in urban and rural areas different?</li>
+</ol>
+<h3 id="变化--预测">变化 / 预测</h3>
+<ol start="9" type="1">
+<li>How have shopping habits changed because of the internet?</li>
+<li>Will people still read paper books in fifty years?</li>
+</ol>
+<h3 id="解决问题">解决问题</h3>
+<ol start="11" type="1">
+<li>How can employers help staff reduce work-related stress?</li>
+<li>How can cities preserve historic buildings while continuing to develop?</li>
+</ol>
+<h2 id="十二原资料如何被合并">十二、原资料如何被合并</h2>
+<ul>
+<li>《IELTS speaking lesson Part 3》：题型、AREA、横向与纵向展开。</li>
+<li>《Part 3 6 个延伸维度的语料》：六个通用维度与核心表达；删去重复词表，保留可说的表达。</li>
+<li>《Part 3 利弊类综合》：人群、全球化、社交媒体、城市、广告以及比较题素材。</li>
+<li>《Part 3 题型逻辑梳理 0411》：十二类主题观点库；作为较新的主版本。</li>
+<li>《Part 3 题型逻辑梳理 2》：用于交叉核对较早版本，补足被后续批注覆盖的内容。</li>
+<li>《语法》：只提取 Part 3 需要的名词性从句、比较、保留语气与高频错误。</li>
+<li>《雅思口语 Part 3 逻辑图》：社会压力、社交媒体、健康、代际、个人成长、儿童教育、科技、消费、社交、文化与政府责任等逻辑链；已合并进通用角度库。</li>
+<li>《衔接词大全》：筛选适合口语的衔接方式，按功能并入 Part 1–3 全局工具，删去过度书面或容易堆砌的表达。</li>
+<li>《雅思口语 词汇同意替换库》：按常见表达功能整合同义替换，并补充语域和搭配边界，避免机械替换。</li>
+</ul>
+<p>整合时删除了重复题目、过长词表和不自然模板；同时修正了原材料中明显的语法、搭配与单复数问题。</p>
+
+      </article>
+    </main>
+  </div>
+
+  <aside class="practice-panel" id="practicePanel" aria-hidden="true" aria-label="随机计时练习">
+    <div class="practice-head">
+      <h2>随机题 · 40 秒</h2>
+      <button class="close-button" id="closePractice" type="button" aria-label="关闭练习">×</button>
+    </div>
+    <div class="practice-question" id="practiceQuestion">点击“换一题”开始。</div>
+    <div class="timer-row">
+      <div class="timer" id="timer" aria-live="polite">0:40</div>
+      <button class="primary" id="timerButton" type="button">开始计时</button>
+      <button id="nextQuestion" type="button">换一题</button>
+    </div>
+    <label class="outline-label" for="outline">只写关键词，不写全文</label>
+    <textarea id="outline" placeholder="Type：&#10;Answer：&#10;Chain：原因 → 机制 → 结果&#10;Optional：例子 / 对比 / 条件"></textarea>
+    <p class="outline-hint">内容会保存在当前浏览器中。换题时不会清空。</p>
+  </aside>
+
+  <script>
+  (() => {
+    'use strict';
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+    const storage = {
+      get(key, fallback) { try { const value = localStorage.getItem(key); return value === null ? fallback : JSON.parse(value); } catch { return fallback; } },
+      set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} }
+    };
+
+    const content = $('#content');
+    const navItems = $$('.nav-item');
+    const searchInput = $('#searchInput');
+    const searchResults = $('#searchResults');
+    const resultList = $('#resultList');
+    const resultCount = $('#resultCount');
+    const overlay = $('#overlay');
+    const sidebar = $('#sidebar');
+    const practicePanel = $('#practicePanel');
+    const reviewed = new Set(storage.get('part3-reviewed', []));
+    let chapters = [];
+    let activeIndex = 0;
+    let timerId = null;
+    let seconds = 40;
+
+    function slug(text) {
+      return text.trim().toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    function groupChapters() {
+      const nodes = [...content.childNodes];
+      let current = null;
+      for (const node of nodes) {
+        if (node.nodeType === 1 && node.tagName === 'H2') {
+          const section = document.createElement('section');
+          section.className = 'chapter';
+          section.dataset.chapter = slug(node.textContent);
+          section.id = section.dataset.chapter;
+
+          const head = document.createElement('div');
+          head.className = 'chapter-head';
+          head.append(node);
+
+          const reviewButton = document.createElement('button');
+          reviewButton.type = 'button';
+          reviewButton.className = 'review-button';
+          reviewButton.textContent = '标记已复习';
+          reviewButton.addEventListener('click', () => toggleReviewed(section.dataset.chapter));
+          head.append(reviewButton);
+          section.append(head);
+          content.append(section);
+          current = section;
+        } else if (current) {
+          current.append(node);
+        } else if (node.nodeType === 1) {
+          node.remove();
+        }
+      }
+      chapters = $$('.chapter', content);
+      chapters.forEach(chapter => wrapTopicCards(chapter));
+    }
+
+    function wrapTopicCards(chapter) {
+      const headings = $$(':scope > h3', chapter);
+      headings.forEach((heading, index) => {
+        const details = document.createElement('details');
+        details.className = 'topic-card';
+        details.open = index === 0 && headings.length > 4;
+        const summary = document.createElement('summary');
+        summary.textContent = heading.textContent;
+        const body = document.createElement('div');
+        body.className = 'topic-card-body';
+        let node = heading.nextSibling;
+        while (node && !(node.nodeType === 1 && node.tagName === 'H3')) {
+          const next = node.nextSibling;
+          body.append(node);
+          node = next;
+        }
+        details.append(summary, body);
+        heading.replaceWith(details);
+      });
+    }
+
+    function setActiveChapter(target) {
+      const index = typeof target === 'number' ? target : chapters.findIndex(c => c.dataset.chapter === target);
+      activeIndex = index >= 0 ? index : 0;
+      navItems.forEach((item, i) => item.classList.toggle('active', i === activeIndex));
+      const title = $('h2', chapters[activeIndex])?.textContent || '';
+      $('#currentTitle').textContent = title;
+    }
+
+    function jumpToChapter(target, updateHash = true) {
+      setActiveChapter(target);
+      searchResults.classList.remove('active');
+      content.classList.remove('searching');
+      if (updateHash) history.replaceState(null, '', '#' + chapters[activeIndex].dataset.chapter);
+      setTimeout(() => chapters[activeIndex].scrollIntoView({behavior: 'smooth', block: 'start'}), 0);
+      closeDrawer();
+    }
+
+    function toggleReviewed(id) {
+      reviewed.has(id) ? reviewed.delete(id) : reviewed.add(id);
+      storage.set('part3-reviewed', [...reviewed]);
+      updateProgress();
+    }
+
+    function updateProgress() {
+      chapters.forEach((chapter, index) => {
+        const done = reviewed.has(chapter.dataset.chapter);
+        $('.review-button', chapter)?.classList.toggle('done', done);
+        const button = $('.review-button', chapter);
+        if (button) button.textContent = done ? '✓ 已复习' : '标记已复习';
+        navItems[index]?.classList.toggle('reviewed', done);
+      });
+      $('#progressText').textContent = `${reviewed.size} / ${chapters.length}`;
+      $('#progressFill').style.width = `${chapters.length ? reviewed.size / chapters.length * 100 : 0}%`;
+    }
+
+    function openDrawer() { sidebar.classList.add('open'); overlay.classList.add('active'); }
+    function closeDrawer() { sidebar.classList.remove('open'); if (!practicePanel.classList.contains('open')) overlay.classList.remove('active'); }
+    function openPractice() { practicePanel.classList.add('open'); practicePanel.setAttribute('aria-hidden', 'false'); overlay.classList.add('active'); }
+    function closePractice() { practicePanel.classList.remove('open'); practicePanel.setAttribute('aria-hidden', 'true'); overlay.classList.remove('active'); }
+
+    function cleanText(text) { return text.replace(/\s+/g, ' ').trim(); }
+    function escapeRegExp(text) { return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    function marked(text, query) {
+      const safe = text.replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]));
+      return safe.replace(new RegExp(`(${escapeRegExp(query)})`, 'ig'), '<mark>$1</mark>');
+    }
+
+    function search(query) {
+      const q = query.trim();
+      if (!q) {
+        searchResults.classList.remove('active');
+        content.classList.remove('searching');
+        return;
+      }
+      content.classList.add('searching');
+      searchResults.classList.add('active');
+      resultList.replaceChildren();
+      const matches = [];
+      chapters.forEach((chapter, chapterIndex) => {
+        const chapterTitle = $('h2', chapter)?.textContent || '';
+        const candidates = $$('summary, p, li, tr', chapter);
+        candidates.forEach(element => {
+          const text = cleanText(element.textContent);
+          if (text && text.toLowerCase().includes(q.toLowerCase())) matches.push({element, text, chapterIndex, chapterTitle});
+        });
+      });
+      matches.slice(0, 60).forEach(match => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'result-card';
+        const path = document.createElement('div');
+        path.className = 'result-path';
+        path.textContent = match.chapterTitle;
+        const text = document.createElement('div');
+        text.className = 'result-text';
+        text.innerHTML = marked(match.text.slice(0, 260), q);
+        button.append(path, text);
+        button.addEventListener('click', () => {
+          searchInput.value = '';
+          jumpToChapter(match.chapterIndex);
+          const details = match.element.closest('details');
+          if (details) details.open = true;
+          setTimeout(() => match.element.scrollIntoView({behavior: 'smooth', block: 'center'}), 120);
+        });
+        resultList.append(button);
+      });
+      resultCount.textContent = matches.length > 60 ? `找到 ${matches.length} 条，显示前 60 条` : `找到 ${matches.length} 条`;
+    }
+
+    const practiceQuestions = [
+      'Is it important for children to learn how to cooperate with others?',
+      'Should the government be responsible for protecting old buildings?',
+      'Why do people buy things they do not need?',
+      'Why do some people find it difficult to maintain a work-life balance?',
+      'What are the advantages and disadvantages of being a famous child?',
+      'What positive and negative effects does social media have on friendship?',
+      'What are the differences between online and face-to-face communication?',
+      'How are transport systems in urban and rural areas different?',
+      'How have shopping habits changed because of the internet?',
+      'Will people still read paper books in fifty years?',
+      'How can employers help staff reduce work-related stress?',
+      'How can cities preserve historic buildings while continuing to develop?',
+      'Do you think students are overly reliant on AI?',
+      'Why is it difficult for some people to relax?',
+      'Do you think school rules are important?'
+    ];
+    let lastQuestion = -1;
+    function nextQuestion() {
+      let index;
+      do { index = Math.floor(Math.random() * practiceQuestions.length); } while (practiceQuestions.length > 1 && index === lastQuestion);
+      lastQuestion = index;
+      $('#practiceQuestion').textContent = practiceQuestions[index];
+      resetTimer();
+    }
+    function renderTimer() {
+      $('#timer').textContent = `0:${String(seconds).padStart(2, '0')}`;
+      $('#timer').classList.toggle('warning', seconds <= 10);
+    }
+    function resetTimer() {
+      clearInterval(timerId); timerId = null; seconds = 40; renderTimer(); $('#timerButton').textContent = '开始计时';
+    }
+    function toggleTimer() {
+      if (timerId) { clearInterval(timerId); timerId = null; $('#timerButton').textContent = '继续'; return; }
+      if (seconds === 0) seconds = 40;
+      $('#timerButton').textContent = '暂停';
+      timerId = setInterval(() => {
+        seconds -= 1; renderTimer();
+        if (seconds <= 0) { clearInterval(timerId); timerId = null; $('#timerButton').textContent = '重新开始'; }
+      }, 1000);
+    }
+
+    groupChapters();
+    navItems.forEach((item, index) => item.addEventListener('click', () => jumpToChapter(index)));
+    updateProgress();
+    const hash = decodeURIComponent(location.hash.slice(1));
+    setActiveChapter(hash || 0);
+    if (hash) setTimeout(() => chapters[activeIndex].scrollIntoView({block: 'start'}), 0);
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        if (content.classList.contains('searching')) return;
+        const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActiveChapter(chapters.indexOf(visible.target));
+      }, {rootMargin: '-80px 0px -68% 0px', threshold: [0, .15, .4]});
+      chapters.forEach(chapter => observer.observe(chapter));
+    }
+
+    $$('.jump-button').forEach(button => button.addEventListener('click', () => {
+      const index = chapters.findIndex(chapter => $('h2', chapter)?.textContent.includes(button.dataset.jump));
+      if (index >= 0) jumpToChapter(index);
+    }));
+
+    searchInput.addEventListener('input', e => search(e.target.value));
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && window.innerWidth <= 880) closeDrawer();
+    });
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (window.innerWidth <= 880) openDrawer();
+        searchInput.focus();
+      }
+      if (e.key === 'Escape') { closeDrawer(); closePractice(); searchInput.blur(); }
+    });
+
+    $('#menuButton').addEventListener('click', openDrawer);
+    $('#drawerClose').addEventListener('click', closeDrawer);
+    overlay.addEventListener('click', () => { closeDrawer(); closePractice(); });
+    $('#openPractice').addEventListener('click', () => { closeDrawer(); openPractice(); if (lastQuestion < 0) nextQuestion(); });
+    $('#heroPractice').addEventListener('click', () => { openPractice(); if (lastQuestion < 0) nextQuestion(); });
+    $('#closePractice').addEventListener('click', closePractice);
+    $('#nextQuestion').addEventListener('click', nextQuestion);
+    $('#timerButton').addEventListener('click', toggleTimer);
+    $('#outline').value = storage.get('part3-outline', '');
+    $('#outline').addEventListener('input', e => storage.set('part3-outline', e.target.value));
+
+    const initialFont = Math.min(21, Math.max(14, storage.get('part3-font-size', 17)));
+    document.documentElement.style.setProperty('--reading-size', initialFont + 'px');
+    function changeFont(delta) {
+      const current = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--reading-size')) || 17;
+      const next = Math.min(21, Math.max(14, current + delta));
+      document.documentElement.style.setProperty('--reading-size', next + 'px');
+      storage.set('part3-font-size', next);
+    }
+    $('#fontDown').addEventListener('click', () => changeFont(-1));
+    $('#fontUp').addEventListener('click', () => changeFont(1));
+    $('#focusToggle').addEventListener('click', e => {
+      const active = document.body.classList.toggle('focus-mode');
+      e.currentTarget.setAttribute('aria-pressed', String(active));
+      e.currentTarget.textContent = active ? '退出重点' : '重点模式';
+    });
+    $('#printButton').addEventListener('click', () => window.print());
+    window.addEventListener('beforeprint', () => $$('.topic-card').forEach(d => { d.dataset.wasOpen = String(d.open); d.open = true; }));
+    window.addEventListener('afterprint', () => $$('.topic-card').forEach(d => { d.open = d.dataset.wasOpen === 'true'; }));
+  })();
+  </script>
+</body>
+</html>
