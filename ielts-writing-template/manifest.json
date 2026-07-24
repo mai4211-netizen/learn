@@ -4,6 +4,16 @@
   "files": [
     "index.html"
   ],
-  "length": 52076,
-  "sha256": "2a8b7dda2528c9ca709d036feb7689ddc95804d89dfecd95c9485cfeb1665846"
+  "legacyFallbackChunks": [
+    "page-chunk-00.js",
+    "page-chunk-01.js",
+    "page-chunk-02.js",
+    "page-chunk-03.js",
+    "page-chunk-04.js",
+    "page-chunk-05.js",
+    "page-chunk-06.js",
+    "page-chunk-07.js"
+  ],
+  "length": 51886,
+  "sha256": "6c49a4faccc336f7cb6df6401e1a13fcadb14c2b18aa8e393a5e372393df413c"
 }
