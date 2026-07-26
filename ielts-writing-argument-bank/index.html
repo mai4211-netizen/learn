@@ -13,13 +13,14 @@ html,body{height:100%;margin:0}body{display:grid;place-items:center;background:#
 <script>
 (async()=>{
   const resources=[
-    ['.data/v3-01.b64?v=4',4000],
-    ['.data/v3-02.b64?v=4',4000],
-    ['.data/v4-rest-01.b64?v=4',9500],
-    ['.data/v4-rest-02.b64?v=4',9500],
-    ['.data/v4-rest-03.b64?v=4',9500],
-    ['.data/v4-rest-04.b64?v=4',9348]
+    ['.data/v3-01.b64?v=5',4000],
+    ['.data/v3-02.b64?v=5',4000],
+    ['.data/v4-rest-01.b64?v=5',9500],
+    ['.data/v4-rest-02.b64?v=5',9500],
+    ['.data/v4-rest-03.b64?v=5',9500],
+    ['.data/v4-rest-04.b64?v=5',9348]
   ];
+  const expectedHash='e272d18d6e77341720292fb49331ef13b4c22d00e3e142bc389f55f393b76081';
   try{
     const parts=await Promise.all(resources.map(async([file,size])=>{
       const response=await fetch(file,{cache:'no-store'});
@@ -30,6 +31,9 @@ html,body{height:100%;margin:0}body{display:grid;place-items:center;background:#
     }));
     const encoded=parts.join('');
     if(encoded.length!==45848) throw new Error('页面数据长度异常');
+    const hashBuffer=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(encoded));
+    const hash=[...new Uint8Array(hashBuffer)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
+    if(hash!==expectedHash) throw new Error('页面数据校验失败，请稍后强制刷新');
     const raw=atob(encoded);
     const bytes=new Uint8Array(raw.length);
     for(let i=0;i<raw.length;i++) bytes[i]=raw.charCodeAt(i);
