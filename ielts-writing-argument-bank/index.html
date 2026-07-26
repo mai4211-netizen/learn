@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IELTS 大作文 12 类观点与词组压缩库</title>
+<style>
+html,body{height:100%;margin:0}body{display:grid;place-items:center;background:#f5f6f2;color:#1c201c;font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}.loading{padding:24px;text-align:center}.dot{display:inline-block;width:8px;height:8px;margin:0 3px;border-radius:50%;background:#246b55;animation:pulse 1s infinite alternate}.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}@keyframes pulse{to{opacity:.2;transform:translateY(-3px)}}.error{max-width:560px;color:#91463f;text-align:left}
+</style>
+</head>
+<body>
+<div class="loading" id="status">正在载入资料 <span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<script>
+(async()=>{
+  const files=Array.from({length:6},(_,i)=>`.data/page-${String(i+1).padStart(2,'0')}.b64`);
+  try{
+    const parts=await Promise.all(files.map(async file=>{
+      const response=await fetch(file,{cache:'no-store'});
+      if(!response.ok) throw new Error(`${file}：${response.status}`);
+      return (await response.text()).trim();
+    }));
+    const raw=atob(parts.join(''));
+    const bytes=new Uint8Array(raw.length);
+    for(let i=0;i<raw.length;i++) bytes[i]=raw.charCodeAt(i);
+    if(!('DecompressionStream' in window)) throw new Error('当前浏览器不支持页面解压，请使用最新版 Chrome、Edge、Safari 或 Firefox。');
+    const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    const html=await new Response(stream).text();
+    document.open();
+    document.write(html);
+    document.close();
+  }catch(error){
+    document.getElementById('status').className='error';
+    document.getElementById('status').textContent=`页面载入失败：${error.message}`;
+    console.error(error);
+  }
+})();
+</script>
+</body>
+</html>
