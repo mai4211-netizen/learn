@@ -12,20 +12,30 @@ html,body{height:100%;margin:0}body{display:grid;place-items:center;background:#
 <div class="loading" id="status">正在载入资料 <span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
 <script>
 (async()=>{
-  const files=Array.from({length:6},(_,i)=>`.data/page-${String(i+1).padStart(2,'0')}.b64?v=2`);
+  const resources=[
+    ['.data/v3-01.b64?v=4',4000],
+    ['.data/v3-02.b64?v=4',4000],
+    ['.data/v4-rest-01.b64?v=4',9500],
+    ['.data/v4-rest-02.b64?v=4',9500],
+    ['.data/v4-rest-03.b64?v=4',9500],
+    ['.data/v4-rest-04.b64?v=4',9348]
+  ];
   try{
-    const parts=await Promise.all(files.map(async file=>{
+    const parts=await Promise.all(resources.map(async([file,size])=>{
       const response=await fetch(file,{cache:'no-store'});
       if(!response.ok) throw new Error(`${file.split('?')[0]}：${response.status}`);
-      return (await response.text()).trim();
+      const text=(await response.text()).trim();
+      if(text.length<size) throw new Error(`${file.split('?')[0]} 内容不完整`);
+      return text.slice(0,size);
     }));
-    const raw=atob(parts.join(''));
+    const encoded=parts.join('');
+    if(encoded.length!==45848) throw new Error('页面数据长度异常');
+    const raw=atob(encoded);
     const bytes=new Uint8Array(raw.length);
     for(let i=0;i<raw.length;i++) bytes[i]=raw.charCodeAt(i);
     if(!('DecompressionStream' in window)) throw new Error('当前浏览器不支持页面解压，请使用最新版 Chrome、Edge、Safari 或 Firefox。');
     const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-    let html=await new Response(stream).text();
-    html=html.replace('</head>','<style>.source{display:none!important}</style></head>');
+    const html=await new Response(stream).text();
     document.open();
     document.write(html);
     document.close();
