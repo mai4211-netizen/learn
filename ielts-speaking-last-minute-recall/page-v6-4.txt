@@ -1,0 +1,79 @@
+stateKey(id))||''}
+function setState(id,s){s?localStorage.setItem(stateKey(id),s):localStorage.removeItem(stateKey(id));updateWeak();render()}
+function labels(n){return n===1?['核心']:n===2?['先答','展开']:n===3?['先答','原因','细节']:['先答','原因','细节','落点']}
+function p1Memory(title){
+ const q=(title||'').toLowerCase().replace(/[?]/g,'').trim();
+ if(/where is your hometown|where is your home|where do you live/.test(q))return'地点 → 方位或周边 → 最明显的特点';
+ if(/what is your hometown like|what.*place.*like|what.*home.*like/.test(q))return'整体印象 → 两个具体特点 → 一个代表性细节';
+ if(/^what do you do|work or study/.test(q))return'身份 → 日常工作内容 → 最终做出的东西';
+ if(/what.*interesting|most interesting/.test(q))return'有趣点 → 为什么有趣 → 一个具体例子';
+ if(/why/.test(q))return'直接原因 → 对我的影响 → 一个日常细节';
+ if(/how often|how much time|spend a lot of time/.test(q))return'频率 → 常见场景 → 为什么是这个频率';
+ if(/when did|when do|what time/.test(q))return'时间 → 当时做什么 → 为什么选这个时间';
+ if(/where do|where did/.test(q))return'地点 → 当时做什么 → 为什么在那里';
+ if(/have you ever|did you|were you|was there/.test(q))return'先回答有没有 → 一次具体经历 → 感受或结果';
+ if(/do you prefer|which do you prefer|would you rather/.test(q))return'先选一边 → 解释取舍 → 和另一边对比';
+ if(/do you like|are you interested|enjoy|favourite|favorite/.test(q))return'先表态 → 最主要原因 → 一个具体场景';
+ if(/do you think|should|could.*improv|how could|how can/.test(q))return'先给判断 → 问题或原因 → 一个具体做法';
+ if(/what kind|what type|which kind/.test(q))return'类型 → 为什么喜欢 → 一个具体例子';
+ if(/^what/.test(q))return'直接回答 → 一个特点 → 一个具体细节';
+ if(/^how/.test(q))return'简短结论 → 过程或程度 → 一个例子';
+ return'直接回答 → 解释原因 → 一个具体细节';
+}
+function makeP1(doc){
+ const arr=[...doc.querySelectorAll('.p1-card')].map((c,i)=>{
+  const keys=(c.querySelector('.p1-keywords span')?.textContent||'').split('→').map(x=>x.trim()).filter(Boolean);
+  const title=c.querySelector('h3')?.textContent.trim()||'';
+  return{part:'p1',id:c.id||'p1-'+i,topic:c.querySelector('.p1-topic-badge')?.textContent.trim()||'Other',title,answer:c.querySelector('.p1-answer')?.innerHTML||'',keys,cn:p1Memory(title)};
+ });
+ const hasWork=arr.some(x=>x.topic.toLowerCase()==='work'||/what do you do/i.test(x.title));
+ return hasWork?arr:[...EXTRA,...arr];
+}
+function makeP2(doc){
+ return[...doc.querySelectorAll('#part2Panel .card, article.card[id^="q"]')].filter(c=>c.querySelector('.answer')).map((c,i)=>{
+  const stages=[...c.querySelectorAll('.story-stage')].map(x=>({label:x.querySelector('b')?.textContent.trim()||'',text:x.querySelector('span')?.textContent.trim()||''})).filter(x=>x.text);
+  const prompt=c.querySelector('.prompt');
+  return{part:'p2',id:'p2-'+(c.id||i),topic:c.dataset.story||c.querySelector('.badges span')?.textContent.trim()||'Other',title:c.querySelector('.card-head h3')?.textContent.trim()||'',answer:c.querySelector('.answer')?.innerHTML||'',keys:stages,cn:c.querySelector('.story-keywords-cn span')?.textContent.trim()||stages.map(x=>x.label).join(' → '),prompt:prompt?.innerHTML||''};
+ });
+}
+async function load(){
+ let html='',origin='在线原复习页';
+ try{
+  const r=await fetch(SOURCE+'?v='+Date.now());
+  if(!r.ok)throw Error('HTTP '+r.status);
+  html=await r.text();localStorage.setItem('ielts-recall-source',html);
+ }catch(e){
+  html=localStorage.getItem('ielts-recall-source')||'';origin='本机缓存';if(!html)throw e;
+ }
+ const doc=new DOMParser().parseFromString(html,'text/html');
+ DATA.p1=makeP1(doc);DATA.p2=makeP2(doc);
+ $('#p1n').textContent=DATA.p1.length;$('#p2n').textContent=DATA.p2.length;
+ const rawP1=DATA.p1.length-(DATA.p1.some(x=>x.id==='p1-work-1')?4:0);
+ const bad=rawP1!==EXPECT.p1||DATA.p2.length!==EXPECT.p2;
+ $('#source').innerHTML=`来源：${origin} · P1 原题 ${rawP1}/${EXPECT.p1}${DATA.p1.length!==rawP1?' + 4 道工作开场':''} · P2 ${DATA.p2.length}/${EXPECT.p2}${bad?' <span class="bad">数量异常，请刷新检查</span>':''}`;
+ buildFilters();updateWeak();render();
+}
+function current(){return DATA[part]||[]}
+function updateWeak(){$('#weakn').textContent=[...DATA.p1,...DATA.p2].filter(x=>getState(x.id)&&getState(x.id)!=='ok').length}
+function buildFilters(){
+ const topics=[...new Set(current().map(x=>x.topic))];
+ $('#filters').innerHTML='<button class="active" data-filter="all">全部</button>'+topics.map(t=>`<button data-filter="${esc(t)}">${esc(t)}</button>`).join('');
+ filter='all';
+}
+function filtered(){
+ const q=$('#search').value.trim().toLowerCase();
+ return current().filter(x=>(filter==='all'||x.topic===filter)&&(!weakOnly||['blank','shaky'].includes(getState(x.id)))&&(!q||[x.title,x.topic,x.answer,x.cn,...(x.part==='p1'?x.keys:x.keys.map(k=>k.text))].join(' ').toLowerCase().includes(q)));
+}
+function route(item){
+ if(item.part==='p1'){
+  const labs=labels(item.keys.length);
+  return item.keys.map((k,i)=>`<div class="step"><b>${labs[i]||'继续'}</b><span>${esc(k)}</span></div>`).join('');
+ }
+ return item.keys.map(k=>`<div class="step"><b>${esc(k.label)}</b><span>${esc(k.text)}</span></div>`).join('');
+}
+function statusHtml(item){
+ return`<div class="status"><button data-id="${esc(item.id)}" data-s="blank" class="${getState(item.id)==='blank'?'on':''}">脑子空白</button><button data-id="${esc(item.id)}" data-s="shaky" class="${getState(item.id)==='shaky'?'on':''}">知道但不稳</button><button data-id="${esc(item.id)}" data-s="ok" class="${getState(item.id)==='ok'?'on':''}">能自己说</button></div>`;
+}
+function cardContent(x,index,total,isLearning){
+ const keys=x.part==='p1'?x.keys:x.keys.map(k=>k.text);
+ return`<article class="card ${isLearning?'learning-card':''}
