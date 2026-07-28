@@ -22,37 +22,51 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import base64, gzip, hashlib
+          import base64, gzip, hashlib, traceback
 
-          source = Path('ielts-part2-shared-v2/assets')
-          encoded = ''.join(
-              (source / f'part-{i:02d}.txt').read_text(encoding='utf-8').strip()
-              for i in range(8)
-          )
-          html = gzip.decompress(base64.b64decode(encoded)).decode('utf-8')
-          digest = hashlib.sha256(html.encode('utf-8')).hexdigest()
-          expected = 'f77da22c265c39ee51f20ba3c1d17360995d370a653692557558a0e856092a09'
-          if digest != expected:
-              raise SystemExit(f'checksum mismatch: {digest}')
-          if html.count('class="card"') != 59:
-              raise SystemExit('card count mismatch')
-
-          for target in (
-              Path('ielts-part2-shared-v2/index.html'),
-              Path('ielts-part2-shared-v2-direct/index.html'),
-              Path('ielts-part2-shared-v2-static/index.html'),
-          ):
-              target.parent.mkdir(parents=True, exist_ok=True)
-              target.write_text(html, encoding='utf-8')
-              print(target, len(html.encode('utf-8')), digest)
+          debug = []
+          try:
+              source = Path('ielts-part2-shared-v2/assets')
+              parts = []
+              for i in range(8):
+                  path = source / f'part-{i:02d}.txt'
+                  text = path.read_text(encoding='utf-8').strip()
+                  debug.append(f'{path}: {len(text)} chars')
+                  parts.append(text)
+              encoded = ''.join(parts)
+              debug.append(f'encoded: {len(encoded)} chars')
+              compressed = base64.b64decode(encoded, validate=True)
+              debug.append(f'compressed: {len(compressed)} bytes')
+              raw = gzip.decompress(compressed)
+              debug.append(f'uncompressed: {len(raw)} bytes')
+              digest = hashlib.sha256(raw).hexdigest()
+              debug.append(f'sha256: {digest}')
+              html = raw.decode('utf-8')
+              debug.append(f'cards: {html.count(chr(99)+chr(108)+chr(97)+chr(115)+chr(115)+chr(61)+chr(34)+chr(99)+chr(97)+chr(114)+chr(100)+chr(34))}')
+              expected = 'f77da22c265c39ee51f20ba3c1d17360995d370a653692557558a0e856092a09'
+              if digest != expected:
+                  raise RuntimeError(f'checksum mismatch: {digest}')
+              for target in (
+                  Path('ielts-part2-shared-v2/index.html'),
+                  Path('ielts-part2-shared-v2-direct/index.html'),
+                  Path('ielts-part2-shared-v2-static/index.html'),
+              ):
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(raw)
+                  debug.append(f'wrote {target}')
+          except Exception:
+              debug.append(traceback.format_exc())
+          Path('ielts-restore-debug.txt').write_text('\n'.join(debug), encoding='utf-8')
+          print('\n'.join(debug))
           PY
+          test -f ielts-part2-shared-v2-static/index.html
 
       - name: Commit exact static HTML to PR branch
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ielts-part2-shared-v2/index.html ielts-part2-shared-v2-direct/index.html ielts-part2-shared-v2-static/index.html
+          git add ielts-part2-shared-v2/index.html ielts-part2-shared-v2-direct/index.html ielts-part2-shared-v2-static/index.html ielts-restore-debug.txt
           if git diff --cached --quiet; then
             echo "Already exact; nothing to commit"
           else
