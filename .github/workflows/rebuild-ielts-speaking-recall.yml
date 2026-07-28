@@ -1,0 +1,110 @@
+name: Rebuild IELTS speaking recall
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ielts-speaking-last-minute-recall/batch-payload-*.txt'
+      - '.github/workflows/rebuild-ielts-speaking-recall.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decode, rebuild and validate
+        shell: python
+        run: |
+          import base64, gzip, hashlib, pathlib, re
+
+          root = pathlib.Path('ielts-speaking-last-minute-recall')
+          decoded = []
+          report = []
+
+          def decode_text(name, text):
+              clean = re.sub(r'\s+', '', text)
+              try:
+                  data = base64.b64decode(clean, validate=True)
+                  return data, 1
+              except Exception:
+                  # Also accepts a file containing several independently padded Base64 blocks.
+                  blocks = re.findall(r'[A-Za-z0-9+/]+={0,2}', clean)
+                  if not blocks:
+                      raise RuntimeError(f'{name}: no Base64 data found')
+                  out = bytearray()
+                  for index, block in enumerate(blocks, 1):
+                      block += '=' * (-len(block) % 4)
+                      try:
+                          out.extend(base64.b64decode(block, validate=True))
+                      except Exception as exc:
+                          raise RuntimeError(f'{name}: Base64 block {index} invalid: {exc}')
+                  return bytes(out), len(blocks)
+
+          for i in range(1, 6):
+              path = root / f'batch-payload-{i}.txt'
+              text = path.read_text(encoding='utf-8')
+              data, blocks = decode_text(path.name, text)
+              decoded.append(data)
+              report.append((path.name, len(text), len(data), blocks))
+
+          compressed = b''.join(decoded)
+          try:
+              html = gzip.decompress(compressed).decode('utf-8')
+          except Exception as exc:
+              raise RuntimeError(f'Combined gzip stream invalid: {exc}')
+
+          required = [
+              '<!doctype html>',
+              'id="learningMode"',
+              'data-record-start',
+              'button[data-view]',
+              '本轮练习',
+              '分享练习包',
+              'randomCard()',
+              'startRecording(itemId)',
+          ]
+          missing = [token for token in required if token not in html]
+          if missing:
+              raise RuntimeError('Rebuilt HTML missing: ' + ', '.join(missing))
+          if html.count('<script') != html.count('</script>'):
+              raise RuntimeError('Unbalanced script tags')
+          if html.count('<style') != html.count('</style>'):
+              raise RuntimeError('Unbalanced style tags')
+
+          out = root / 'index.html'
+          out.write_text(html, encoding='utf-8')
+          print('PAYLOAD REPORT')
+          for row in report:
+              print(row)
+          print('HTML bytes:', len(html.encode('utf-8')))
+          print('HTML sha256:', hashlib.sha256(html.encode('utf-8')).hexdigest())
+          print('VALIDATION: PASS')
+
+      - name: JavaScript syntax test
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path('ielts-speaking-last-minute-recall/index.html').read_text()
+          scripts = re.findall(r'<script[^>]*>(.*?)</script>', html, flags=re.S | re.I)
+          Path('/tmp/ielts-recall.js').write_text('\n'.join(scripts))
+          PY
+          node --check /tmp/ielts-recall.js
+
+      - name: Commit rebuilt single-file page
+        shell: bash
+        run: |
+          if git diff --quiet -- ielts-speaking-last-minute-recall/index.html; then
+            echo 'index.html already matches validated build'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ielts-speaking-last-minute-recall/index.html
+          git commit -m 'Rebuild IELTS recall as validated single file'
+          git push
