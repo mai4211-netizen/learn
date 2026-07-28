@@ -4,31 +4,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>IELTS Part 2 · 共用段落整合版</title>
-<style>
-html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#faf8f5;color:#6b645c}.loading{height:100%;display:grid;place-items:center;padding:24px;text-align:center;font-size:14px;line-height:1.7}
-</style>
-<script src="assets/pako.min.js?v=20260729-3"></script>
+<style>html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#faf8f5;color:#6b645c}.loading{height:100%;display:grid;place-items:center;padding:24px;text-align:center;font-size:14px;line-height:1.7}</style>
+<script src="assets/pako.min.js?v=20260729-4"></script>
 </head>
 <body><div class="loading">正在载入…</div>
 <script>
-(async()=>{
+(function(){
   try{
-    if(!window.pako) throw new Error('本地解压组件载入失败');
-    const version='20260729-3';
-    const files=Array.from({length:8},(_,i)=>`assets/part-${String(i).padStart(2,'0')}.txt?v=${version}`);
-    const parts=await Promise.all(files.map(async file=>{
-      const response=await fetch(file,{cache:'no-store'});
-      if(!response.ok) throw new Error(`${file}: ${response.status}`);
-      return (await response.text()).trim();
-    }));
-    const bytes=Uint8Array.from(atob(parts.join('')),c=>c.charCodeAt(0));
-    const html=new TextDecoder('utf-8').decode(window.pako.ungzip(bytes));
-    document.open();
-    document.write(html);
-    document.close();
+    if(!window.pako) throw new Error('本地解压组件未载入');
+    var version='20260729-4';
+    var encoded='';
+    for(var i=0;i<8;i++){
+      var n=(i<10?'0':'')+i;
+      var xhr=new XMLHttpRequest();
+      xhr.open('GET','assets/part-'+n+'.txt?v='+version,false);
+      xhr.send(null);
+      if(xhr.status!==200 && xhr.status!==0) throw new Error('数据 '+n+' 载入失败：'+xhr.status);
+      encoded+=xhr.responseText.replace(/\s+/g,'');
+    }
+    var binary=atob(encoded);
+    var bytes=new Uint8Array(binary.length);
+    for(var j=0;j<binary.length;j++) bytes[j]=binary.charCodeAt(j);
+    var html=window.pako.ungzip(bytes,{to:'string'});
+    if(html.indexOf('<title>IELTS Part 2')<0 || html.length<200000) throw new Error('页面数据校验失败');
+    document.open();document.write(html);document.close();
   }catch(error){
     console.error(error);
-    document.body.innerHTML='<div class="loading">页面载入失败。请关闭当前页面后重新打开。<br><small>'+String(error.message||error)+'</small></div>';
+    document.body.innerHTML='<div class="loading">页面载入失败。<br><small>'+String(error.message||error)+'</small></div>';
   }
 })();
 </script>
