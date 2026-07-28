@@ -1,1 +1,320 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IELTS Speaking 考前开口版</title><style>body{font-family:system-ui,-apple-system,"PingFang SC",sans-serif;background:#f5f1e8;color:#202321;display:grid;place-items:center;min-height:100vh;margin:0}.box{max-width:520px;padding:28px;text-align:center}.small{color:#6b706c;font-size:14px}.error{color:#a33;white-space:pre-wrap}</style></head><body><div class="box"><h1>正在加载复习材料…</h1><p class="small">正在载入学习卡片模式。</p><p id="err" class="error"></p></div><script>(async()=>{try{const names=['learning-payload-1.txt','learning-payload-2.txt','learning-payload-3.txt'];const parts=await Promise.all(names.map(n=>fetch(n+'?v=2').then(r=>{if(!r.ok)throw new Error(n+' 加载失败');return r.text()})));const b64=parts.join('').replace(/\s/g,'');const raw=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));const ds=new DecompressionStream('gzip');const html=await new Response(new Blob([raw]).stream().pipeThrough(ds)).text();document.open();document.write(html);document.close()}catch(e){document.querySelector('h1').textContent='页面加载失败';document.getElementById('err').textContent=e.message+'\n请强制刷新后重试。'}})();</script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IELTS Speaking｜考前开口版</title>
+<style>
+:root{--paper:#f5f1e8;--ink:#202321;--muted:#6b706c;--card:#fffdf8;--line:#d8d2c5;--red:#b94b43;--green:#375d50;--gold:#b08343;--blue:#506b7a;--shadow:0 14px 38px rgba(42,44,40,.08)}
+*{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;line-height:1.65}
+button,input{font:inherit}button{cursor:pointer}.wrap{width:min(980px,calc(100% - 32px));margin:auto;padding:42px 0 90px}
+.hero{border-bottom:1px solid var(--line);padding:18px 0 32px}.eyebrow{font-size:11px;letter-spacing:.14em;color:var(--red);font-weight:800}
+.hero h1{font:500 clamp(38px,7vw,72px)/1 Georgia,"Songti SC",serif;letter-spacing:-.04em;margin:12px 0 16px}
+.hero p{margin:0;max-width:760px;color:var(--muted)}.stats{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:9px 13px;font-size:12px}.stat b{font-size:20px;margin-right:5px}.bad{color:#9b322d}
+.tabs{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:9px;margin:18px 0 12px;background:rgba(245,241,232,.96);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px}
+.tabs button,.view button,.filters button,.actions button,.card-view button,.card-nav button,.record-actions button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 12px;color:var(--ink)}
+.tabs button{border-radius:10px;font-weight:800}.tabs button.active,.view button.active,.filters button.active,.actions button.active,.card-view button.active{background:var(--green);color:#fff;border-color:var(--green)}
+.controls{position:sticky;top:66px;z-index:15;background:rgba(245,241,232,.97);backdrop-filter:blur(10px);padding:8px 0 12px;border-bottom:1px solid var(--line)}
+.searchrow{display:flex;gap:8px}.searchrow input{min-width:0;flex:1;border:1px solid var(--line);background:var(--card);border-radius:11px;padding:10px 12px}
+.searchrow button{border:0;background:var(--ink);color:#fff;border-radius:10px;padding:0 14px}.view,.filters,.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.view button,.filters button,.actions button{font-size:12px;padding:5px 10px}.filters{overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.filters button{flex:0 0 auto}
+.source{font-size:12px;color:var(--muted);margin:9px 2px 0}.cards{display:flex;flex-direction:column;gap:14px;margin-top:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:20px;box-shadow:var(--shadow);scroll-margin-top:245px}
+.card-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.num{font:italic 18px Georgia,serif;color:var(--red);margin-right:8px}
+.topic{display:inline-block;background:#e0ebe5;color:var(--green);font-size:11px;border-radius:999px;padding:3px 7px}.card h2{font:600 19px/1.45 Inter,"PingFang SC",sans-serif;margin:10px 0 0}
+.badge{font-size:11px;color:var(--muted);white-space:nowrap}.route{display:grid;gap:7px;margin:16px 0 0}
+.step{display:grid;grid-template-columns:54px 1fr;gap:9px;align-items:start;background:#f0ece3;border-radius:9px;padding:8px 10px;font-size:13px}
+.step b{color:var(--green);font-size:11px;letter-spacing:.05em}.step span{font-family:Georgia,"Times New Roman",serif}
+.cn-memory{margin-top:14px;background:#fff7e7;border:1px solid #dfcca4;border-left:4px solid var(--gold);border-radius:0 11px 11px 0;padding:11px 13px}
+.cn-memory small{display:block;color:#8a6227;font-size:10px;font-weight:800;letter-spacing:.08em;margin-bottom:5px}.cnline{color:#4e463c;font-size:14px;font-weight:650}
+.cnkeys{display:block;margin-top:7px;color:var(--muted);font:13px/1.65 Georgia,"Times New Roman",serif}.answer{font:16px/1.78 Georgia,"Times New Roman",serif;margin-top:15px}
+.answer p{margin:10px 0}.prompt{margin-top:13px;color:var(--muted);font-size:13px}.prompt summary{cursor:pointer;color:var(--blue);font-weight:700}.prompt ul{padding-left:19px}
+.status{display:flex;gap:6px;flex-wrap:wrap;margin-top:15px;padding-top:12px;border-top:1px dashed var(--line)}
+.status button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:5px 9px;font-size:11px}
+.status button.on[data-s="blank"]{background:#f3d8d4;border-color:#dba29c}.status button.on[data-s="shaky"]{background:#f0e3c6;border-color:#d7bd84}.status button.on[data-s="ok"]{background:#dceadf;border-color:#9fc2a7}
+.empty,.loading{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:28px;text-align:center;color:var(--muted)}
+.learning-card{min-height:590px;padding:38px 42px;display:flex;flex-direction:column}.learning-card .card-head h2{font-size:34px;max-width:790px;margin-top:18px}
+.card-view{display:flex;gap:7px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:17px;margin-top:24px}.card-view button{font-size:12px;padding:6px 10px}
+.card-body{flex:1}.card-hint{border:1px dashed var(--line);border-radius:11px;padding:10px 13px;color:var(--muted);font-size:13px;margin-top:14px}
+.card-nav{display:flex;gap:8px;align-items:center;margin-top:24px;padding-top:18px;border-top:1px dashed var(--line)}
+.card-nav button{font-size:12px}.card-nav [data-card-random]{background:var(--ink);border-color:var(--ink);color:#fff}.card-nav .exit{margin-left:auto}
+.record-panel{margin-top:18px;border:1px solid var(--line);border-radius:14px;background:#faf7f1;padding:14px}
+.record-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.record-head b{font-size:13px}.record-time{font:700 14px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--red)}
+.record-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.record-actions button{font-size:12px}.record-actions button.primary{background:var(--red);border-color:var(--red);color:#fff}
+.record-actions button:disabled{opacity:.45;cursor:not-allowed}.live-text,.record-result,.local-analysis{margin-top:10px;border-radius:10px;padding:10px 12px;font-size:13px}
+.live-text{background:#fff;color:#4d514d;min-height:42px}.live-text:empty:before{content:"支持的浏览器会在这里显示实时转写";color:#999}
+.record-result{background:#fff}.record-result audio{width:100%;margin-top:7px}.local-analysis{background:#eef3ef;color:#36453c}.local-analysis ul{margin:6px 0 0;padding-left:19px}
+.privacy-note{font-size:11px;color:var(--muted);margin-top:8px}
+body[data-view="question"] .route,body[data-view="question"] .cn-memory,body[data-view="question"] .answer,body[data-view="question"] .prompt{display:none}
+body[data-view="anchor"] .cn-memory,body[data-view="anchor"] .answer,body[data-view="anchor"] .prompt{display:none}
+body[data-view="memory"] .route,body[data-view="memory"] .answer,body[data-view="memory"] .prompt{display:none}
+body[data-view="skeleton"] .cn-memory,body[data-view="skeleton"] .answer{display:none}
+body[data-view="full"] .route,body[data-view="full"] .cn-memory{display:none}
+body.card-mode .view{display:none}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;border-radius:999px;padding:8px 13px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:99}.toast.show{opacity:1}
+@media(max-width:650px){.wrap{width:min(100% - 20px,980px);padding-top:20px}.hero h1{font-size:42px}.card{padding:15px}.card-head{display:block}.badge{display:block;margin-top:5px}.controls{top:64px}.step{grid-template-columns:48px 1fr}.view{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.view button{flex:0 0 auto}.learning-card{min-height:520px;padding:22px}.learning-card .card-head h2{font-size:26px}.card-nav{flex-wrap:wrap}.card-nav .exit{margin-left:0}.record-head{align-items:flex-start}}
+</style>
+</head>
+<body data-view="anchor">
+<div class="wrap">
+<header class="hero"><div class="eyebrow">IELTS SPEAKING · LAST-MINUTE RECALL</div><h1>先知道自己在说什么</h1><p>先只看问题开口；卡住时再看极短提示或中文记忆链，最后才打开完整稿。</p><div class="stats"><div class="stat"><b id="p1n">—</b>P1</div><div class="stat"><b id="p2n">—</b>P2</div><div class="stat"><b id="weakn">0</b>待处理</div></div></header>
+<div class="tabs"><button class="active" data-part="p1">Part 1</button><button data-part="p2">Part 2</button></div>
+<section class="controls">
+<div class="searchrow"><input id="search" placeholder="搜索题目、主题或答案"><button id="random">随机一题</button></div>
+<div class="view"><button data-view="question">只看问题</button><button class="active" data-view="anchor">极短提示</button><button data-view="memory">中文记忆链</button><button data-view="skeleton">口头骨架</button><button data-view="full">完整稿</button></div>
+<div class="actions"><button id="learningMode">学习卡片</button><button id="weakOnly">只看卡点</button><button id="resetStatus">清除当前部分标记</button></div>
+<div class="filters" id="filters"></div><div class="source" id="source">正在读取原复习页……</div>
+</section>
+<main class="cards" id="cards"><div class="loading">正在载入全部题目……</div></main>
+</div><div class="toast" id="toast"></div>
+<script>
+const SOURCE='../ielts-speaking-review/index.html';
+const EXPECT={p1:175,p2:59};
+const EXTRA=[
+{part:'p1',id:'p1-work-1',topic:'Work',title:'What do you do?',answer:'<p>I work as a UI/UX designer. I mainly design interfaces and campaign pages for social and voice-based apps. My job is to turn product ideas into clear and usable screens.</p>',keys:['UI/UX designer','interfaces and campaign pages','clear and usable screens'],cn:'职业身份 → 主要做什么 → 工作产出'},
+{part:'p1',id:'p1-work-2',topic:'Work',title:'What is interesting about your job?',answer:'<p>The most interesting part is turning a vague idea into something visual and practical. For example, I sometimes need to make a complicated feature easier to understand through layout and interaction.</p>',keys:['vague idea','visual and practical','easier to understand'],cn:'有趣点 → 具体怎么做 → 用户得到什么'},
+{part:'p1',id:'p1-work-3',topic:'Work',title:'Why did you choose this kind of work?',answer:'<p>I chose it because it combines visual design with problem-solving. I have always liked making things look clear, but I also enjoy working out how people can use them more easily.</p>',keys:['visual design','problem-solving','use them more easily'],cn:'选择原因 → 两种能力结合 → 对用户的价值'},
+{part:'p1',id:'p1-work-4',topic:'Work',title:'Do you like your job?',answer:'<p>Yes, especially when I can work on a project from the early idea to the final design. Seeing a vague idea gradually become a real product gives me a strong sense of achievement.</p>',keys:['early idea','final design','real product'],cn:'先表态 → 最喜欢的过程 → 成就感来源'}
+];
+let DATA={p1:[],p2:[]},part='p1',filter='all',weakOnly=false,cardMode=false,currentCardId='',currentIndex=0;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1400)}
+function stateKey(id){return'ielts-recall:'+id}
+function getState(id){return localStorage.getItem(stateKey(id))||''}
+function setState(id,s){s?localStorage.setItem(stateKey(id),s):localStorage.removeItem(stateKey(id));updateWeak();render()}
+function labels(n){return n===1?['核心']:n===2?['先答','展开']:n===3?['先答','原因','细节']:['先答','原因','细节','落点']}
+function p1Memory(title){
+ const q=(title||'').toLowerCase().replace(/[?]/g,'').trim();
+ if(/where is your hometown|where is your home|where do you live/.test(q))return'地点 → 方位或周边 → 最明显的特点';
+ if(/what is your hometown like|what.*place.*like|what.*home.*like/.test(q))return'整体印象 → 两个具体特点 → 一个代表性细节';
+ if(/^what do you do|work or study/.test(q))return'身份 → 日常工作内容 → 最终做出的东西';
+ if(/what.*interesting|most interesting/.test(q))return'有趣点 → 为什么有趣 → 一个具体例子';
+ if(/why/.test(q))return'直接原因 → 对我的影响 → 一个日常细节';
+ if(/how often|how much time|spend a lot of time/.test(q))return'频率 → 常见场景 → 为什么是这个频率';
+ if(/when did|when do|what time/.test(q))return'时间 → 当时做什么 → 为什么选这个时间';
+ if(/where do|where did/.test(q))return'地点 → 当时做什么 → 为什么在那里';
+ if(/have you ever|did you|were you|was there/.test(q))return'先回答有没有 → 一次具体经历 → 感受或结果';
+ if(/do you prefer|which do you prefer|would you rather/.test(q))return'先选一边 → 解释取舍 → 和另一边对比';
+ if(/do you like|are you interested|enjoy|favourite|favorite/.test(q))return'先表态 → 最主要原因 → 一个具体场景';
+ if(/do you think|should|could.*improv|how could|how can/.test(q))return'先给判断 → 问题或原因 → 一个具体做法';
+ if(/what kind|what type|which kind/.test(q))return'类型 → 为什么喜欢 → 一个具体例子';
+ if(/^what/.test(q))return'直接回答 → 一个特点 → 一个具体细节';
+ if(/^how/.test(q))return'简短结论 → 过程或程度 → 一个例子';
+ return'直接回答 → 解释原因 → 一个具体细节';
+}
+function makeP1(doc){
+ const arr=[...doc.querySelectorAll('.p1-card')].map((c,i)=>{
+  const keys=(c.querySelector('.p1-keywords span')?.textContent||'').split('→').map(x=>x.trim()).filter(Boolean);
+  const title=c.querySelector('h3')?.textContent.trim()||'';
+  return{part:'p1',id:c.id||'p1-'+i,topic:c.querySelector('.p1-topic-badge')?.textContent.trim()||'Other',title,answer:c.querySelector('.p1-answer')?.innerHTML||'',keys,cn:p1Memory(title)};
+ });
+ const hasWork=arr.some(x=>x.topic.toLowerCase()==='work'||/what do you do/i.test(x.title));
+ return hasWork?arr:[...EXTRA,...arr];
+}
+function makeP2(doc){
+ return[...doc.querySelectorAll('#part2Panel .card, article.card[id^="q"]')].filter(c=>c.querySelector('.answer')).map((c,i)=>{
+  const stages=[...c.querySelectorAll('.story-stage')].map(x=>({label:x.querySelector('b')?.textContent.trim()||'',text:x.querySelector('span')?.textContent.trim()||''})).filter(x=>x.text);
+  const prompt=c.querySelector('.prompt');
+  return{part:'p2',id:'p2-'+(c.id||i),topic:c.dataset.story||c.querySelector('.badges span')?.textContent.trim()||'Other',title:c.querySelector('.card-head h3')?.textContent.trim()||'',answer:c.querySelector('.answer')?.innerHTML||'',keys:stages,cn:c.querySelector('.story-keywords-cn span')?.textContent.trim()||stages.map(x=>x.label).join(' → '),prompt:prompt?.innerHTML||''};
+ });
+}
+async function load(){
+ let html='',origin='在线原复习页';
+ try{
+  const r=await fetch(SOURCE+'?v='+Date.now());
+  if(!r.ok)throw Error('HTTP '+r.status);
+  html=await r.text();localStorage.setItem('ielts-recall-source',html);
+ }catch(e){
+  html=localStorage.getItem('ielts-recall-source')||'';origin='本机缓存';if(!html)throw e;
+ }
+ const doc=new DOMParser().parseFromString(html,'text/html');
+ DATA.p1=makeP1(doc);DATA.p2=makeP2(doc);
+ $('#p1n').textContent=DATA.p1.length;$('#p2n').textContent=DATA.p2.length;
+ const rawP1=DATA.p1.length-(DATA.p1.some(x=>x.id==='p1-work-1')?4:0);
+ const bad=rawP1!==EXPECT.p1||DATA.p2.length!==EXPECT.p2;
+ $('#source').innerHTML=`来源：${origin} · P1 原题 ${rawP1}/${EXPECT.p1}${DATA.p1.length!==rawP1?' + 4 道工作开场':''} · P2 ${DATA.p2.length}/${EXPECT.p2}${bad?' <span class="bad">数量异常，请刷新检查</span>':''}`;
+ buildFilters();updateWeak();render();
+}
+function current(){return DATA[part]||[]}
+function updateWeak(){$('#weakn').textContent=[...DATA.p1,...DATA.p2].filter(x=>getState(x.id)&&getState(x.id)!=='ok').length}
+function buildFilters(){
+ const topics=[...new Set(current().map(x=>x.topic))];
+ $('#filters').innerHTML='<button class="active" data-filter="all">全部</button>'+topics.map(t=>`<button data-filter="${esc(t)}">${esc(t)}</button>`).join('');
+ filter='all';
+}
+function filtered(){
+ const q=$('#search').value.trim().toLowerCase();
+ return current().filter(x=>(filter==='all'||x.topic===filter)&&(!weakOnly||['blank','shaky'].includes(getState(x.id)))&&(!q||[x.title,x.topic,x.answer,x.cn,...(x.part==='p1'?x.keys:x.keys.map(k=>k.text))].join(' ').toLowerCase().includes(q)));
+}
+function route(item){
+ if(item.part==='p1'){
+  const labs=labels(item.keys.length);
+  return item.keys.map((k,i)=>`<div class="step"><b>${labs[i]||'继续'}</b><span>${esc(k)}</span></div>`).join('');
+ }
+ return item.keys.map(k=>`<div class="step"><b>${esc(k.label)}</b><span>${esc(k.text)}</span></div>`).join('');
+}
+function statusHtml(item){
+ return`<div class="status"><button data-id="${esc(item.id)}" data-s="blank" class="${getState(item.id)==='blank'?'on':''}">脑子空白</button><button data-id="${esc(item.id)}" data-s="shaky" class="${getState(item.id)==='shaky'?'on':''}">知道但不稳</button><button data-id="${esc(item.id)}" data-s="ok" class="${getState(item.id)==='ok'?'on':''}">能自己说</button></div>`;
+}
+function cardContent(x,index,total,isLearning){
+ const keys=x.part==='p1'?x.keys:x.keys.map(k=>k.text);
+ return`<article class="card ${isLearning?'learning-card':''}" id="show-${esc(x.id)}">
+ <div class="card-head"><div><span class="num">${String(index+1).padStart(2,'0')}</span><span class="topic">${esc(x.topic)}</span><h2>${esc(x.title)}</h2></div><span class="badge">${isLearning?`${index+1} / ${total}`:(x.part==='p1'?'Part 1':'Part 2')}</span></div>
+ ${isLearning?`<div class="card-view"><button data-view="question">只看问题</button><button data-view="anchor">极短提示</button><button data-view="memory">中文记忆链</button><button data-view="skeleton">口头骨架</button><button data-view="full">完整稿</button></div><div class="card-hint">先直接开口。卡住后再逐层打开提示。</div>`:''}
+ <div class="card-body">
+ <div class="cn-memory"><small>中文记忆链</small><div class="cnline">${esc(x.cn||'直接回答 → 原因 → 具体细节')}</div><span class="cnkeys">${keys.map(esc).join(' → ')}</span></div>
+ <div class="route">${route(x)}</div>
+ ${x.prompt?`<details class="prompt"><summary>题目提示点</summary>${x.prompt}</details>`:''}
+ <div class="answer">${x.answer}</div>
+ ${statusHtml(x)}
+ ${isLearning?recordPanel(x):''}
+ </div>
+ ${isLearning?`<div class="card-nav"><button data-card-random>随机一问</button><button data-card-next>下一题</button><button class="exit" data-card-exit>退出学习卡片</button></div>`:''}
+ </article>`;
+}
+function recordPanel(x){
+ return`<section class="record-panel" data-record-panel="${esc(x.id)}">
+ <div class="record-head"><b>录音练习</b><span class="record-time">00:00</span></div>
+ <div class="record-actions"><button class="primary" data-record-start="${esc(x.id)}">开始录音</button><button data-record-stop disabled>停止</button><button data-record-analyze disabled>本地分析</button><button data-record-copy disabled>复制转写</button></div>
+ <div class="live-text"></div><div class="record-result" hidden></div><div class="local-analysis" hidden></div>
+ <div class="privacy-note">录音只保留在当前浏览器页面，除非你主动下载或复制。实时转写取决于浏览器支持。</div>
+ </section>`;
+}
+function render(){
+ const arr=filtered();
+ if(cardMode){
+  document.body.classList.add('card-mode');$('#learningMode').classList.add('active');
+  if(!arr.length){$('#cards').innerHTML='<div class="empty">当前筛选下没有可练习的题目。</div>';return}
+  let idx=arr.findIndex(x=>x.id===currentCardId);
+  if(idx<0){idx=Math.floor(Math.random()*arr.length);currentCardId=arr[idx].id}
+  currentIndex=idx;$('#cards').innerHTML=cardContent(arr[idx],idx,arr.length,true);syncViewButtons();
+ }else{
+  document.body.classList.remove('card-mode');$('#learningMode').classList.remove('active');
+  $('#cards').innerHTML=arr.length?arr.map((x,i)=>cardContent(x,i,arr.length,false)).join(''):'<div class="empty">没有符合条件的题目。</div>';
+ }
+}
+function syncViewButtons(){
+ const view=document.body.dataset.view||'question';
+ document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+}
+function setView(v){document.body.dataset.view=v;localStorage.setItem('ielts-recall-view',v);syncViewButtons()}
+function randomCard(){
+ const arr=filtered();if(!arr.length)return;
+ let next=arr[Math.floor(Math.random()*arr.length)];
+ if(arr.length>1&&next.id===currentCardId)next=arr[(arr.findIndex(x=>x.id===next.id)+1)%arr.length];
+ currentCardId=next.id;setView('question');render();
+}
+function nextCard(){
+ const arr=filtered();if(!arr.length)return;
+ let idx=arr.findIndex(x=>x.id===currentCardId);idx=(idx+1)%arr.length;currentCardId=arr[idx].id;setView('question');render();
+}
+function toggleCardMode(){
+ stopRecording(true);
+ cardMode=!cardMode;
+ if(cardMode){currentCardId='';setView('question')}else{setView(localStorage.getItem('ielts-recall-list-view')||'anchor')}
+ render();
+}
+let rec={media:null,stream:null,chunks:[],started:0,timer:null,recognition:null,finalText:'',interim:'',url:'',duration:0,itemId:'',audioContext:null,analyser:null,raf:0,silenceStart:0,pauseLatched:false,pauses:0};
+function fmt(sec){sec=Math.max(0,Math.round(sec));return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')}
+function panel(){return rec.itemId?document.querySelector(`[data-record-panel="${CSS.escape(rec.itemId)}"]`):null}
+async function startRecording(itemId){
+ if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){toast('当前浏览器不支持录音');return}
+ stopRecording(true);rec.itemId=itemId;rec.finalText='';rec.interim='';rec.pauses=0;rec.silenceStart=0;rec.pauseLatched=false;
+ try{
+  rec.stream=await navigator.mediaDevices.getUserMedia({audio:true});
+  rec.chunks=[];const opts=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?{mimeType:'audio/webm;codecs=opus'}:{};
+  rec.media=new MediaRecorder(rec.stream,opts);
+  rec.media.ondataavailable=e=>{if(e.data.size)rec.chunks.push(e.data)};
+  rec.media.onstop=finishRecording;
+  rec.media.start(250);rec.started=Date.now();
+  const p=panel();if(!p)return;
+  p.querySelector('[data-record-start]').disabled=true;p.querySelector('[data-record-stop]').disabled=false;
+  p.querySelector('.record-result').hidden=true;p.querySelector('.local-analysis').hidden=true;p.querySelector('.live-text').textContent='';
+  rec.timer=setInterval(()=>{const q=panel();if(q)q.querySelector('.record-time').textContent=fmt((Date.now()-rec.started)/1000)},250);
+  startRecognition();startPauseMonitor();toast('开始录音');
+ }catch(e){toast(e.name==='NotAllowedError'?'没有获得麦克风权限':'录音启动失败');cleanupMedia()}
+}
+function startRecognition(){
+ const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R)return;
+ try{
+  const r=new R();r.lang='en-US';r.continuous=true;r.interimResults=true;
+  r.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)rec.finalText+=t+' ';else interim+=t}rec.interim=interim;const p=panel();if(p)p.querySelector('.live-text').textContent=(rec.finalText+interim).trim()};
+  r.onerror=()=>{};r.onend=()=>{if(rec.media?.state==='recording'){try{r.start()}catch{}}};r.start();rec.recognition=r;
+ }catch{}
+}
+function startPauseMonitor(){
+ try{
+  const AC=window.AudioContext||window.webkitAudioContext;rec.audioContext=new AC();const src=rec.audioContext.createMediaStreamSource(rec.stream);
+  rec.analyser=rec.audioContext.createAnalyser();rec.analyser.fftSize=1024;src.connect(rec.analyser);const data=new Uint8Array(rec.analyser.fftSize);
+  const loop=()=>{if(!rec.analyser||rec.media?.state!=='recording')return;rec.analyser.getByteTimeDomainData(data);let sum=0;for(const v of data){const n=(v-128)/128;sum+=n*n}const rms=Math.sqrt(sum/data.length);const now=performance.now();
+   if(rms<0.018){if(!rec.silenceStart)rec.silenceStart=now;if(now-rec.silenceStart>1500&&!rec.pauseLatched){rec.pauses++;rec.pauseLatched=true}}
+   else{rec.silenceStart=0;rec.pauseLatched=false}
+   rec.raf=requestAnimationFrame(loop);
+  };loop();
+ }catch{}
+}
+function stopRecording(silent=false){
+ if(rec.media?.state==='recording'){try{rec.media.stop()}catch{}}
+ if(rec.recognition){try{rec.recognition.stop()}catch{}rec.recognition=null}
+ clearInterval(rec.timer);rec.timer=null;if(!silent)toast('录音已停止');
+}
+function cleanupMedia(){
+ if(rec.stream){rec.stream.getTracks().forEach(t=>t.stop());rec.stream=null}
+ if(rec.audioContext){try{rec.audioContext.close()}catch{}rec.audioContext=null}cancelAnimationFrame(rec.raf);rec.raf=0;rec.analyser=null;
+}
+function finishRecording(){
+ rec.duration=(Date.now()-rec.started)/1000;cleanupMedia();
+ const blob=new Blob(rec.chunks,{type:rec.media?.mimeType||'audio/webm'});if(rec.url)URL.revokeObjectURL(rec.url);rec.url=URL.createObjectURL(blob);
+ const p=panel();if(!p)return;
+ p.querySelector('[data-record-start]').disabled=false;p.querySelector('[data-record-stop]').disabled=true;
+ p.querySelector('[data-record-analyze]').disabled=false;p.querySelector('[data-record-copy]').disabled=!rec.finalText.trim();
+ const box=p.querySelector('.record-result');box.hidden=false;
+ const ext=(blob.type||'').includes('mp4')?'m4a':(blob.type||'').includes('ogg')?'ogg':'webm';
+ box.innerHTML=`<b>录音完成 · ${fmt(rec.duration)}</b><audio controls src="${rec.url}"></audio><a download="ielts-${Date.now()}.${ext}" href="${rec.url}">下载录音</a>`;
+}
+function itemById(id){return[...DATA.p1,...DATA.p2].find(x=>x.id===id)}
+function localAnalyze(){
+ const p=panel(),item=itemById(rec.itemId);if(!p||!item)return;
+ const text=(rec.finalText+rec.interim).trim();const words=(text.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g)||[]);
+ const wpm=rec.duration?Math.round(words.length/(rec.duration/60)):0;
+ const fillers=(text.toLowerCase().match(/\b(um+|uh+|erm+|you know|i mean)\b/g)||[]).length;
+ const repeat=(text.toLowerCase().match(/\b([a-z]+)\s+\1\b/g)||[]).length;
+ const keyText=(item.part==='p1'?item.keys:item.keys.map(k=>k.text)).join(' ').toLowerCase();
+ const stops=new Set('the a an and or but to of in on at for with is are was were i my me it this that do does did have has had be been being'.split(' '));
+ const keyWords=[...new Set((keyText.match(/[a-z]+/g)||[]).filter(w=>w.length>3&&!stops.has(w)))];
+ const hit=keyWords.filter(w=>text.toLowerCase().includes(w));const coverage=keyWords.length?Math.round(hit.length/keyWords.length*100):0;
+ const pace=!text?'没有转写，无法计算':wpm<90?'偏慢，注意不要长时间搜索内容':wpm>170?'偏快，注意清晰度和停顿':'速度较稳定';
+ const box=p.querySelector('.local-analysis');box.hidden=false;
+ box.innerHTML=`<b>即时练习数据（不是雅思评分）</b><ul><li>时长：${fmt(rec.duration)}；转写词数：${words.length}；约 ${wpm||'—'} 词/分钟（${pace}）</li><li>超过约1.5秒的静音段：${rec.pauses}；明显填充词：${fillers}；连续重复词：${repeat}</li><li>与当前答案触发词的字面覆盖：${text?coverage+'%':'—'}。改用自己的表达时，这项可能低估。</li></ul>${text?`<details><summary>查看转写</summary><p>${esc(text)}</p></details>`:'<p>当前浏览器没有提供实时转写。仍可下载录音后上传到聊天中分析。</p>'}`;
+}
+async function copyTranscript(){
+ const text=(rec.finalText+rec.interim).trim();if(!text)return;
+ const item=itemById(rec.itemId);const out=`Question: ${item?.title||''}\n\nTranscript:\n${text}`;
+ try{await navigator.clipboard.writeText(out);toast('已复制问题和转写')}catch{toast('复制失败')}
+}
+document.addEventListener('click',e=>{
+ const partBtn=e.target.closest('[data-part]');if(partBtn){stopRecording(true);part=partBtn.dataset.part;document.querySelectorAll('[data-part]').forEach(b=>b.classList.toggle('active',b===partBtn));$('#search').value='';weakOnly=false;$('#weakOnly').classList.remove('active');currentCardId='';buildFilters();render();return}
+ const viewBtn=e.target.closest('[data-view]');if(viewBtn){const v=viewBtn.dataset.view;if(!cardMode)localStorage.setItem('ielts-recall-list-view',v);setView(v);return}
+ const filterBtn=e.target.closest('[data-filter]');if(filterBtn){stopRecording(true);filter=filterBtn.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b===filterBtn));currentCardId='';render();return}
+ const statusBtn=e.target.closest('[data-s]');if(statusBtn){const old=getState(statusBtn.dataset.id);setState(statusBtn.dataset.id,old===statusBtn.dataset.s?'':statusBtn.dataset.s);return}
+ if(e.target.closest('[data-card-random]')){stopRecording(true);randomCard();return}
+ if(e.target.closest('[data-card-next]')){stopRecording(true);nextCard();return}
+ if(e.target.closest('[data-card-exit]')){toggleCardMode();return}
+ const start=e.target.closest('[data-record-start]');if(start){startRecording(start.dataset.recordStart);return}
+ if(e.target.closest('[data-record-stop]')){stopRecording();return}
+ if(e.target.closest('[data-record-analyze]')){localAnalyze();return}
+ if(e.target.closest('[data-record-copy]')){copyTranscript();return}
+});
+$('#search').addEventListener('input',()=>{currentCardId='';render()});
+$('#learningMode').addEventListener('click',toggleCardMode);
+$('#weakOnly').addEventListener('click',()=>{weakOnly=!weakOnly;$('#weakOnly').classList.toggle('active',weakOnly);currentCardId='';render()});
+$('#resetStatus').addEventListener('click',()=>{current().forEach(x=>localStorage.removeItem(stateKey(x.id)));updateWeak();render();toast('已清除当前部分标记')});
+$('#random').addEventListener('click',()=>{if(cardMode){stopRecording(true);randomCard()}else{const list=[...document.querySelectorAll('.card')];if(!list.length)return;const x=list[Math.floor(Math.random()*list.length)];x.scrollIntoView({behavior:'smooth',block:'start'});x.animate([{outline:'3px solid #b08343'},{outline:'0 solid transparent'}],{duration:1200})}});
+window.addEventListener('beforeunload',()=>stopRecording(true));
+const saved=localStorage.getItem('ielts-recall-list-view')||'anchor';setView(saved);
+load().catch(e=>{$('#cards').innerHTML='<div class="empty"><b>载入失败</b><br>'+esc(e.message)+'<br>请联网后刷新。</div>';$('#source').textContent='无法读取原复习页'});
+</script>
+</body>
+</html>
