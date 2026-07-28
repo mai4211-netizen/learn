@@ -1,0 +1,17 @@
+ielts-part2-shared-v2/assets/part-00.txt: 9502 chars
+ielts-part2-shared-v2/assets/part-01.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-02.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-03.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-04.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-05.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-06.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-07.txt: 4032 chars
+encoded: 61534 chars
+Traceback (most recent call last):
+  File "/home/runner/work/learn/learn/.github/scripts/restore_ielts.py", line 18, in <module>
+    compressed = base64.b64decode(encoded, validate=True)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/base64.py", line 88, in b64decode
+    return binascii.a2b_base64(s, strict_mode=validate)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+binascii.Error: Incorrect padding
