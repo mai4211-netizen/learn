@@ -1,0 +1,74 @@
+" id="show-${esc(x.id)}">
+ <div class="card-head"><div><span class="num">${String(index+1).padStart(2,'0')}</span><span class="topic">${esc(x.topic)}</span><h2>${esc(x.title)}</h2></div><span class="badge">${isLearning?`${index+1} / ${total}`:(x.part==='p1'?'Part 1':'Part 2')}</span></div>
+ ${isLearning?`<div class="card-view"><button data-view="question">只看问题</button><button data-view="anchor">极短提示</button><button data-view="memory">中文记忆链</button><button data-view="skeleton">口头骨架</button><button data-view="full">完整稿</button></div><div class="card-hint">先直接开口。卡住后再逐层打开提示。</div>`:''}
+ <div class="card-body">
+ <div class="cn-memory"><small>中文记忆链</small><div class="cnline">${esc(x.cn||'直接回答 → 原因 → 具体细节')}</div><span class="cnkeys">${keys.map(esc).join(' → ')}</span></div>
+ <div class="route">${route(x)}</div>
+ ${x.prompt?`<details class="prompt"><summary>题目提示点</summary>${x.prompt}</details>`:''}
+ <div class="answer">${x.answer}</div>
+ ${statusHtml(x)}
+ ${isLearning?recordPanel(x):''}
+ </div>
+ ${isLearning?`<div class="card-nav"><button data-card-random>随机一问</button><button data-card-next>下一题</button><button class="exit" data-card-exit>退出学习卡片</button></div>`:''}
+ </article>`;
+}
+function recordPanel(x){
+ return`<section class="record-panel" data-record-panel="${esc(x.id)}">
+ <div class="record-head"><b>录音练习</b><span class="record-time">00:00</span></div>
+ <div class="record-actions"><button class="primary" data-record-start="${esc(x.id)}">开始录音</button><button data-record-stop disabled>停止</button><button data-record-analyze disabled>本地分析</button><button data-record-copy disabled>复制本题转写</button></div>
+ <div class="record-status" aria-live="polite">点击开始后，请允许浏览器使用麦克风。</div><div class="live-text"></div><div class="record-result" hidden></div><div class="local-analysis" hidden></div><div class="saved-note" hidden>已自动存入本轮练习</div>
+ <div class="privacy-note">录音保存在此浏览器的本轮练习中；可累积多题后一次分享或导出。实时转写取决于浏览器支持。</div>
+ </section>`;
+}
+function render(){
+ const arr=filtered();
+ if(cardMode){
+  document.body.classList.add('card-mode');$('#learningMode').classList.add('active');
+  if(!arr.length){$('#cards').innerHTML='<div class="empty">当前筛选下没有可练习的题目。</div>';return}
+  let idx=arr.findIndex(x=>x.id===currentCardId);
+  if(idx<0){idx=Math.floor(Math.random()*arr.length);currentCardId=arr[idx].id}
+  currentIndex=idx;$('#cards').innerHTML=cardContent(arr[idx],idx,arr.length,true);syncViewButtons();
+ }else{
+  document.body.classList.remove('card-mode');$('#learningMode').classList.remove('active');
+  $('#cards').innerHTML=arr.length?arr.map((x,i)=>cardContent(x,i,arr.length,false)).join(''):'<div class="empty">没有符合条件的题目。</div>';
+ }
+}
+function syncViewButtons(){
+ const view=document.body.dataset.view||'question';
+ document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+}
+function setView(v){document.body.dataset.view=v;localStorage.setItem('ielts-recall-view',v);syncViewButtons()}
+function randomCard(){
+ const arr=filtered();if(!arr.length)return;
+ let next=arr[Math.floor(Math.random()*arr.length)];
+ if(arr.length>1&&next.id===currentCardId)next=arr[(arr.findIndex(x=>x.id===next.id)+1)%arr.length];
+ currentCardId=next.id;setView('question');render();
+}
+function nextCard(){
+ const arr=filtered();if(!arr.length)return;
+ let idx=arr.findIndex(x=>x.id===currentCardId);idx=(idx+1)%arr.length;currentCardId=arr[idx].id;setView('question');render();
+}
+function toggleCardMode(){
+ stopRecording(true);
+ cardMode=!cardMode;
+ if(cardMode){currentCardId='';setView('question')}else{setView(localStorage.getItem('ielts-recall-list-view')||'anchor')}
+ render();
+}
+let rec={media:null,stream:null,chunks:[],started:0,timer:null,recognition:null,finalText:'',interim:'',url:'',duration:0,itemId:'',audioContext:null,analyser:null,raf:0,silenceStart:0,pauseLatched:false,pauses:0,blob:null,takeId:''};
+let sessionUrls=[];
+function fmt(sec){sec=Math.max(0,Math.round(sec));return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')}
+function panel(){return rec.itemId?[...document.querySelectorAll('[data-record-panel]')].find(x=>x.dataset.recordPanel===rec.itemId)||null:null}
+async function startRecording(itemId){
+ const startBtn=document.querySelector(`[data-record-start="${itemId}"]`),host=startBtn?.closest('.record-panel'),status=host?.querySelector('.record-status');
+ if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){if(status)status.textContent='当前浏览器不支持网页录音，请换用最新版 Safari 或 Chrome。';toast('当前浏览器不支持录音');return}
+ stopRecording(true);rec.itemId=itemId;rec.takeId='take-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);rec.finalText='';rec.interim='';rec.pauses=0;rec.silenceStart=0;rec.pauseLatched=false;rec.blob=null;
+ if(startBtn){startBtn.disabled=true;startBtn.textContent='请求麦克风…'}if(status)status.textContent='请在浏览器提示中允许使用麦克风。';
+ try{
+  rec.stream=await navigator.mediaDevices.getUserMedia({audio:true});
+  rec.chunks=[];const canWebm=typeof MediaRecorder.isTypeSupported==='function'&&MediaRecorder.isTypeSupported('audio/webm;codecs=opus');const opts=canWebm?{mimeType:'audio/webm;codecs=opus'}:{};
+  rec.media=new MediaRecorder(rec.stream,opts);
+  rec.media.ondataavailable=e=>{if(e.data.size)rec.chunks.push(e.data)};
+  rec.media.onstop=finishRecording;
+  rec.media.start(250);rec.started=Date.now();
+  const p=panel();if(!p){cleanupMedia();return}
+  const b=p.que
