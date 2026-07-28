@@ -1,0 +1,53 @@
+rySelector('[data-record-start]');b.disabled=true;b.textContent='录音中…';p.querySelector('[data-record-stop]').disabled=false;
+  p.querySelector('.record-status').textContent='正在录音。完成后点击“停止”。';p.querySelector('.record-result').hidden=true;p.querySelector('.local-analysis').hidden=true;p.querySelector('.saved-note').hidden=true;p.querySelector('.live-text').textContent='';
+  rec.timer=setInterval(()=>{const q=panel();if(q)q.querySelector('.record-time').textContent=fmt((Date.now()-rec.started)/1000)},250);
+  startRecognition();startPauseMonitor();toast('开始录音');
+ }catch(e){const msg=e.name==='NotAllowedError'||e.name==='PermissionDeniedError'?'麦克风权限被拒绝，请在浏览器地址栏的网站设置中允许麦克风。':e.name==='NotFoundError'?'没有检测到可用麦克风。':'录音启动失败：'+(e.message||e.name||'未知原因');if(startBtn){startBtn.disabled=false;startBtn.textContent='开始录音'}if(status)status.textContent=msg;toast(msg);cleanupMedia()}
+}
+function startRecognition(){
+ const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R)return;
+ try{
+  const r=new R();r.lang='en-US';r.continuous=true;r.interimResults=true;
+  r.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)rec.finalText+=t+' ';else interim+=t}rec.interim=interim;const p=panel();if(p)p.querySelector('.live-text').textContent=(rec.finalText+interim).trim()};
+  r.onerror=()=>{};r.onend=()=>{if(rec.media?.state==='recording'){try{r.start()}catch{}}};r.start();rec.recognition=r;
+ }catch{}
+}
+function startPauseMonitor(){
+ try{
+  const AC=window.AudioContext||window.webkitAudioContext;rec.audioContext=new AC();const src=rec.audioContext.createMediaStreamSource(rec.stream);
+  rec.analyser=rec.audioContext.createAnalyser();rec.analyser.fftSize=1024;src.connect(rec.analyser);const data=new Uint8Array(rec.analyser.fftSize);
+  const loop=()=>{if(!rec.analyser||rec.media?.state!=='recording')return;rec.analyser.getByteTimeDomainData(data);let sum=0;for(const v of data){const n=(v-128)/128;sum+=n*n}const rms=Math.sqrt(sum/data.length);const now=performance.now();
+   if(rms<0.018){if(!rec.silenceStart)rec.silenceStart=now;if(now-rec.silenceStart>1500&&!rec.pauseLatched){rec.pauses++;rec.pauseLatched=true}}
+   else{rec.silenceStart=0;rec.pauseLatched=false}
+   rec.raf=requestAnimationFrame(loop);
+  };loop();
+ }catch{}
+}
+function stopRecording(silent=false){
+ if(rec.media?.state==='recording'){try{rec.media.stop()}catch{}}
+ if(rec.recognition){try{rec.recognition.stop()}catch{}rec.recognition=null}
+ clearInterval(rec.timer);rec.timer=null;if(!silent)toast('录音已停止');
+}
+function cleanupMedia(){
+ if(rec.stream){rec.stream.getTracks().forEach(t=>t.stop());rec.stream=null}
+ if(rec.audioContext){try{rec.audioContext.close()}catch{}rec.audioContext=null}cancelAnimationFrame(rec.raf);rec.raf=0;rec.analyser=null;
+}
+async function finishRecording(){
+ rec.duration=(Date.now()-rec.started)/1000;cleanupMedia();
+ const blob=new Blob(rec.chunks,{type:rec.media?.mimeType||'audio/webm'});rec.blob=blob;if(rec.url)URL.revokeObjectURL(rec.url);rec.url=URL.createObjectURL(blob);
+ const item=itemById(rec.itemId);const transcript=(rec.finalText+rec.interim).trim();
+ try{await saveTake({id:rec.takeId,itemId:rec.itemId,part:item?.part||'',topic:item?.topic||'',question:item?.title||'',transcript,duration:rec.duration,pauses:rec.pauses,mime:blob.type||'audio/webm',createdAt:Date.now(),blob});await refreshSessionCount()}catch(e){toast('录音完成，但存入本轮失败')}
+ const p=panel();if(!p)return;
+ p.querySelector('[data-record-start]').disabled=false;p.querySelector('[data-record-start]').textContent='重新录音';p.querySelector('[data-record-stop]').disabled=true;p.querySelector('.record-status').textContent='录音已完成，并已存入本轮练习。';
+ p.querySelector('[data-record-analyze]').disabled=false;p.querySelector('[data-record-copy]').disabled=!transcript;
+ p.querySelector('.saved-note').hidden=false;
+ const box=p.querySelector('.record-result');box.hidden=false;
+ const ext=fileExt(blob.type);box.innerHTML=`<b>录音完成 · ${fmt(rec.duration)}</b><audio controls src="${rec.url}"></audio><a download="ielts-${Date.now()}.${ext}" href="${rec.url}">单独下载本题</a>`;
+}
+
+const DB_NAME='ielts-speaking-recall-v1',STORE='takes';
+function openSessionDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(STORE))req.result.createObjectStore(STORE,{keyPath:'id'})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+async function saveTake(take){const db=await openSessionDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(take);tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}})}
+async function allTakes(){const db=await openSessionDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readonly'),req=tx.objectStore(STORE).getAll();req.onsuccess=()=>{db.close();resolve(req.result.sort((a,b)=>a.createdAt-b.createdAt))};req.onerror=()=>{db.close();reject(req.error)}})}
+async function deleteTake(id){const db=await openSessionDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}})}
+async function clearTakes(){const db=await openSessionDB();r
