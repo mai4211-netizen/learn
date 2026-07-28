@@ -1,1 +1,1 @@
-restore diagnostics 3
+restore diagnostics 4
