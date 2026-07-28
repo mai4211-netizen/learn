@@ -2,18 +2,20 @@ name: Rebuild IELTS Part 2 static page
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/rebuild-ielts-part2-static.yml'
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
 
 jobs:
   rebuild:
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.title == '[automation] rebuild IELTS Part 2 static page'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Restore original HTML
         shell: bash
