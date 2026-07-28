@@ -1,0 +1,50 @@
+L.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('已下载练习包，可上传到聊天')} }catch(e){if(e?.name!=='AbortError')toast('整理练习包失败')}}
+
+function itemById(id){return[...DATA.p1,...DATA.p2].find(x=>x.id===id)}
+function localAnalyze(){
+ const p=panel(),item=itemById(rec.itemId);if(!p||!item)return;
+ const text=(rec.finalText+rec.interim).trim();const words=(text.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g)||[]);
+ const wpm=rec.duration?Math.round(words.length/(rec.duration/60)):0;
+ const fillers=(text.toLowerCase().match(/\b(um+|uh+|erm+|you know|i mean)\b/g)||[]).length;
+ const repeat=(text.toLowerCase().match(/\b([a-z]+)\s+\1\b/g)||[]).length;
+ const keyText=(item.part==='p1'?item.keys:item.keys.map(k=>k.text)).join(' ').toLowerCase();
+ const stops=new Set('the a an and or but to of in on at for with is are was were i my me it this that do does did have has had be been being'.split(' '));
+ const keyWords=[...new Set((keyText.match(/[a-z]+/g)||[]).filter(w=>w.length>3&&!stops.has(w)))];
+ const hit=keyWords.filter(w=>text.toLowerCase().includes(w));const coverage=keyWords.length?Math.round(hit.length/keyWords.length*100):0;
+ const pace=!text?'没有转写，无法计算':wpm<90?'偏慢，注意不要长时间搜索内容':wpm>170?'偏快，注意清晰度和停顿':'速度较稳定';
+ const box=p.querySelector('.local-analysis');box.hidden=false;
+ box.innerHTML=`<b>即时练习数据（不是雅思评分）</b><ul><li>时长：${fmt(rec.duration)}；转写词数：${words.length}；约 ${wpm||'—'} 词/分钟（${pace}）</li><li>超过约1.5秒的静音段：${rec.pauses}；明显填充词：${fillers}；连续重复词：${repeat}</li><li>与当前答案触发词的字面覆盖：${text?coverage+'%':'—'}。改用自己的表达时，这项可能低估。</li></ul>${text?`<details><summary>查看转写</summary><p>${esc(text)}</p></details>`:'<p>当前浏览器没有提供实时转写。仍可下载录音后上传到聊天中分析。</p>'}`;
+}
+async function copyTranscript(){
+ const text=(rec.finalText+rec.interim).trim();if(!text)return;
+ const item=itemById(rec.itemId);const out=`Question: ${item?.title||''}\n\nTranscript:\n${text}`;
+ try{await navigator.clipboard.writeText(out);toast('已复制问题和转写')}catch{toast('复制失败')}
+}
+document.addEventListener('click',e=>{
+ const partBtn=e.target.closest('[data-part]');if(partBtn){stopRecording(true);part=partBtn.dataset.part;document.querySelectorAll('[data-part]').forEach(b=>b.classList.toggle('active',b===partBtn));$('#search').value='';weakOnly=false;$('#weakOnly').classList.remove('active');currentCardId='';buildFilters();render();return}
+ const viewBtn=e.target.closest('button[data-view]');if(viewBtn){const v=viewBtn.dataset.view;if(!cardMode)localStorage.setItem('ielts-recall-list-view',v);setView(v);return}
+ const filterBtn=e.target.closest('[data-filter]');if(filterBtn){stopRecording(true);filter=filterBtn.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b===filterBtn));currentCardId='';render();return}
+ const statusBtn=e.target.closest('[data-s]');if(statusBtn){const old=getState(statusBtn.dataset.id);setState(statusBtn.dataset.id,old===statusBtn.dataset.s?'':statusBtn.dataset.s);return}
+ if(e.target.closest('[data-card-random]')){stopRecording(true);randomCard();return}
+ if(e.target.closest('[data-card-next]')){stopRecording(true);nextCard();return}
+ if(e.target.closest('[data-card-exit]')){toggleCardMode();return}
+ const start=e.target.closest('[data-record-start]');if(start){startRecording(start.dataset.recordStart);return}
+ if(e.target.closest('[data-record-stop]')){stopRecording();return}
+ if(e.target.closest('[data-record-analyze]')){localAnalyze();return}
+ if(e.target.closest('[data-record-copy]')){copyTranscript();return}
+ const del=e.target.closest('[data-session-delete]');if(del){deleteTake(del.dataset.sessionDelete).then(()=>{openSessionSheet();refreshSessionCount()});return}
+ if(e.target.closest('[data-session-close]')||e.target.id==='sessionSheet'){closeSessionSheet();return}
+});
+$('#search').addEventListener('input',()=>{currentCardId='';render()});
+$('#learningMode').addEventListener('click',toggleCardMode);
+$('#weakOnly').addEventListener('click',()=>{weakOnly=!weakOnly;$('#weakOnly').classList.toggle('active',weakOnly);currentCardId='';render()});
+$('#resetStatus').addEventListener('click',()=>{current().forEach(x=>localStorage.removeItem(stateKey(x.id)));updateWeak();render();toast('已清除当前部分标记')});
+$('#random').addEventListener('click',()=>{if(cardMode){stopRecording(true);randomCard()}else{const list=[...document.querySelectorAll('.card')];if(!list.length)return;const x=list[Math.floor(Math.random()*list.length)];x.scrollIntoView({behavior:'smooth',block:'start'});x.animate([{outline:'3px solid #b08343'},{outline:'0 solid transparent'}],{duration:1200})}});
+$('#sessionOpen').addEventListener('click',openSessionSheet);$('#sessionShare').addEventListener('click',shareSession);$('#sessionShareSheet').addEventListener('click',shareSession);$('#sessionCopyAll').addEventListener('click',copyAllTranscripts);$('#sessionClear').addEventListener('click',async()=>{if(!confirm('清空本轮全部录音？'))return;await clearTakes();closeSessionSheet();await refreshSessionCount();toast('已清空本轮')});
+window.addEventListener('beforeunload',()=>stopRecording(true));
+const saved=localStorage.getItem('ielts-recall-list-view')||'anchor';setView(saved);
+refreshSessionCount();
+load().catch(e=>{$('#cards').innerHTML='<div class="empty"><b>载入失败</b><br>'+esc(e.message)+'<br>请联网后刷新。</div>';$('#source').textContent='无法读取原复习页'});
+</script>
+</body>
+</html>
