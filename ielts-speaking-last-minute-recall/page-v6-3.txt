@@ -1,0 +1,32 @@
+:650px){.wrap{width:min(100% - 20px,980px);padding-top:20px}.hero h1{font-size:42px}.card{padding:15px}.card-head{display:block}.badge{display:block;margin-top:5px}.controls{top:64px}.step{grid-template-columns:48px 1fr}.view{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.view button{flex:0 0 auto}.learning-card{min-height:520px;padding:22px}.learning-card .card-head h2{font-size:26px}.card-nav{flex-wrap:wrap}.card-nav .exit{margin-left:0}.record-head{align-items:flex-start}.record-actions{display:grid;grid-template-columns:1fr 1fr}.record-actions button{min-height:44px}.card-view{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.card-view button{flex:0 0 auto;min-height:42px}.card-nav{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(255,253,248,0),var(--card) 22%);padding-top:28px;padding-bottom:4px}.card-nav button{min-height:44px}.session-bar{bottom:7px;width:calc(100% - 14px);border-radius:16px;padding-left:10px;padding-right:10px}.session-bar button{padding:7px 10px;white-space:nowrap}.session-bar .share{max-width:120px}.session-sheet{padding:0}.session-dialog{max-height:88dvh;border-radius:22px 22px 0 0}.session-actions{grid-template-columns:1fr}.session-head{padding-top:14px}.session-list{padding-bottom:18px}}
+</style>
+</head>
+<body data-view="anchor">
+<div class="wrap">
+<header class="hero"><div class="eyebrow">IELTS SPEAKING · LAST-MINUTE RECALL</div><h1>先知道自己在说什么</h1><p>先只看问题开口；卡住时再看极短提示或中文记忆链，最后才打开完整稿。</p><div class="stats"><div class="stat"><b id="p1n">—</b>P1</div><div class="stat"><b id="p2n">—</b>P2</div><div class="stat"><b id="weakn">0</b>待处理</div></div></header>
+<div class="tabs"><button class="active" data-part="p1">Part 1</button><button data-part="p2">Part 2</button></div>
+<section class="controls">
+<div class="searchrow"><input id="search" placeholder="搜索题目、主题或答案"><button id="random">随机一题</button></div>
+<div class="view"><button data-view="question">只看问题</button><button class="active" data-view="anchor">极短提示</button><button data-view="memory">中文记忆链</button><button data-view="skeleton">口头骨架</button><button data-view="full">完整稿</button></div>
+<div class="actions"><button id="learningMode">学习卡片</button><button id="weakOnly">只看卡点</button><button id="resetStatus">清除当前部分标记</button></div>
+<div class="filters" id="filters"></div><div class="source" id="source">正在读取原复习页……</div>
+</section>
+<main class="cards" id="cards"><div class="loading">正在载入全部题目……</div></main>
+</div><div class="toast" id="toast"></div>
+<div class="session-bar" id="sessionBar"><div class="session-summary"><b>本轮练习 <span id="sessionCount">0</span> 题</b><span id="sessionHint">录完会自动存入，可一次分享</span></div><button id="sessionOpen">查看</button><button class="share" id="sessionShare" disabled>分享练习包</button></div>
+<div class="session-sheet" id="sessionSheet" hidden><div class="session-dialog" role="dialog" aria-modal="true" aria-labelledby="sessionTitle"><div class="session-head"><div><h3 id="sessionTitle">本轮练习</h3><p>录音、问题和转写会合成一个资料包。</p></div><button class="session-close" data-session-close aria-label="关闭">×</button></div><div class="session-list" id="sessionList"></div><div class="session-actions"><button class="primary" id="sessionShareSheet">分享练习包</button><button id="sessionCopyAll">复制全部转写</button><button class="danger" id="sessionClear">清空本轮</button></div></div></div>
+<script>
+const SOURCE='../ielts-speaking-review/index.html';
+const EXPECT={p1:175,p2:59};
+const EXTRA=[
+{part:'p1',id:'p1-work-1',topic:'Work',title:'What do you do?',answer:'<p>I work as a UI/UX designer. I mainly design interfaces and campaign pages for social and voice-based apps. My job is to turn product ideas into clear and usable screens.</p>',keys:['UI/UX designer','interfaces and campaign pages','clear and usable screens'],cn:'职业身份 → 主要做什么 → 工作产出'},
+{part:'p1',id:'p1-work-2',topic:'Work',title:'What is interesting about your job?',answer:'<p>The most interesting part is turning a vague idea into something visual and practical. For example, I sometimes need to make a complicated feature easier to understand through layout and interaction.</p>',keys:['vague idea','visual and practical','easier to understand'],cn:'有趣点 → 具体怎么做 → 用户得到什么'},
+{part:'p1',id:'p1-work-3',topic:'Work',title:'Why did you choose this kind of work?',answer:'<p>I chose it because it combines visual design with problem-solving. I have always liked making things look clear, but I also enjoy working out how people can use them more easily.</p>',keys:['visual design','problem-solving','use them more easily'],cn:'选择原因 → 两种能力结合 → 对用户的价值'},
+{part:'p1',id:'p1-work-4',topic:'Work',title:'Do you like your job?',answer:'<p>Yes, especially when I can work on a project from the early idea to the final design. Seeing a vague idea gradually become a real product gives me a strong sense of achievement.</p>',keys:['early idea','final design','real product'],cn:'先表态 → 最喜欢的过程 → 成就感来源'}
+];
+let DATA={p1:[],p2:[]},part='p1',filter='all',weakOnly=false,cardMode=false,currentCardId='',currentIndex=0;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1400)}
+function stateKey(id){return'ielts-recall:'+id}
+function getState(id){return localStorage.getItem(
