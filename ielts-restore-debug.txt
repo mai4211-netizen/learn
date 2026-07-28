@@ -1,0 +1,16 @@
+ielts-part2-shared-v2/assets/part-00.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-01.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-02.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-03.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-04.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-05.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-06.txt: 8000 chars
+ielts-part2-shared-v2/assets/part-07.txt: 4032 chars
+encoded: 60032 chars
+compressed: 45024 bytes
+uncompressed: 271916 bytes
+sha256: f77da22c265c39ee51f20ba3c1d17360995d370a653692557558a0e856092a09
+cards: 59
+wrote ielts-part2-shared-v2/index.html
+wrote ielts-part2-shared-v2-direct/index.html
+wrote ielts-part2-shared-v2-static/index.html
