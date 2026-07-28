@@ -5,31 +5,30 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>IELTS Part 2 · 共用段落整合版</title>
 <style>
-html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#faf8f5;color:#6b645c}.loading{height:100%;display:grid;place-items:center;font-size:14px}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#faf8f5;color:#6b645c}.loading{height:100%;display:grid;place-items:center;padding:24px;text-align:center;font-size:14px;line-height:1.7}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
 </head>
 <body><div class="loading">正在载入…</div>
 <script>
 (async()=>{
   try{
-    const files=Array.from({length:8},(_,i)=>`assets/part-${String(i).padStart(2,'0')}.txt`);
+    if(!window.pako) throw new Error('解压组件载入失败');
+    const version='20260729-2';
+    const files=Array.from({length:8},(_,i)=>`assets/part-${String(i).padStart(2,'0')}.txt?v=${version}`);
     const parts=await Promise.all(files.map(async file=>{
-      const response=await fetch(file,{cache:'no-cache'});
+      const response=await fetch(file,{cache:'no-store'});
       if(!response.ok) throw new Error(`${file}: ${response.status}`);
       return (await response.text()).trim();
     }));
     const bytes=Uint8Array.from(atob(parts.join('')),c=>c.charCodeAt(0));
-    const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-    const html=await new Response(stream).text();
-    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(html));
-    const hex=[...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('');
-    if(hex!=='f77da22c265c39ee51f20ba3c1d17360995d370a653692557558a0e856092a09') throw new Error('内容校验失败');
+    const html=new TextDecoder('utf-8').decode(window.pako.ungzip(bytes));
     document.open();
     document.write(html);
     document.close();
   }catch(error){
     console.error(error);
-    document.body.innerHTML='<div class="loading">页面载入失败，请刷新重试，或使用最新版 Chrome、Edge、Safari。</div>';
+    document.body.innerHTML='<div class="loading">页面载入失败，请刷新重试。<br>若仍失败，请点右下角指南针图标，用 Safari 打开。</div>';
   }
 })();
 </script>
