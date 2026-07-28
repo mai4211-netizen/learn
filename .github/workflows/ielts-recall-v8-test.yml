@@ -1,0 +1,34 @@
+name: IELTS Recall v8 self-test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ielts-speaking-last-minute-recall/index.html'
+      - 'ielts-speaking-last-minute-recall/patch-v7.js'
+      - 'ielts-speaking-last-minute-recall/patch-v8.js'
+      - 'ielts-speaking-last-minute-recall/page-v6-*.txt'
+      - 'ielts-speaking-last-minute-recall/v8-selftest.mjs'
+      - '.github/workflows/ielts-recall-v8-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run recording and transcript tests
+        run: node ielts-speaking-last-minute-recall/v8-selftest.mjs
+      - name: Commit test report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ielts-speaking-last-minute-recall/v8-test-report.json
+          git diff --cached --quiet || git commit -m "Update IELTS recall v8 test report"
+          git push
