@@ -24,7 +24,7 @@ root_memory_fixes = {
     'demanding': '词族记忆：demand（要求）→ demanding（要求高的；费力的、吃力的）。',
     'magnetic': '词族记忆：magnet（磁铁）→ magnetic（磁性的；有吸引力的）。',
     'loss': '词族记忆：lose（失去）对应名词 loss（损失；丧失）。',
-    'sophisticate': '词族记忆：sophisticate 与 sophisticated 同词族；核心概念与“使复杂、使精致、使老练”有关。',
+    'sophisticate': '词形辨析：sophisticate 与 sophisticated、sophistication 同词族；三者词性和常见用法不同，阅读时不要只凭词形直接互换。',
     'specific': '用法记忆：specific 表示“具体的、特定的”；常见 be specific about…、a specific example。',
     'surrounding': '词族记忆：surround（围绕）→ surrounding（周围的）；surroundings 常表示“周围环境”。',
     'expertise': '词族记忆：expert（专家）→ expertise（专业知识；专长）。',
@@ -65,6 +65,10 @@ for x in items.values():
 artificial = items.get('artificial')
 if artificial:
     artificial['phrases'] = [str(p).replace('intelli-gence', 'intelligence') for p in artificial.get('phrases', [])]
+
+approach = items.get('approach')
+if approach:
+    approach['phrases'] = ['an approach to sth 做某事的方法/途径', 'approach sb/sth 接近某人/某物']
 
 DATA.write_text(prefix + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';\n', encoding='utf-8')
 
@@ -110,9 +114,12 @@ if SENTINEL not in app:
         raise SystemExit('review ipa anchor changed')
     app = app.replace(old, new, 1)
 
-    # Correct an old hand-authored override that used the UK IPA in both fields.
     app = app.replace("ipa_us: '/nəʊ/',\n        ipa_uk: '/nəʊ/',", "ipa_us: '/noʊ/',\n        ipa_uk: '/nəʊ/',", 1)
     app += '\n' + SENTINEL + '\n'
+
+# Always-safe UI polish, deliberately idempotent.
+app = app.replace('<span class="label l2">词根记忆</span>', '<span class="label l2">记忆提示</span>')
+app = app.replace("document.getElementById('main-footer').style.display = mode === 'card' ? 'flex' : 'none';", "document.getElementById('main-footer').style.display = mode === 'card' ? 'grid' : 'none';")
 
 APP.write_text(app, encoding='utf-8')
 print('PATCH_OK', len(data.get('core', [])), len(data.get('replacement', [])))
