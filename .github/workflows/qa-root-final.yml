@@ -63,7 +63,7 @@ jobs:
               const unlock = page.locator('#speech-unlock-overlay:not(.hidden) #speech-unlock-btn');
               if (await unlock.count()) {
                 await unlock.click();
-                await page.waitForSelector('#speech-unlock-overlay.hidden');
+                await page.waitForSelector('#speech-unlock-overlay', {state:'hidden'});
                 await page.screenshot({path:`final-${cfg.name}-unlocked.png`, fullPage:true});
               }
 
