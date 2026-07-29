@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>答案词随身听</title></head><body><div id="s" style="font:14px/1.6 system-ui;padding:24px">正在加载…</div><script>
+(async()=>{
+ const base='../answer-word-player-v5-2/';
+ const fixed=[...Array(13)].map((_,i)=>`${base}chunks/${String(i).padStart(2,'0')}.txt`).concat([`${base}chunks/13a.txt`,`${base}chunks/13b.txt`]);
+ const prefix=(await Promise.all(fixed.map(async f=>{const r=await fetch(f,{cache:'no-store'});if(!r.ok)throw new Error(f+' '+r.status);return r.text()}))).join('');
+ const marker='tKxkn/L49rpDhluIbBAutCqm16NOQCtq', tailLen=25182;
+ const names=['14a.txt','14p0.txt','14.txt'];
+ async function decode(b64){const bin=atob(b64);const u8=Uint8Array.from(bin,c=>c.charCodeAt(0));return await new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream('gzip'))).text()}
+ const texts=[];
+ for(const n of names){try{const r=await fetch(base+'chunks/'+n,{cache:'no-store'});if(r.ok)texts.push(await r.text())}catch(e){}}
+ const corpora=[...texts];
+ for(let i=0;i<texts.length;i++)for(let j=0;j<texts.length;j++)if(i!==j)corpora.push(texts[i]+texts[j]);
+ let html='';
+ outer:for(const t of corpora){let pos=t.indexOf(marker);while(pos>=0){const tail=t.slice(pos,pos+tailLen);if(tail.length===tailLen){try{const h=await decode(prefix+tail);if(/<!doctype html|<html/i.test(h)){html=h;break outer}}catch(e){}}pos=t.indexOf(marker,pos+1)}}
+ if(!html)throw new Error('部署数据校验失败');
+ document.open();document.write(html);document.close();
+})().catch(e=>{document.getElementById('s').textContent='加载失败：'+e.message});
+</script></body></html>
