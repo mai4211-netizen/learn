@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'ielts-part2-shared-v2/.upload-20260730/**'
+      - 'ielts-part2-shared-v2/.upload-20260730-xz/**'
 
 permissions:
   contents: write
@@ -24,14 +24,14 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import base64, gzip, hashlib, re, subprocess
+          import base64, lzma, hashlib, re, subprocess
 
-          source = Path('ielts-part2-shared-v2/.upload-20260730')
+          source = Path('ielts-part2-shared-v2/.upload-20260730-xz')
           parts = sorted(source.glob('part-*.txt'))
-          if len(parts) != 9:
-              raise SystemExit(f'expected 9 parts, got {len(parts)}')
+          if len(parts) != 6:
+              raise SystemExit(f'expected 6 parts, got {len(parts)}')
           encoded = ''.join(p.read_text(encoding='utf-8').strip() for p in parts)
-          html = gzip.decompress(base64.b64decode(encoded, validate=True))
+          html = lzma.decompress(base64.b64decode(encoded, validate=True))
           digest = hashlib.sha256(html).hexdigest()
           expected = '379bbdbacb4f00ef198250eb10be28ef2f792c97e79fc6ead3a4f155532eb8e2'
           if digest != expected:
