@@ -1,0 +1,17 @@
+name: IELTS 538 data audit
+
+on:
+  push:
+    paths:
+      - '.github/workflows/ielts538-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit dataset
+        run: python3 tools/audit_538.py
