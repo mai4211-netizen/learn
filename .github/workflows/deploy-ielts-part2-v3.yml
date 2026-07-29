@@ -1,0 +1,61 @@
+name: Deploy IELTS Part 2 v3 static HTML
+
+on:
+  push:
+    paths:
+      - '.github/workflows/deploy-ielts-part2-v3.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Rebuild and verify uploaded v3 HTML
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64, gzip, hashlib
+
+          source = Path('ielts-part2-shared-v2/v3-assets')
+          encoded = ''.join((source / f'part-{i:02d}.txt').read_text(encoding='utf-8').strip() for i in range(9))
+          html = gzip.decompress(base64.b64decode(encoded))
+          digest = hashlib.sha256(html).hexdigest()
+          expected = 'd45c7305afa50f81f2387051f700ef4d11355c6730c79eb84d60be62f73d6049'
+          if digest != expected:
+              raise SystemExit(f'checksum mismatch: {digest}')
+          text = html.decode('utf-8')
+          if '<title>IELTS Part 2 · 共用段落整合版 v3</title>' not in text:
+              raise SystemExit('v3 title check failed')
+          if text.count('class="card"') != 59:
+              raise SystemExit('card count mismatch')
+
+          for target in (
+              Path('ielts-part2-shared-v2/index.html'),
+              Path('ielts-part2-shared-v2-static/index.html'),
+              Path('ielts-part2-shared-v2-direct/index.html'),
+          ):
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_bytes(html)
+              print(f'wrote {target}: {len(html)} bytes, sha256={digest}')
+          PY
+
+      - name: Commit v3 static HTML
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ielts-part2-shared-v2/index.html ielts-part2-shared-v2-static/index.html ielts-part2-shared-v2-direct/index.html
+          if git diff --cached --quiet; then
+            echo "Already up to date"
+          else
+            git commit -m "Deploy IELTS Part 2 v3 static HTML"
+            git push origin main
+          fi
