@@ -1,0 +1,60 @@
+name: Restore answer-word-player v5-2
+
+on:
+  push:
+    paths:
+      - '.github/workflows/restore-answer-word-player-v5-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Find exact HTML in Git history
+        shell: bash
+        run: |
+          set -euo pipefail
+          TARGET='c985e85135d06d476e9f2d56a30b2f1bc9b4490ecfd8678c074c3b2e20774a97'
+          FOUND=''
+          while read -r obj path; do
+            [ -n "${path:-}" ] || continue
+            case "$path" in
+              *.html) ;;
+              *) continue ;;
+            esac
+            if [ "$(git cat-file -t "$obj" 2>/dev/null || true)" != 'blob' ]; then
+              continue
+            fi
+            h="$(git cat-file blob "$obj" | sha256sum | awk '{print $1}')"
+            if [ "$h" = "$TARGET" ]; then
+              FOUND="$obj"
+              echo "Found exact HTML blob at historical path: $path"
+              break
+            fi
+          done < <(git rev-list --objects --all)
+          if [ -z "$FOUND" ]; then
+            echo 'Exact HTML not found in Git history.' >&2
+            exit 2
+          fi
+          mkdir -p answer-word-player-v5-2
+          git cat-file blob "$FOUND" > answer-word-player-v5-2/index.html
+          test "$(sha256sum answer-word-player-v5-2/index.html | awk '{print $1}')" = "$TARGET"
+      - name: Commit restored page
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add answer-word-player-v5-2/index.html
+          if git diff --cached --quiet; then
+            echo 'No change required.'
+            exit 0
+          fi
+          git commit -m 'Restore exact answer-word-player v5-2 HTML'
+          git push
