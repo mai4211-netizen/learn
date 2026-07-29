@@ -1,0 +1,75 @@
+name: Recover answer-word-player v5-2 from chunks
+
+on:
+  push:
+    paths:
+      - '.github/workflows/recover-answer-word-player-v5-2-chunks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: recover-answer-word-player-v5-2
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Recover exact HTML from historical chunk blobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64,gzip,hashlib,itertools,subprocess,pathlib
+          TARGET='c985e85135d06d476e9f2d56a30b2f1bc9b4490ecfd8678c074c3b2e20774a97'
+          root='answer-word-player/chunks'
+          candidates=[]
+          for i in range(12):
+              path=f'{root}/{i:02d}.txt'
+              commits=subprocess.run(['git','log','--all','--format=%H','--',path],capture_output=True,text=True,check=True).stdout.split()
+              vals=[]; seen=set()
+              for c in commits:
+                  r=subprocess.run(['git','show',f'{c}:{path}'],capture_output=True)
+                  if r.returncode: continue
+                  try: s=r.stdout.decode().strip()
+                  except UnicodeDecodeError: continue
+                  if s and s not in seen:
+                      seen.add(s); vals.append(s)
+              print(path, 'candidates', len(vals))
+              if not vals:
+                  raise SystemExit(f'No historical candidates for {path}')
+              candidates.append(vals)
+          tried=0
+          for combo in itertools.product(*candidates):
+              tried+=1
+              try:
+                  raw=gzip.decompress(base64.b64decode(''.join(combo), validate=True))
+              except Exception:
+                  continue
+              if hashlib.sha256(raw).hexdigest()==TARGET:
+                  out=pathlib.Path('answer-word-player-v5-2/index.html')
+                  out.parent.mkdir(parents=True,exist_ok=True)
+                  out.write_bytes(raw)
+                  print('Recovered exact HTML after',tried,'combinations')
+                  raise SystemExit(0)
+          raise SystemExit(f'No exact reconstruction found after {tried} combinations')
+          PY
+      - name: Commit exact recovered HTML
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum answer-word-player-v5-2/index.html | awk '{print $1}')" = 'c985e85135d06d476e9f2d56a30b2f1bc9b4490ecfd8678c074c3b2e20774a97'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add answer-word-player-v5-2/index.html
+          if git diff --cached --quiet; then
+            echo 'Already exact.'
+            exit 0
+          fi
+          git commit -m 'Recover exact answer-word-player v5-2 HTML'
+          git push
