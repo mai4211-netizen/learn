@@ -1,17 +1,1 @@
-<!doctype html>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>答案词随身听</title>
-<body><p style="font-family:system-ui;padding:24px">正在加载…</p>
-<script>
-(async()=>{
-  const files = ["chunks/00.txt", "chunks/01.txt", "chunks/02.txt", "chunks/03.txt", "chunks/04.txt", "chunks/05.txt", "chunks/06.txt", "chunks/07.txt", "chunks/08.txt", "chunks/09.txt", "chunks/10.txt", "chunks/11.txt"];
-  const parts = await Promise.all(files.map(file => fetch(file).then(r => { if (!r.ok) throw new Error(file + ' ' + r.status); return r.text(); })));
-  const b64 = parts.join('');
-  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-  const html = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
-  document.open(); document.write(html); document.close();
-})().catch(error => {
-  document.body.innerHTML = '<pre style="white-space:pre-wrap;padding:24px">加载失败：' + error + '</pre>';
-});
-</script>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>答案词随身听</title></head><body><script>(async()=>{const files=Array.from({length:16},(_,i)=>`chunks/${String(i).padStart(2,'0')}.txt`);const parts=await Promise.all(files.map(async f=>{const r=await fetch(f);if(!r.ok)throw new Error(`${f}: ${r.status}`);return r.text()}));const b64=parts.join('');const bin=atob(b64);const u8=Uint8Array.from(bin,c=>c.charCodeAt(0));const ds=new DecompressionStream('gzip');const html=await new Response(new Blob([u8]).stream().pipeThrough(ds)).text();document.open();document.write(html);document.close()})().catch(e=>document.body.innerHTML='<pre style="white-space:pre-wrap;padding:24px;font:14px/1.5 system-ui">加载失败：'+e.message+'</pre>')</script></body></html>
