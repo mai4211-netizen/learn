@@ -1,0 +1,34 @@
+name: IELTS 538 public Pages verification
+
+on:
+  pull_request:
+    types: [synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-public-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for the current main build on GitHub Pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://mai4211-netizen.github.io/learn/'
+          ok=0
+          for attempt in $(seq 1 18); do
+            echo "Pages check ${attempt}/18"
+            html="$(curl -fsSL --connect-timeout 10 --max-time 20 "${URL}?qa=${GITHUB_RUN_ID}-${attempt}" || true)"
+            css="$(curl -fsSL --connect-timeout 10 --max-time 20 "${URL}responsive.css?qa=${GITHUB_RUN_ID}-${attempt}" || true)"
+            app="$(curl -fsSL --connect-timeout 10 --max-time 20 "${URL}app.js?qa=${GITHUB_RUN_ID}-${attempt}" || true)"
+            if grep -q 'responsive.css?v=20260730' <<<"$html" \
+              && grep -q 'grid-template-columns: repeat(3, minmax(0, 1fr))' <<<"$css" \
+              && grep -q "VOICE_PREF_KEY = 'ielts538.voiceURI'" <<<"$app"; then
+              echo "PUBLIC_PAGES_OK ${URL}"
+              ok=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ok" = 1
