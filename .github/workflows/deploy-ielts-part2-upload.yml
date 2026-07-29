@@ -1,0 +1,74 @@
+name: Deploy IELTS Part 2 uploaded HTML
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'ielts-part2-shared-v2/.upload-20260729/**'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Rebuild and validate uploaded HTML
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64, gzip, hashlib, re, subprocess
+
+          source = Path('ielts-part2-shared-v2/.upload-20260729')
+          parts = sorted(source.glob('part-*.txt'))
+          if len(parts) != 5:
+              raise SystemExit(f'expected 5 parts, got {len(parts)}')
+          encoded = ''.join(p.read_text(encoding='utf-8').strip() for p in parts)
+          html = gzip.decompress(base64.b64decode(encoded, validate=True))
+          digest = hashlib.sha256(html).hexdigest()
+          expected = '379bbdbacb4f00ef198250eb10be28ef2f792c97e79fc6ead3a4f155532eb8e2'
+          if digest != expected:
+              raise SystemExit(f'checksum mismatch: {digest}')
+          text = html.decode('utf-8')
+          if '<title>IELTS Part 2 · 共用段落整合版 v3</title>' not in text:
+              raise SystemExit('title check failed')
+          if text.count('class="card"') != 59:
+              raise SystemExit('card count mismatch')
+          if re.search(r'https?://', text):
+              raise SystemExit('unexpected external URL dependency')
+          ids = set(re.findall(r'\bid="([^"]+)"', text))
+          hrefs = re.findall(r'href="#([^"]+)"', text)
+          missing = sorted(set(hrefs) - ids)
+          if missing:
+              raise SystemExit(f'missing anchors: {missing[:10]}')
+          scripts = re.findall(r'<script[^>]*>(.*?)</script>', text, re.S|re.I)
+          if len(scripts) != 1:
+              raise SystemExit(f'expected 1 inline script, got {len(scripts)}')
+          js = Path('/tmp/ielts-inline.js')
+          js.write_text(scripts[0], encoding='utf-8')
+          subprocess.run(['node', '--check', str(js)], check=True)
+
+          target = Path('ielts-part2-shared-v2/index.html')
+          target.write_bytes(html)
+          print(f'wrote {target}: {len(html)} bytes sha256={digest}')
+          PY
+
+      - name: Commit generated static page
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ielts-part2-shared-v2/index.html
+          if git diff --cached --quiet; then
+            echo "No generated change"
+          else
+            git commit -m "Deploy latest IELTS Part 2 page"
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
