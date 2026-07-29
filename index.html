@@ -3,35 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>IELTS 538 V2</title>
-  <link rel="stylesheet" href="./styles.css?v=20260730">
-  <link rel="stylesheet" href="./responsive.css?v=20260730">
+  <meta name="theme-color" content="#f5f7fb" />
+  <title>IELTS 538 考点词</title>
+  <link rel="stylesheet" href="./styles.css?v=20260730-r2">
+  <link rel="stylesheet" href="./responsive.css?v=20260730-r2">
 </head>
-<body class="v2-shell v2-only" data-build="2026-07-30">
+<body class="v2-shell v2-only" data-build="2026-07-30-r2">
   <div id="speech-unlock-overlay" class="speech-unlock-overlay hidden" role="dialog" aria-modal="true" aria-label="解锁发音">
     <div class="speech-unlock-card">
-      <div class="speech-unlock-title">点击开始</div>
-      <div class="speech-unlock-text">为保证 iPhone 和 iPad 发音稳定，请先点击一次解锁发音。</div>
-      <button id="speech-unlock-btn" class="speech-unlock-btn" type="button" onclick="handleSpeechUnlockTap(event)">开始并解锁发音</button>
+      <div class="speech-unlock-badge">AUDIO</div>
+      <div class="speech-unlock-title">启用单词发音</div>
+      <div class="speech-unlock-text">iPhone / iPad 需要一次点击才能启用浏览器语音。之后切换词卡会自动播放。</div>
+      <button id="speech-unlock-btn" class="speech-unlock-btn" type="button" onclick="handleSpeechUnlockTap(event)">开始学习</button>
     </div>
   </div>
-  <header>
+
+  <header class="app-header">
     <div class="head-row">
-      <div class="title">IELTS 538 考点词</div>
+      <div class="brand-block">
+        <div class="eyebrow">IELTS READING · VOCABULARY</div>
+        <div class="title">538 考点词</div>
+        <div class="subtitle">376 核心词 · 162 关联词</div>
+      </div>
       <div class="tabs" role="tablist" aria-label="视图切换">
         <button class="tab-btn active" id="tab-card" onclick="switchView('card')">卡片</button>
         <button class="tab-btn" id="tab-list" onclick="switchView('list')">列表</button>
         <button class="tab-btn review-tab-btn" id="tab-review" onclick="switchView('review')">复习</button>
       </div>
     </div>
-    <input id="search" class="search-box" type="search" inputmode="search" autocomplete="off" placeholder="搜索单词、含义或同义词..." oninput="onSearch()" />
-    <details class="audio-settings" id="audio-settings">
-      <summary>发音设置</summary>
-      <div class="audio-settings-body">
-        <label for="voice-select">声音</label>
-        <select id="voice-select" aria-label="选择英语发音声音"><option value="">自动选择</option></select>
-      </div>
-    </details>
+    <div class="command-row">
+      <label class="search-shell" for="search">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input id="search" class="search-box" type="search" inputmode="search" autocomplete="off" placeholder="搜索单词、中文、同义词" oninput="onSearch()" />
+      </label>
+      <details class="audio-settings" id="audio-settings">
+        <summary aria-label="打开发音设置">发音</summary>
+        <div class="audio-settings-body">
+          <label for="voice-select">声音</label>
+          <select id="voice-select" aria-label="选择英语发音声音"><option value="">自动选择</option></select>
+        </div>
+      </details>
+    </div>
   </header>
 
   <main>
@@ -42,13 +54,14 @@
             <div class="category" id="f-cat">CATEGORY</div>
             <button id="f-word" class="word-btn" aria-label="重播单词发音">loading</button>
             <div class="ipa-row">
-            <button id="f-ipa" class="pill" aria-label="切换英美音">/../ [US]</button>
+              <button id="f-ipa" class="pill" aria-label="切换英美音">/../ [US]</button>
             </div>
             <div class="helper-row v2-word-tools">
               <button id="f-slow" class="pill ghost-pill" aria-label="慢速拼读当前单词">慢速拼读</button>
             </div>
-            <div class="section-title">替换 / 命题词（点击查看详情并发音）</div>
+            <div class="section-title">关联词 · 点击查看详情</div>
             <div id="f-repl" class="chips"></div>
+            <div class="flip-hint">点击卡片查看释义</div>
           </article>
 
           <article class="face back v2-card-face">
@@ -73,62 +86,42 @@
         <button class="review-tab" id="review-tab-cn" role="tab" aria-selected="false" onclick="setReviewMode('cn')">考中文</button>
       </div>
       <details class="review-scope-panel">
-        <summary><span>单词范围</span><span class="review-scope-summary" id="review-selection-summary">已选：全部范围</span></summary>
+        <summary><span>复习范围</span><span class="review-scope-summary" id="review-selection-summary">已选：全部范围</span></summary>
         <div class="review-scope-body">
           <div class="review-filter-grid" aria-label="复习范围筛选">
             <label class="review-filter-item review-filter-all" for="review-filter-all">
               <input type="checkbox" id="review-filter-all" />
-              <span class="review-filter-copy"><span>所有单词（核心+关联词）</span><span class="review-filter-count" id="review-count-all">0</span></span>
+              <span class="review-filter-copy"><span>所有单词</span><span class="review-filter-count" id="review-count-all">0</span></span>
             </label>
-            <label class="review-filter-item" for="review-filter-cat1">
-              <input type="checkbox" id="review-filter-cat1" />
-              <span class="review-filter-copy"><span>第一类单词</span><span class="review-filter-count" id="review-count-cat1">0</span></span>
-            </label>
-            <label class="review-filter-item" for="review-filter-cat2">
-              <input type="checkbox" id="review-filter-cat2" />
-              <span class="review-filter-copy"><span>第二类单词</span><span class="review-filter-count" id="review-count-cat2">0</span></span>
-            </label>
-            <label class="review-filter-item" for="review-filter-cat3">
-              <input type="checkbox" id="review-filter-cat3" />
-              <span class="review-filter-copy"><span>第三类单词</span><span class="review-filter-count" id="review-count-cat3">0</span></span>
-            </label>
-            <label class="review-filter-item" for="review-filter-core">
-              <input type="checkbox" id="review-filter-core" />
-              <span class="review-filter-copy"><span>核心词</span><span class="review-filter-count" id="review-count-core">0</span></span>
-            </label>
-            <label class="review-filter-item" for="review-filter-replacement">
-              <input type="checkbox" id="review-filter-replacement" />
-              <span class="review-filter-copy"><span>关联词</span><span class="review-filter-count" id="review-count-replacement">0</span></span>
-            </label>
+            <label class="review-filter-item" for="review-filter-cat1"><input type="checkbox" id="review-filter-cat1" /><span class="review-filter-copy"><span>第一类</span><span class="review-filter-count" id="review-count-cat1">0</span></span></label>
+            <label class="review-filter-item" for="review-filter-cat2"><input type="checkbox" id="review-filter-cat2" /><span class="review-filter-copy"><span>第二类</span><span class="review-filter-count" id="review-count-cat2">0</span></span></label>
+            <label class="review-filter-item" for="review-filter-cat3"><input type="checkbox" id="review-filter-cat3" /><span class="review-filter-copy"><span>第三类</span><span class="review-filter-count" id="review-count-cat3">0</span></span></label>
+            <label class="review-filter-item" for="review-filter-core"><input type="checkbox" id="review-filter-core" /><span class="review-filter-copy"><span>核心词</span><span class="review-filter-count" id="review-count-core">0</span></span></label>
+            <label class="review-filter-item" for="review-filter-replacement"><input type="checkbox" id="review-filter-replacement" /><span class="review-filter-copy"><span>关联词</span><span class="review-filter-count" id="review-count-replacement">0</span></span></label>
           </div>
-          <div class="review-filter-note">范围筛选按并集计算；勾选关联词时，会把对应核心词下的关联词作为独立题卡纳入 deck。</div>
+          <div class="review-filter-note">分类和题型按并集计算；关联词会作为独立题卡进入复习。</div>
         </div>
       </details>
-      <div class="review-card-stage">
-        <div class="review-card-container" id="review-card-container"></div>
-      </div>
+      <div class="review-card-stage"><div class="review-card-container" id="review-card-container"></div></div>
     </section>
   </main>
 
   <footer id="main-footer">
-    <button class="nav-btn" id="prev-btn" aria-label="上一个">⇠</button>
+    <button class="nav-btn" id="prev-btn" aria-label="上一个">←</button>
     <div class="prog">
       <div class="prog-main" id="progress">0 / 0</div>
-      <div class="prog-sub" id="progress-sub">目标：376主词 + 162替换词</div>
+      <div class="prog-sub" id="progress-sub">376 核心词 · 162 关联词</div>
     </div>
-    <button class="nav-btn" id="next-btn" aria-label="下一个">⇢</button>
+    <button class="nav-btn" id="next-btn" aria-label="下一个">→</button>
   </footer>
 
   <div class="mask" id="modal-mask" onclick="closeSheet()"></div>
   <aside class="sheet" id="bottom-sheet" role="dialog" aria-modal="true" aria-label="替换词详情">
-    <div class="sheet-head">
-      <strong id="sheet-title">详情</strong>
-      <button onclick="closeSheet()" aria-label="关闭详情">×</button>
-    </div>
+    <div class="sheet-head"><strong id="sheet-title">详情</strong><button onclick="closeSheet()" aria-label="关闭详情">×</button></div>
     <div class="sheet-body" id="sheet-body"></div>
   </aside>
 
-  <script src="./data.js?v=20260730"></script>
-  <script src="./app.js?v=20260730"></script>
+  <script src="./data.js?v=20260730-r2"></script>
+  <script src="./app.js?v=20260730-r2"></script>
 </body>
 </html>
