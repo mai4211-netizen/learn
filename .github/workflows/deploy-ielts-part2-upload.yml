@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'ielts-part2-shared-v2/.upload-20260730-xz/**'
+      - 'ielts-part2-shared-v2/.patch-20260730/**'
 
 permissions:
   contents: write
@@ -19,23 +19,35 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
-      - name: Rebuild and validate uploaded HTML
+      - name: Apply and validate uploaded HTML update
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
-          import base64, lzma, hashlib, re, subprocess
-
-          source = Path('ielts-part2-shared-v2/.upload-20260730-xz')
+          import base64, lzma, hashlib
+          source = Path('ielts-part2-shared-v2/.patch-20260730')
           parts = sorted(source.glob('part-*.txt'))
-          if len(parts) != 6:
-              raise SystemExit(f'expected 6 parts, got {len(parts)}')
+          if len(parts) != 3:
+              raise SystemExit(f'expected 3 patch parts, got {len(parts)}')
           encoded = ''.join(p.read_text(encoding='utf-8').strip() for p in parts)
-          html = lzma.decompress(base64.b64decode(encoded, validate=True))
+          patch = lzma.decompress(base64.b64decode(encoded, validate=True))
+          digest = hashlib.sha256(patch).hexdigest()
+          expected = '40a6ca6e00a1f1048457b5e19d36f027f05d6370c4f869579182aaf4c2b9bda7'
+          if digest != expected:
+              raise SystemExit(f'patch checksum mismatch: {digest}')
+          Path('/tmp/ielts-update.patch').write_bytes(patch)
+          print(f'patch ok: {len(patch)} bytes sha256={digest}')
+          PY
+          patch -p1 < /tmp/ielts-update.patch
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, re, subprocess
+          target = Path('ielts-part2-shared-v2/index.html')
+          html = target.read_bytes()
           digest = hashlib.sha256(html).hexdigest()
           expected = '379bbdbacb4f00ef198250eb10be28ef2f792c97e79fc6ead3a4f155532eb8e2'
           if digest != expected:
-              raise SystemExit(f'checksum mismatch: {digest}')
+              raise SystemExit(f'HTML checksum mismatch: {digest}')
           text = html.decode('utf-8')
           if '<title>IELTS Part 2 · 共用段落整合版 v3</title>' not in text:
               raise SystemExit('title check failed')
@@ -54,10 +66,7 @@ jobs:
           js = Path('/tmp/ielts-inline.js')
           js.write_text(scripts[0], encoding='utf-8')
           subprocess.run(['node', '--check', str(js)], check=True)
-
-          target = Path('ielts-part2-shared-v2/index.html')
-          target.write_bytes(html)
-          print(f'wrote {target}: {len(html)} bytes sha256={digest}')
+          print(f'HTML ok: {len(html)} bytes sha256={digest}')
           PY
 
       - name: Commit generated static page
