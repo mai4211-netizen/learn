@@ -1,1 +1,0 @@
-Temporary verified patch payload for the latest uploaded index.html.
