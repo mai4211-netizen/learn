@@ -29,7 +29,12 @@ jobs:
           parts = sorted(source.glob('part-*.txt'))
           if len(parts) != 3:
               raise SystemExit(f'expected 3 patch parts, got {len(parts)}')
-          encoded = ''.join(p.read_text(encoding='utf-8').strip() for p in parts)
+          pieces = [p.read_text(encoding='utf-8').strip() for p in parts]
+          # Correct one transcription character in the middle payload chunk.
+          if len(pieces[1]) != 6000 or pieces[1][747] != '7':
+              raise SystemExit('unexpected part-01 payload shape')
+          pieces[1] = pieces[1][:747] + '9' + pieces[1][748:]
+          encoded = ''.join(pieces)
           patch = lzma.decompress(base64.b64decode(encoded, validate=True))
           digest = hashlib.sha256(patch).hexdigest()
           expected = '40a6ca6e00a1f1048457b5e19d36f027f05d6370c4f869579182aaf4c2b9bda7'
