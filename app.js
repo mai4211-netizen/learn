@@ -900,7 +900,7 @@ let coreData = [];
       const phraseHtml = formatPhraseHTML(coreView.phrases || []);
       const exampleHtml = formatExampleHTML(coreView.example);
       const rootBlock = shouldDisplayRootMemory(coreView.root)
-        ? `<div class="item sheet-card"><span class="label l2">词根记忆</span><div class="txt">${sanitizeHTML(coreView.root)}</div></div>`
+        ? `<div class="item sheet-card"><span class="label l2">记忆提示</span><div class="txt">${sanitizeHTML(coreView.root)}</div></div>`
         : '';
       const backDensityClass = getCopyDensityClass(
         [coreView.meaning, coreView.root, coreView.example, (coreView.phrases || []).join(' ')],
@@ -1708,7 +1708,7 @@ let coreData = [];
       document.getElementById('card-view').style.display = mode === 'card' ? 'flex' : 'none';
       document.getElementById('list-view').style.display = mode === 'list' ? 'flex' : 'none';
       document.getElementById('review-view').style.display = mode === 'review' ? 'flex' : 'none';
-      document.getElementById('main-footer').style.display = mode === 'card' ? 'flex' : 'none';
+      document.getElementById('main-footer').style.display = mode === 'card' ? 'grid' : 'none';
       document.getElementById('tab-card').classList.toggle('active', mode === 'card');
       document.getElementById('tab-list').classList.toggle('active', mode === 'list');
       document.getElementById('tab-review').classList.toggle('active', mode === 'review');
