@@ -1,0 +1,35 @@
+name: Restore old answer-word-player
+
+on:
+  push:
+    paths:
+      - '.github/workflows/restore-old-answer-word-player.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore folder to state before this deployment attempt
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='a3b9be44b18129304483ee0b85ec40562959e9dd'
+          git cat-file -e "$BASE^"
+          git rm -r --ignore-unmatch answer-word-player
+          git checkout "$BASE^" -- answer-word-player
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A answer-word-player
+          if git diff --cached --quiet; then
+            echo 'Already restored.'
+            exit 0
+          fi
+          git commit -m 'Restore previous answer-word-player state'
+          git push
