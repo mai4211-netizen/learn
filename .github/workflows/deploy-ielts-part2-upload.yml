@@ -28,8 +28,8 @@ jobs:
 
           source = Path('ielts-part2-shared-v2/.upload-20260730')
           parts = sorted(source.glob('part-*.txt'))
-          if len(parts) != 17:
-              raise SystemExit(f'expected 17 parts, got {len(parts)}')
+          if len(parts) != 9:
+              raise SystemExit(f'expected 9 parts, got {len(parts)}')
           encoded = ''.join(p.read_text(encoding='utf-8').strip() for p in parts)
           html = gzip.decompress(base64.b64decode(encoded, validate=True))
           digest = hashlib.sha256(html).hexdigest()
