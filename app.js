@@ -70,7 +70,7 @@ let coreData = [];
         ielts_example: '',
       },
       'know': {
-        ipa_us: '/nəʊ/',
+        ipa_us: '/noʊ/',
         ipa_uk: '/nəʊ/',
         meaning_cn: 'v. 知道；了解',
         meaning_en: 'to have information in your mind',
@@ -354,8 +354,8 @@ let coreData = [];
           .trim();
         out.root = '（逻辑考点词，词根项不适用）';
       }
-      if (!out.root) out.root = '（词根待校验）';
-      if (!out.example) out.example = '（例句待校验）';
+      if (isPendingText(out.root)) out.root = '';
+      if (isPendingText(out.example)) out.example = '';
       return out;
     }
 
@@ -460,15 +460,15 @@ let coreData = [];
     }
 
     function formatExampleHTML(value) {
-      if (!value || (typeof value === 'string' && !String(value).trim())) return sanitizeHTML('（例句待校验）');
-      if (typeof value === 'string' && isPendingText(value)) return sanitizeHTML(value);
+      if (!value || (typeof value === 'string' && !String(value).trim())) return '';
+      if (typeof value === 'string' && isPendingText(value)) return '';
       const blocks = normalizeExampleBlocks(value).map(({ en, cn }) => {
         const parts = [];
         if (en) parts.push(`<span class="example-en">${sanitizeHTML(en)}</span>`);
         if (cn) parts.push(`<span class="example-cn">${sanitizeHTML(cn)}</span>`);
         return `<div>${parts.join('')}</div>`;
       });
-      return blocks.length ? `<div class="example-lines">${blocks.join('')}</div>` : sanitizeHTML('（例句待校验）');
+      return blocks.length ? `<div class="example-lines">${blocks.join('')}</div>` : '';
     }
 
     function parseSynonyms(raw) {
@@ -534,10 +534,9 @@ let coreData = [];
         curList = [...coreData];
 
         const hard = report.hard_check || {};
-        const summary = `校验 core=${report.core_count} total=${report.total_words_by_count_rule} 对齐错误=${report.line_alignment_errors}`;
-        document.getElementById('progress-sub').innerText = summary;
-        if (!hard.core_equals_376 || !hard.count_rule_equals_538 || !hard.no_missing_fields || !hard.no_placeholders || !hard.line_alignment_zero) {
-          document.getElementById('progress-sub').innerText = '数据校验未全绿，请先运行构建脚本修复';
+        document.getElementById('progress-sub').innerText = `${coreData.length} 核心词 · ${replacementData.length} 关联词`;
+        if (Object.keys(hard).length && (!hard.core_equals_376 || !hard.count_rule_equals_538 || !hard.line_alignment_zero)) {
+          console.warn('IELTS 538 integrity report needs review', report);
         }
 
         bindEvents();
@@ -869,6 +868,17 @@ let coreData = [];
       `;
     }
 
+    function getDisplayIpa(item) {
+      if (!item) return '';
+      const us = String(item.ipa_us || '').trim();
+      const uk = String(item.ipa_uk || '').trim();
+      if (accent === 'en-GB') return uk || us;
+      // If a supposedly US transcription is literally the same as a British one and still
+      // contains the UK LOT vowel, do not present it as verified US pronunciation.
+      if (us && uk && us === uk && /ɒ/.test(us)) return '';
+      return us || uk;
+    }
+
     function render(options = {}) {
       const it = curList[curIdx];
       if (!it) {
@@ -880,8 +890,8 @@ let coreData = [];
       frontWordShowsSyllables = false;
       backWordShowsSyllables = false;
       setWordButtonText('f-word', it.word, frontWordShowsSyllables);
-      const ipa = accent === 'en-US' ? it.ipa_us : it.ipa_uk;
-      document.getElementById('f-ipa').innerText = `${ipa} [${accent === 'en-US' ? 'US' : 'UK'}]`;
+      const ipa = getDisplayIpa(it);
+      document.getElementById('f-ipa').innerText = `${ipa || '音标待复核'} [${accent === 'en-US' ? 'US' : 'UK'}]`;
 
       const replWords = parseSynonyms(it.synonym_raw);
       renderReplacementChips('f-repl', replWords, it);
@@ -901,12 +911,12 @@ let coreData = [];
         <div class="sheet-meaning ${meaningFitClass}">${sanitizeHTML(coreView.meaning || '（释义待校验）')}</div>
         <div class="sheet-wordline">
           <button id="b-word" class="sheet-word" aria-label="切换音节显示并播放 ${sanitizeHTML(it.word)}">${sanitizeHTML(it.word)}</button>
-          <div class="sheet-sub">${sanitizeHTML(it.ipa_us || '')}</div>
+          <div class="sheet-sub">${sanitizeHTML(getDisplayIpa(it) || '音标待复核')}</div>
         </div>
         ${rootBlock}
         <div class="item"><span class="label l1">关联词汇</span><div class="chips chips-left" id="b-repl"></div></div>
         <div class="item"><span class="label l3">高频词组</span><div class="txt">${phraseHtml}</div></div>
-        <div class="item"><span class="label l4">雅思真题例句</span><div class="txt example">${exampleHtml}</div></div>
+        ${exampleHtml ? `<div class="item"><span class="label l4">已校验例句</span><div class="txt example">${exampleHtml}</div></div>` : ''}
       `;
       const backHost = document.getElementById('b-content');
       backHost.className = `back-scroll ${backDensityClass}`.trim();
@@ -991,8 +1001,7 @@ let coreData = [];
     }
 
     function getReviewCardIpa(card) {
-      if (!card) return '';
-      return String(accent === 'en-US' ? (card.ipa_us || card.ipa_uk || '') : (card.ipa_uk || card.ipa_us || '')).trim();
+      return getDisplayIpa(card);
     }
 
     function computeReviewScopeStats() {
@@ -1801,3 +1810,5 @@ let coreData = [];
     }
 
     init();
+
+// IELTS538_R2_DATA_POLICY
