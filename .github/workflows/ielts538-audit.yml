@@ -41,9 +41,12 @@ jobs:
           assert 'bene（好）+ fic' not in items['approach']['root_memory']
           assert 'immun（免除' not in items['trait']['root_memory']
           assert 'intelli-gence' not in ' '.join(items['artificial'].get('phrases',[]))
+          assert items['approach']['phrases'] == ['an approach to sth 做某事的方法/途径', 'approach sb/sth 接近某人/某物']
           app=Path('app.js').read_text(encoding='utf-8')
           assert 'IELTS538_R2_DATA_POLICY' in app
           assert "ipa_us: '/noʊ/'" in app
+          assert '记忆提示' in app
+          assert "style.display = mode === 'card' ? 'grid' : 'none'" in app
           print('DATA_REGRESSION_PASS')
           PY
 
@@ -120,6 +123,7 @@ jobs:
               await page.waitForTimeout(550);
               const backText=await page.locator('#b-content').innerText();
               if (backText.includes('bene（好）') || backText.includes('待校验')) throw new Error(`${cfg.name}: unverified/wrong content visible on approach back`);
+              if (!backText.includes('记忆提示') || !backText.includes('an approach to sth')) throw new Error(`${cfg.name}: polished approach content missing`);
               await page.screenshot({path:`qa-${cfg.name}-back.png`, fullPage:true});
 
               await page.fill('#search','measure');
@@ -138,17 +142,23 @@ jobs:
               }
 
               await page.click('#tab-list');
+              if (!(await page.locator('#tab-list').evaluate(el => el.classList.contains('active'))) || await page.locator('#tab-review').evaluate(el => el.classList.contains('active'))) throw new Error(`${cfg.name}: list tab active state wrong`);
               await page.fill('#search','resemble');
               await page.waitForTimeout(120);
               if (!(await page.locator('#list-items').innerText()).toLowerCase().includes('resemble')) throw new Error(`${cfg.name}: list search failed`);
+              await page.locator('#search').evaluate(el => el.blur());
               await page.screenshot({path:`qa-${cfg.name}-list.png`, fullPage:true});
               await page.fill('#search','');
 
               await page.click('#tab-review');
               if (!(await page.locator('#review-view').isVisible())) throw new Error(`${cfg.name}: review view failed`);
+              if (!(await page.locator('#tab-review').evaluate(el => el.classList.contains('active'))) || await page.locator('#tab-list').evaluate(el => el.classList.contains('active'))) throw new Error(`${cfg.name}: review tab active state wrong`);
               await page.screenshot({path:`qa-${cfg.name}-review.png`, fullPage:true});
 
               await page.click('#tab-card');
+              if (!(await page.locator('#tab-card').evaluate(el => el.classList.contains('active')))) throw new Error(`${cfg.name}: card tab active state wrong`);
+              const footerDisplay=await page.locator('#main-footer').evaluate(el => getComputedStyle(el).display);
+              if (footerDisplay !== 'grid') throw new Error(`${cfg.name}: footer layout regressed to ${footerDisplay}`);
               await page.locator('#audio-settings summary').click();
               if (!(await page.locator('#voice-select').isVisible())) throw new Error(`${cfg.name}: voice selector failed`);
               await context.close();
