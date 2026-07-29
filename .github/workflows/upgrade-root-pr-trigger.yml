@@ -1,0 +1,103 @@
+name: IELTS 538 verified upgrade
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  verify-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main source
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply guarded patch
+        run: python3 tools/upgrade_root.py
+
+      - name: Syntax checks
+        run: |
+          node --check app.js
+          node --check data.js
+
+      - name: Browser acceptance tests
+        shell: bash
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright >/dev/null 2>&1
+          npx playwright install chromium >/dev/null 2>&1
+          python3 -m http.server 4173 >/tmp/ielts538-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          node <<'JS'
+          const { chromium } = require('playwright');
+          (async () => {
+            const browser = await chromium.launch({headless:true});
+            const cases = [
+              {name:'desktop', viewport:{width:1440,height:900}},
+              {name:'iphone', viewport:{width:390,height:844}, isMobile:true, hasTouch:true},
+            ];
+            for (const cfg of cases) {
+              const context = await browser.newContext({viewport:cfg.viewport, isMobile:!!cfg.isMobile, hasTouch:!!cfg.hasTouch});
+              const page = await context.newPage();
+              const errors = [];
+              page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
+              page.on('console', msg => { if (msg.type() === 'error') errors.push(`console: ${msg.text()}`); });
+              await page.goto('http://127.0.0.1:4173/', {waitUntil:'networkidle'});
+              await page.waitForFunction(() => {
+                const el = document.querySelector('#f-word');
+                return el && el.textContent.trim() && el.textContent.trim() !== 'loading';
+              }, null, {timeout:10000});
+              const state = await page.evaluate(() => ({
+                build: document.body.dataset.build,
+                width: document.documentElement.scrollWidth,
+                innerWidth: window.innerWidth,
+                word: document.querySelector('#f-word')?.textContent?.trim(),
+                progress: document.querySelector('#progress')?.textContent?.trim(),
+              }));
+              if (state.build !== '2026-07-30') throw new Error(`${cfg.name}: build hook missing`);
+              if (!state.word || state.word === 'loading') throw new Error(`${cfg.name}: card failed to render`);
+              if (!state.progress || !state.progress.includes('/')) throw new Error(`${cfg.name}: progress failed`);
+              if (state.width > state.innerWidth + 2) throw new Error(`${cfg.name}: horizontal overflow ${state.width} > ${state.innerWidth}`);
+              if (errors.length) throw new Error(`${cfg.name}: ${errors.join(' | ')}`);
+
+              await page.click('#tab-list');
+              if (!(await page.locator('#list-view').isVisible())) throw new Error(`${cfg.name}: list tab failed`);
+              await page.fill('#search', 'resemble');
+              await page.waitForTimeout(120);
+              if (!(await page.locator('#list-items').innerText()).toLowerCase().includes('resemble')) throw new Error(`${cfg.name}: search failed`);
+              await page.fill('#search', '');
+              await page.click('#tab-review');
+              if (!(await page.locator('#review-view').isVisible())) throw new Error(`${cfg.name}: review tab failed`);
+              await page.click('#tab-card');
+              await page.locator('#audio-settings summary').click();
+              if (!(await page.locator('#voice-select').isVisible())) throw new Error(`${cfg.name}: voice chooser failed`);
+              await page.screenshot({path:`qa-${cfg.name}.png`, fullPage:true});
+              await context.close();
+              console.log(`${cfg.name}: PASS`);
+            }
+            await browser.close();
+          })().catch(err => { console.error(err); process.exit(1); });
+          JS
+
+      - name: Upload QA screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: ielts538-qa
+          path: qa-*.png
+          retention-days: 7
+
+      - name: Commit verified build to main
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f .github/workflows/upgrade-root-app.yml .github/workflows/upgrade-root-pr-trigger.yml tools/upgrade_root.py
+          git add -A
+          git commit -m 'feat: upgrade IELTS 538 UI and learning reliability'
+          git push origin HEAD:main
