@@ -58,7 +58,15 @@ jobs:
               if (!metrics.cardRect || metrics.cardRect.right > metrics.innerWidth + 2 || metrics.cardRect.left < -2) throw new Error(`${cfg.name}: card out of viewport`);
               if (!metrics.footerRect || metrics.footerRect.right > metrics.innerWidth + 2 || metrics.footerRect.left < -2) throw new Error(`${cfg.name}: footer out of viewport`);
               if (errors.length) throw new Error(`${cfg.name}: ${errors.join('|')}`);
-              await page.screenshot({path:`final-${cfg.name}.png`, fullPage:true});
+              await page.screenshot({path:`final-${cfg.name}-entry.png`, fullPage:true});
+
+              const unlock = page.locator('#speech-unlock-overlay:not(.hidden) #speech-unlock-btn');
+              if (await unlock.count()) {
+                await unlock.click();
+                await page.waitForSelector('#speech-unlock-overlay.hidden');
+                await page.screenshot({path:`final-${cfg.name}-unlocked.png`, fullPage:true});
+              }
+
               await page.click('#tab-list');
               await page.fill('#search','resemble');
               if (!(await page.locator('#list-items').innerText()).toLowerCase().includes('resemble')) throw new Error(`${cfg.name}: search regression`);
