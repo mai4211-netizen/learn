@@ -1,59 +1,83 @@
-/* Responsive constraints kept separate so device-specific layout stays auditable. */
-html,
-body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: clip;
+html, body { width: 100%; max-width: 100%; overflow-x: clip; }
+header, main, #main-footer, .head-row, .brand-block, .tabs { min-width: 0; max-width: 100%; }
+
+@media (max-width: 760px) {
+  .app-header { width: 100%; padding: max(12px, env(safe-area-inset-top)) 14px 8px; }
+  .head-row { align-items: stretch; flex-direction: column; gap: 12px; }
+  .eyebrow { font-size: 9px; }
+  .title { font-size: clamp(25px, 8vw, 34px); }
+  .subtitle { margin-top: 5px; font-size: 11px; }
+  .tabs { width: 100%; grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .tab-btn, .review-tab-btn { width: 100%; min-width: 0; min-height: 36px; padding: 0 8px; font-size: 12px; }
+  .command-row { margin-top: 10px; grid-template-columns: minmax(0,1fr) auto; gap: 7px; }
+  .search-shell { height: 44px; grid-template-columns: 30px minmax(0,1fr); border-radius: 13px; }
+  .search-box { font-size: 16px; }
+  .audio-settings summary { min-height: 44px; padding: 0 12px; border-radius: 13px; font-size: 12px; }
+  .audio-settings-body { right: 0; width: min(330px, calc(100vw - 28px)); }
+
+  main { width: 100%; }
+  #card-view { padding: 4px 10px 8px; }
+  .card-wrap, .v2-card-wrap { width: min(94vw, 520px); height: min(61dvh, 510px); }
+  .front { padding: 26px 18px 18px 23px; }
+  .back { padding: 24px 18px 20px 23px; }
+  .face, .v2-shell .face { border-radius: 22px; }
+  .word-btn { margin-top: 18px; font-size: clamp(36px, 11vw, 50px); }
+  .section-title { padding-top: 16px; }
+  .flip-hint { margin-top: 12px; }
+  .sheet-meaning { font-size: 26px; }
+  .sheet-word { font-size: 22px; }
+  .txt { font-size: 13px; }
+
+  .list-scroll, .v2-list-scroll { padding: 6px 10px 8px; }
+  .list-row, .v2-list-row { margin-bottom: 7px; padding: 15px 14px 15px 18px; border-radius: 14px; }
+  .list-word, .v2-list-row .list-word { font-size: 22px; }
+  .list-mean, .v2-list-row .list-mean { font-size: 14px; }
+
+  #review-view { padding: 4px 10px 8px; gap: 8px; }
+  .review-scope-panel { padding: 9px 10px; border-radius: 13px; }
+  .review-filter-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 6px; }
+  .review-filter-item.review-filter-all { grid-column: 1 / -1; }
+  .review-filter-item { min-height: 39px; padding: 7px 8px; }
+  .review-card, .review-card-shell, .v2-review-card-shell { width: min(94vw, 500px); }
+  .review-card-shell, .v2-review-card-shell { min-height: 316px; }
+  .review-card-shell.density-compact, .review-card-shell.density-compact .review-card-flip { min-height: 352px; }
+  .review-card-shell.density-dense, .review-card-shell.density-dense .review-card-flip { min-height: 390px; }
+  .review-card-face { padding: 24px 16px 15px 20px; border-radius: 19px; }
+  .review-card-face::before { top: 24px; height: 46px; }
+  .review-word-btn { font-size: 34px; }
+  .review-card-word-back { font-size: 28px; }
+  .review-card-meaning-cn { font-size: 21px; }
+  .review-card-meaning-cn.fit-compact { font-size: 19px; }
+  .review-card-meaning-cn.fit-dense { font-size: 17px; }
+  .review-card-meaning-cn.fit-ultra { font-size: 15px; }
+  .review-front-main { grid-template-rows: auto auto minmax(44px, auto) auto; gap: 7px; }
+  .review-error-slot { min-height: 44px; }
+
+  #main-footer { width: calc(100% - 20px); min-height: 62px; margin-bottom: max(7px, env(safe-area-inset-bottom)); grid-template-columns: 44px minmax(0,1fr) 44px; border-radius: 17px; }
+  .nav-btn { width: 40px; height: 40px; border-radius: 12px; }
+  .prog-main { font-size: 16px; }
+
+  .sheet { width: 100%; max-height: 82dvh; border-radius: 22px 22px 0 0; }
+  .sheet-head { padding: 14px 14px 8px; }
+  .sheet-body { padding: 3px 14px calc(18px + env(safe-area-inset-bottom)); }
 }
 
-header,
-main,
-#main-footer {
-  min-width: 0;
-  max-width: 100%;
+@media (max-width: 390px) {
+  .app-header { padding-inline: 12px; }
+  .title { font-size: 24px; }
+  .command-row { gap: 6px; }
+  .audio-settings summary { padding: 0 10px; }
+  .card-wrap, .v2-card-wrap { height: min(59dvh, 488px); }
+  .front { padding-left: 21px; padding-right: 16px; }
+  .back { padding-left: 21px; padding-right: 16px; }
+  .chip-btn { font-size: 11px; padding: 0 9px; }
 }
 
-.head-row,
-.title,
-.tabs {
-  min-width: 0;
-}
-
-@media (max-width: 640px) {
-  header {
-    width: 100%;
-  }
-
-  .head-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .title {
-    align-self: flex-start;
-    max-width: 100%;
-  }
-
-  .tabs {
-    width: 100%;
-    max-width: 100%;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .tab-btn,
-  .review-tab-btn {
-    min-width: 0;
-    width: 100%;
-  }
-
-  .audio-settings-body {
-    max-width: calc(100vw - 28px);
-  }
-
-  .audio-settings select {
-    min-width: 0;
-    max-width: min(58vw, 260px);
-  }
+@media (max-height: 700px) and (max-width: 760px) {
+  .subtitle { display: none; }
+  .app-header { padding-top: max(8px, env(safe-area-inset-top)); }
+  .head-row { gap: 8px; }
+  .command-row { margin-top: 7px; }
+  .card-wrap, .v2-card-wrap { height: min(54dvh, 420px); }
+  #main-footer { min-height: 58px; }
 }
