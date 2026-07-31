@@ -86,7 +86,8 @@ body.plain mark.edit{background:none}
 strong.kw{font-weight:700;text-decoration:underline;text-decoration-color:#d9822b;
  text-decoration-thickness:2px;text-underline-offset:3px}
 #kwbtn{position:absolute;z-index:60;border:0;background:var(--ink);color:#fff;border-radius:7px;
- padding:5px 11px;font-size:12.5px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.22)}
+ padding:5px 11px;font-size:12.5px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.22);
+ touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .kwbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0;font-size:13px;color:var(--sub)}
 .kwbar b{color:var(--ink);font-size:13.5px}
 footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);color:var(--sub);font-size:13.5px}
@@ -1146,34 +1147,38 @@ const sub=(rs,s,e)=>{const o=[];for(const [a,b] of rs){if(b<=s||a>=e){o.push([a,
 const covered=(rs,s,e)=>rs.some(([a,b])=>a<=s&&b>=e);
 function count(){let c=0;for(const k in store)c+=store[k].length;
  document.getElementById('kwcount').textContent=c?('已加粗 '+c+' 处'):'';}
-function toggle(){const sel=getSelection();if(!sel.rangeCount||sel.isCollapsed)return;
- const r=sel.getRangeAt(0),el=hostOf(r);if(!el)return;
+let pending=null;
+function selectionInfo(){const sel=getSelection();if(!sel.rangeCount||sel.isCollapsed)return null;
+ const r=sel.getRangeAt(0),el=hostOf(r);if(!el)return null;
  const s=offsetOf(el,r.startContainer,r.startOffset),e=offsetOf(el,r.endContainer,r.endOffset);
- if(s<0||e<0||e<=s)return;
- const k=keyOf(el);let rs=store[k]||[];
+ if(s<0||e<0||e<=s)return null;return {sel,r,el,s,e,k:keyOf(el)};}
+function toggle(){const info=selectionInfo()||pending;if(!info)return;
+ const {sel,el,s,e,k}=info;let rs=store[k]||[];
  rs=covered(rs,s,e)?sub(rs,s,e):merge(rs.concat([[s,e]]));
  if(rs.length)store[k]=rs;else delete store[k];
- save();apply(el,store[k]||[]);count();sel.removeAllRanges();hide();}
+ save();apply(el,store[k]||[]);count();if(sel)sel.removeAllRanges();hide(true);}
 const btn=document.createElement('button');btn.id='kwbtn';btn.hidden=true;document.body.appendChild(btn);
 btn.addEventListener('mousedown',e=>e.preventDefault());
+btn.addEventListener('pointerdown',e=>e.preventDefault());
 btn.addEventListener('click',toggle);
-const hide=()=>btn.hidden=true;
-function show(){const sel=getSelection();if(!sel.rangeCount||sel.isCollapsed)return hide();
- const r=sel.getRangeAt(0),el=hostOf(r);if(!el)return hide();
- const s=offsetOf(el,r.startContainer,r.startOffset),e=offsetOf(el,r.endContainer,r.endOffset);
- if(s<0||e<0||e<=s)return hide();
- btn.textContent=covered(store[keyOf(el)]||[],s,e)?'取消加粗':'加粗';
+const hide=(clear=false)=>{btn.hidden=true;if(clear)pending=null;};
+function show(){const info=selectionInfo();if(!info)return hide(false);
+ const {r,el,s,e,k}=info;pending={sel:null,r:null,el,s,e,k};
+ btn.textContent=covered(store[k]||[],s,e)?'取消加粗':'加粗';
  btn.hidden=false;let b=null;try{b=r.getBoundingClientRect();}catch(err){}
  if(!b||(!b.width&&!b.height))b=el.getBoundingClientRect();
  btn.style.left=Math.max(8,b.right+scrollX-btn.offsetWidth)+'px';
  btn.style.top=Math.max(4,b.top+scrollY-btn.offsetHeight-6)+'px';}
-document.addEventListener('mouseup',()=>setTimeout(show,0));
-document.addEventListener('keyup',e=>{if(!e.ctrlKey&&!e.metaKey)setTimeout(show,0);});
-document.addEventListener('mousedown',e=>{if(e.target!==btn)hide();});
+let showTimer=null;const scheduleShow=(ms=0)=>{clearTimeout(showTimer);showTimer=setTimeout(show,ms);};
+document.addEventListener('mouseup',()=>scheduleShow());
+document.addEventListener('touchend',e=>{if(e.target!==btn)scheduleShow(100);},{passive:true});
+document.addEventListener('keyup',e=>{if(!e.ctrlKey&&!e.metaKey)scheduleShow();});
+document.addEventListener('mousedown',e=>{if(e.target!==btn)hide(true);});
+document.addEventListener('pointerdown',e=>{if(e.target!==btn&&e.pointerType!=='mouse')hide(true);});
 document.addEventListener('keydown',e=>{
  if((e.ctrlKey||e.metaKey)&&(e.key==='b'||e.key==='B')){
   const sel=getSelection();if(sel.rangeCount&&!sel.isCollapsed&&hostOf(sel.getRangeAt(0))){e.preventDefault();toggle();}}
- if(e.key==='Escape')hide();});
+ if(e.key==='Escape')hide(true);});
 function renderAll(){document.querySelectorAll('[data-p]').forEach(el=>{const rs=store[keyOf(el)];if(rs)apply(el,rs);});count();}
 document.getElementById('kwclear').addEventListener('click',()=>{
  if(!confirm('清除全部加粗记录？'))return;store={};save();
