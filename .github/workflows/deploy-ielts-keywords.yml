@@ -1,0 +1,33 @@
+name: Deploy IELTS Part 2 keyword version
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.deploy/ielts_keywords_transform.py'
+      - '.github/workflows/deploy-ielts-keywords.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Build and validate exact uploaded HTML
+        run: python .deploy/ielts_keywords_transform.py
+
+      - name: Commit generated static page and cleanup
+        run: |
+          rm -f .deploy/ielts_keywords_transform.py .github/workflows/deploy-ielts-keywords.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Deploy latest IELTS Part 2 page"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
