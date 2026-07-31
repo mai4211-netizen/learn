@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f4f6f9">
   <title>IELTS 阅读考点词 · 原始数据重构版</title>
-  <link rel="stylesheet" href="./styles.css?v=20260731-r3">
-  <link rel="stylesheet" href="./responsive.css?v=20260731-r3">
+  <link rel="stylesheet" href="./styles.css?v=20260731-r4">
+  <link rel="stylesheet" href="./responsive.css?v=20260731-r4">
+  <link rel="stylesheet" href="./enhancements.css?v=20260731-r4">
 </head>
 <body>
   <div class="app-shell">
@@ -17,10 +18,10 @@
           <h1>阅读考点词</h1>
           <p id="brand-subtitle">376 个核心条目 · 按原始 PDF 重构</p>
         </div>
-        <nav class="tabs" aria-label="学习视图">
-          <button class="tab active" data-view="card" type="button">卡片</button>
-          <button class="tab" data-view="list" type="button">列表</button>
-          <button class="tab" data-view="review" type="button">自测</button>
+        <nav class="tabs" aria-label="学习视图" role="tablist">
+          <button class="tab active" data-view="card" type="button" role="tab" aria-selected="true">卡片</button>
+          <button class="tab" data-view="list" type="button" role="tab" aria-selected="false">列表</button>
+          <button class="tab" data-view="review" type="button" role="tab" aria-selected="false">自测</button>
         </nav>
       </div>
 
@@ -49,6 +50,7 @@
           <button class="scope-btn" type="button" data-category="3">C3</button>
         </div>
         <button class="audit-filter" id="audit-filter" type="button" aria-pressed="false">只看疑点</button>
+        <button class="missed-filter" id="missed-filter" type="button" aria-pressed="false">只看错词 0</button>
         <details class="voice-menu">
           <summary>发音</summary>
           <div class="voice-popover">
@@ -77,7 +79,7 @@
           <div class="card-section">
             <div class="section-head">
               <span>原书“真题命题方式”</span>
-              <span class="section-hint">仅作关联表达，不默认视为同义词</span>
+              <span class="section-hint">只作为题目中的关联表达，不默认可互换</span>
             </div>
             <div class="mapping-chips" id="card-mappings"></div>
           </div>
@@ -88,10 +90,10 @@
           </div>
 
           <details class="source-row" id="source-row">
-            <summary>查看来源对照</summary>
+            <summary>查看原书对照</summary>
             <div class="source-raw-grid">
-              <div><span>考点词</span><strong id="source-term"></strong></div>
-              <div><span>常考中文词义</span><strong id="source-meaning"></strong></div>
+              <div><span>考点词（原书）</span><strong id="source-term"></strong></div>
+              <div><span>常考中文词义（原书）</span><strong id="source-meaning"></strong></div>
               <div class="source-raw-wide"><span>命题方式（原书）</span><strong id="source-mapping"></strong></div>
             </div>
           </details>
@@ -101,7 +103,7 @@
       <section class="view" id="list-view" data-view-panel="list" aria-live="polite">
         <div class="list-header">
           <div><strong id="list-count">0</strong> 条</div>
-          <div class="list-legend"><span class="legend-dot danger"></span>明显疑误 <span class="legend-dot warn"></span>需按语境理解</div>
+          <div class="list-legend"><span class="legend-dot danger"></span>明确错误 <span class="legend-dot warn"></span>需按语境 <span class="legend-dot" style="background:var(--info)"></span>结构考点</div>
         </div>
         <div class="word-list" id="word-list"></div>
       </section>
@@ -130,6 +132,7 @@
           </div>
         </div>
         <div class="review-progress" id="review-progress"></div>
+        <div class="review-shortcuts">空格/Enter 显示答案 · ←/1 没记住 · →/2 记得 · / 搜索</div>
       </section>
     </main>
 
@@ -144,6 +147,7 @@
   </div>
 
   <script src="./data.js?v=20260731-r3"></script>
-  <script src="./app.js?v=20260731-r3"></script>
+  <script src="./corrections-v2.js?v=20260731-r4"></script>
+  <script src="./app.js?v=20260731-r4"></script>
 </body>
 </html>
