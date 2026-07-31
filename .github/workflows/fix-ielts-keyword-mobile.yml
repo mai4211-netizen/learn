@@ -1,0 +1,55 @@
+name: Fix IELTS keyword selection on mobile
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'ielts-part2-shared-v2/.fix-keyword-mobile.patch'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Apply patch and validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          before=$(sha256sum ielts-part2-shared-v2/index.html | awk '{print $1}')
+          test "$before" = "03903c81d1421ebf48691b19baeef6feec62253305c5d146ab32471102a7b378"
+          patch_sha=$(sha256sum ielts-part2-shared-v2/.fix-keyword-mobile.patch | awk '{print $1}')
+          test "$patch_sha" = "8d44df6b685c9dcf2b1a871a818f21f65eb1ed640210f24e289bafd0a9a93966"
+          patch -p1 < ielts-part2-shared-v2/.fix-keyword-mobile.patch
+          after=$(sha256sum ielts-part2-shared-v2/index.html | awk '{print $1}')
+          test "$after" = "9f184058cc6ac62532274b2a81dbfd1b4d8c17885d91bd458dfff6a3d1285c0a"
+          python - <<'PY'
+          from pathlib import Path
+          import re, subprocess
+          p=Path('ielts-part2-shared-v2/index.html')
+          s=p.read_text(encoding='utf-8')
+          assert "document.addEventListener('touchend'" in s
+          assert "btn.addEventListener('pointerdown'" in s
+          assert "selectionInfo()||pending" in s
+          scripts=re.findall(r'<script[^>]*>(.*?)</script>',s,re.S|re.I)
+          assert len(scripts)==1
+          Path('/tmp/ielts-inline.js').write_text(scripts[0],encoding='utf-8')
+          subprocess.run(['node','--check','/tmp/ielts-inline.js'],check=True)
+          PY
+
+      - name: Commit fixed page only
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ielts-part2-shared-v2/index.html
+          git rm ielts-part2-shared-v2/.fix-keyword-mobile.patch .github/workflows/fix-ielts-keyword-mobile.yml
+          git commit -m "Fix keyword selection on mobile"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
