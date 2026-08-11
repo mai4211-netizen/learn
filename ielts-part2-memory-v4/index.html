@@ -3,27 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>IELTS Part 2｜旧稿核对重构版 v8</title>
+<title>IELTS Part 2｜相似语料分组版 v9</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
-  <div class="brand"><div class="eyebrow">OLD DRAFT FIRST · V8</div><h1>IELTS Part 2<br>完整答案核对版</h1><p>每道题先回到旧版最终回答；相似题只放在同一组，不再把不同事件硬拼成一篇。</p><div class="stats"><div class="stat"><b>59</b><span>题目</span></div><div class="stat"><b>45</b><span>稳妥分组</span></div><div class="stat"><b>3</b><span>已确认局部修正</span></div></div></div>
-  <div class="search"><input id="search" placeholder="搜索题号或题目，例如 Q05 / 回复"></div>
+  <div class="brand"><div class="eyebrow">SIMILAR ANSWERS · V9</div><h1>IELTS Part 2<br>相似语料分组版</h1><p>按“相似度”放进同一个 tab，不要求答案一模一样。切换题目时显示各自完整回答，不把别题事件拼进来。</p><div class="stats"><div class="stat"><b>59</b><span>题目</span></div><div class="stat"><b>22</b><span>相似语料组</span></div><div class="stat"><b>3</b><span>已确认局部修正</span></div></div></div>
+  <div class="search"><input id="search" placeholder="搜索题号或题目，例如 Q01 / 妹妹"></div>
   <nav class="nav" id="nav"></nav>
 </aside>
 <main class="main">
-  <div class="topbar"><p>v8 不再使用“固定段落拼装”。每个题目显示自己的完整旧稿；只有已确认确实不够扣题的 Q11 / Q16 / Q25 做局部调整。</p><button class="mode-btn" id="mode">模拟口述：关闭标记</button></div>
+  <div class="topbar"><p>同一 tab = 内容相似、可以一起记；不代表强制共用同一篇正文。每题正文仍以旧版最终回答为基准。</p><button class="mode-btn" id="mode">模拟口述：关闭标记</button></div>
   <article class="card" id="card">
     <header class="head"><div class="kicker"><span id="index"></span><span class="category" id="category"></span></div><h2 id="title"></h2><div class="memory" id="memory"></div><div class="note" id="note"></div></header>
-    <div class="topic-wrap"><div class="topic-label">同一故事组：</div><div class="topics" id="topics"></div><div class="prompt" id="prompt"></div></div>
+    <div class="topic-wrap"><div class="topic-label">这个 tab 里的相似题：</div><div class="topics" id="topics"></div><div class="prompt" id="prompt"></div></div>
     <div class="answer-box"><div class="answer-head"><b id="answerTitle"></b><div class="tools"><button class="tool" id="copy">复制答案</button><button class="tool" onclick="window.print()">打印</button></div></div><div class="answer" id="answer"></div></div>
-    <div class="legend"><span class="dot shared">旧版最终回答：不跨题拼接</span><span class="dot local">已确认局部修正：只改必要处</span></div>
+    <div class="legend"><span class="dot shared">旧版完整回答：不跨题拼接</span><span class="dot local">已确认局部修正：只改必要处</span></div>
   </article>
   <div class="empty" id="empty">正在读取旧版最终回答…</div>
-  <div class="foot">v8 · 旧稿优先 · 59 题逐题完整读取 · 不再跨题拼段</div>
+  <div class="foot">v9 · 按相似度分 tab · 每题保留自己的完整正文</div>
 </main>
 </div>
-<script src="app-v8.js"></script>
+<script src="app-v9.js"></script>
 </body></html>
