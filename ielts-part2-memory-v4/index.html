@@ -3,35 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>IELTS Part 2｜扣题修正版 v7</title>
+<title>IELTS Part 2｜旧稿核对重构版 v8</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
-  <div class="brand"><div class="eyebrow">GITHUB · RELEVANCE FIX V7</div><h1>IELTS Part 2<br>完整答案合并版</h1><p>优先保留旧稿语言和故事；相似题共用，但不为了压模板牺牲扣题。</p><div class="stats"><div class="stat"><b>59</b><span>题目</span></div><div class="stat"><b>27</b><span>完整模板</span></div><div class="stat"><b>0</b><span>新增人物</span></div></div></div>
-  <div class="search"><input id="search" placeholder="搜索题号或题目，例如 Q25 / 河流"></div>
+  <div class="brand"><div class="eyebrow">OLD DRAFT FIRST · V8</div><h1>IELTS Part 2<br>完整答案核对版</h1><p>每道题先回到旧版最终回答；相似题只放在同一组，不再把不同事件硬拼成一篇。</p><div class="stats"><div class="stat"><b>59</b><span>题目</span></div><div class="stat"><b>45</b><span>稳妥分组</span></div><div class="stat"><b>3</b><span>已确认局部修正</span></div></div></div>
+  <div class="search"><input id="search" placeholder="搜索题号或题目，例如 Q05 / 回复"></div>
   <nav class="nav" id="nav"></nav>
 </aside>
 <main class="main">
-  <div class="topbar"><p>蓝色是固定故事；橙色只做必要适配。已按旧版复查语法完整性、人物时间线和题目提示点。</p><button class="mode-btn" id="mode">模拟口述：关闭标记</button></div>
+  <div class="topbar"><p>v8 不再使用“固定段落拼装”。每个题目显示自己的完整旧稿；只有已确认确实不够扣题的 Q11 / Q16 / Q25 做局部调整。</p><button class="mode-btn" id="mode">模拟口述：关闭标记</button></div>
   <article class="card" id="card">
     <header class="head"><div class="kicker"><span id="index"></span><span class="category" id="category"></span></div><h2 id="title"></h2><div class="memory" id="memory"></div><div class="note" id="note"></div></header>
-    <div class="topic-wrap"><div class="topic-label">这篇完整答案覆盖：</div><div class="topics" id="topics"></div><div class="prompt" id="prompt"></div></div>
+    <div class="topic-wrap"><div class="topic-label">同一故事组：</div><div class="topics" id="topics"></div><div class="prompt" id="prompt"></div></div>
     <div class="answer-box"><div class="answer-head"><b id="answerTitle"></b><div class="tools"><button class="tool" id="copy">复制答案</button><button class="tool" onclick="window.print()">打印</button></div></div><div class="answer" id="answer"></div></div>
-    <div class="legend"><span class="dot shared">固定故事，所有题尽量原样说</span><span class="dot local">局部调整，只在题目要求不同的地方变化</span></div>
+    <div class="legend"><span class="dot shared">旧版最终回答：不跨题拼接</span><span class="dot local">已确认局部修正：只改必要处</span></div>
   </article>
-  <div class="empty" id="empty">没有匹配的模板。</div>
-  <div class="foot">GitHub 修正版 v7 · 语法、扣题与人物一致性复查</div>
+  <div class="empty" id="empty">正在读取旧版最终回答…</div>
+  <div class="foot">v8 · 旧稿优先 · 59 题逐题完整读取 · 不再跨题拼段</div>
 </main>
 </div>
-<script src="data1.js"></script>
-<script src="data2.js"></script>
-<script src="data3.js"></script>
-<script src="data4.js"></script>
-<script src="data5.js"></script>
-<script src="patch-v5.js"></script>
-<script src="patch-v6.js"></script>
-<script src="patch-v7.js"></script>
-<script src="app.js"></script>
+<script src="app-v8.js"></script>
 </body></html>
