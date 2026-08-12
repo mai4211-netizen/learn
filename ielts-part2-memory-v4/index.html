@@ -3,55 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>IELTS Part 2｜相似母稿版 v10</title>
+<title>IELTS Part 2｜原稿优先相似组 v11</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
-  <div class="brand">
-    <div class="eyebrow">SIMILARITY FIRST · V10</div>
-    <h1>IELTS Part 2<br>相似母稿版</h1>
-    <p>相似度高的题放在同一个 tab；真正重复的语料作为母稿，题目差异只做局部调整。</p>
-    <div class="stats">
-      <div class="stat"><b>59</b><span>题目</span></div>
-      <div class="stat"><b>22</b><span>相似语料组</span></div>
-      <div class="stat"><b>130–180</b><span>词 / 题</span></div>
-    </div>
-  </div>
+  <div class="brand"><div class="eyebrow">ORIGINAL FIRST · V11</div><h1>IELTS Part 2<br>原稿优先相似组</h1><p>相同或高度相似的题仍放进同一个 tab；人物、时态或核心事件不同，就在 tab 内保留原稿分支，不为少背而离题。</p><div class="stats"><div class="stat"><b>59</b><span>题目</span></div><div class="stat"><b>22</b><span>相似语料组</span></div><div class="stat"><b>✓</b><span>逐题扣题</span></div></div></div>
   <div class="search"><input id="search" placeholder="搜索题号或题目，例如 Q01 / 妹妹"></div>
   <nav class="nav" id="nav"></nav>
 </aside>
 <main class="main">
-  <div class="topbar">
-    <p>蓝色 = 母稿语料；橙色 = 这道题必须调整的部分。Q05 不会再出现 Q44 的酒店取消，Q56 也不会再被画画履历盖掉。</p>
-    <button class="mode-btn" id="mode">模拟口述：关闭标记</button>
-  </div>
+  <div class="topbar"><p>先看 tab 顶部的中文骨架，再背蓝色公共段。橙色只保留原稿中这道题真正不同的部分。</p><button class="mode-btn" id="mode">模拟口述：关闭标记</button></div>
   <article class="card" id="card">
-    <header class="head">
-      <div class="kicker"><span id="index"></span><span class="category" id="category"></span></div>
-      <h2 id="title"></h2>
-      <div class="memory" id="memory"></div>
-      <div class="note" id="note"></div>
-    </header>
-    <div class="topic-wrap">
-      <div class="topic-label">这个 tab 里的相似题：</div>
-      <div class="topics" id="topics"></div>
-      <div class="prompt" id="prompt"></div>
-    </div>
-    <div class="answer-box">
-      <div class="answer-head"><b id="answerTitle"></b><div class="tools"><button class="tool" id="copy">复制答案</button><button class="tool" onclick="window.print()">打印</button></div></div>
-      <div class="answer" id="answer"></div>
-    </div>
-    <div class="legend">
-      <span class="dot shared">母稿语料：同组尽量复用</span>
-      <span class="dot local">本题调整：只为扣题而变化</span>
-    </div>
+    <header class="head"><div class="kicker"><span id="index"></span><span class="category" id="category"></span></div><h2 id="title"></h2><div class="memory" id="memory"></div><div class="note" id="note"></div></header>
+    <div class="topic-wrap"><div class="topic-label">这个 tab 里的高相似题：</div><div class="topics" id="topics"></div><div class="prompt" id="prompt"></div></div>
+    <div class="answer-box"><div class="answer-head"><b id="answerTitle"></b><div class="tools"><button class="tool" id="copy">复制答案</button><button class="tool" onclick="window.print()">打印</button></div></div><div class="answer" id="answer"></div></div>
+    <div class="legend"><span class="dot shared">蓝色：核心母稿，尽量原样复用</span><span class="dot local">橙色：本题开头、补充或收尾</span></div>
   </article>
-  <div class="empty" id="empty">没有匹配的模板。</div>
-  <div class="foot">v10 · 22 个相似组 · 59 题全部重新压缩与核对</div>
+  <div class="empty" id="empty">没有匹配的相似组。</div>
+  <div class="foot">v11 · 原稿优先 · 扣题优先 · 高相似内容同 tab · 59 题逐题复查</div>
 </main>
 </div>
-<script src="app-v10.js"></script>
-</body>
-</html>
+<script src="data1.js"></script>
+<script src="data2.js"></script>
+<script src="data3.js"></script>
+<script src="data4.js"></script>
+<script src="data5.js"></script>
+<script src="patch-v5.js"></script>
+<script src="patch-v6.js"></script>
+<script src="patch-v7.js"></script>
+<script src="patch-v10.js"></script>
+<script src="patch-v11.js"></script>
+<script src="groups-v11.js"></script>
+<script src="app-v11.js"></script>
+</body></html>
