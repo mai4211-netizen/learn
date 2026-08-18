@@ -37,6 +37,11 @@ button{cursor:pointer}
 .stat{flex:1;background:#fff;border:1px solid var(--line);padding:6px 4px;text-align:center}
 .stat b{display:block;font-size:16px;font-weight:650}
 .stat span{font-size:9px;color:#737373}
+.backup-tools{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:7px}
+.backup-tools button{border:1px solid #c8c8c8;background:#fff;color:#444;padding:6px 5px;font-size:10px;border-radius:2px}
+.backup-tools button:hover{border-color:#999;background:#f1f1f1}
+.backup-status{min-height:16px;margin-top:4px;color:#5f6f5f;font-size:9px;line-height:1.4}
+.backup-status.error{color:#a4262c}
 .search{position:sticky;top:-20px;background:var(--panel);padding:7px 0 11px;z-index:2}
 .search input{width:100%;border:1px solid #c9c9c9;border-radius:2px;background:#fff;padding:9px 10px;outline:none;font-size:13px}
 .search input:focus{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
@@ -102,7 +107,7 @@ button{cursor:pointer}
 @media(max-width:850px){
   .app{display:block}
   .sidebar{position:relative;height:auto;border-right:0;border-bottom:1px solid #ccc;padding:14px}
-  .brand h1{font-size:19px}.brand p{display:none}.stats{max-width:360px}
+  .brand h1{font-size:19px}.brand p{display:none}.stats,.backup-tools{max-width:360px}
   .search{position:relative;top:auto;padding:4px 0 8px}
   .nav{display:flex;overflow:auto;padding-bottom:4px}.nav-group{display:none}
   .nav-btn{min-width:184px;background:#eee}

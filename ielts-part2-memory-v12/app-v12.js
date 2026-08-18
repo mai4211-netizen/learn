@@ -72,6 +72,59 @@ function renderBoldOnlyText(text,key){
   return ranges.map(([start,end])=>`<strong>${esc(text.slice(start,end))}</strong>`).join('<span class="excerpt-gap">…</span>');
 }
 function persistBoldState(){storage.set(BOLD_KEY,JSON.stringify(boldState))}
+function validParagraphLengths(){
+  const lengths={};
+  for(const template of DATA){
+    for(const topic of template.topics){
+      answerParts(template,topic).forEach((text,index)=>{lengths[`${topic.q}:${index}`]=text.length});
+    }
+  }
+  return lengths;
+}
+function sanitizeImportedBoldState(value){
+  if(!value||Array.isArray(value)||typeof value!=='object')throw new Error('加粗记录格式不正确');
+  const lengths=validParagraphLengths();
+  const clean={};
+  for(const [key,ranges] of Object.entries(value)){
+    if(!(key in lengths)||!Array.isArray(ranges)||ranges.length>200)continue;
+    const validRanges=ranges.filter(range=>Array.isArray(range)&&range.length===2&&range.every(Number.isInteger));
+    const normalized=normalizeRanges(validRanges,lengths[key]);
+    if(normalized.length)clean[key]=normalized;
+  }
+  return clean;
+}
+function setBackupStatus(message,error=false){
+  const status=$('#backupStatus');
+  status.textContent=message;
+  status.classList.toggle('error',error);
+}
+function boldRangeCount(state=boldState){return Object.values(state).reduce((sum,ranges)=>sum+ranges.length,0)}
+function exportBoldBackup(){
+  const backup={app:'ielts-part2-memory-v12',version:1,exportedAt:new Date().toISOString(),boldRanges:boldState};
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url;
+  link.download=`ielts-part2-bold-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  setBackupStatus(`已导出 ${boldRangeCount()} 处加粗`);
+}
+async function importBoldBackup(file){
+  if(!file)return;
+  if(file.size>1024*1024)throw new Error('文件过大，请选择本页面导出的 JSON 文件');
+  const backup=JSON.parse(await file.text());
+  if(backup?.app!=='ielts-part2-memory-v12'||backup?.version!==1||!('boldRanges' in backup))throw new Error('不是本页面导出的加粗备份');
+  const imported=sanitizeImportedBoldState(backup.boldRanges);
+  const count=boldRangeCount(imported);
+  if(!window.confirm(`导入后会替换当前浏览器中的加粗记录。\n\n备份包含 ${count} 处加粗，是否继续？`))return false;
+  boldState=imported;
+  boldOnly=false;
+  persistBoldState();
+  render();
+  setBackupStatus(`已导入 ${count} 处加粗`);
+  return true;
+}
 function closestParagraph(node){
   const element=node?.nodeType===1?node:node?.parentElement;
   return element?.closest?.('.answer-paragraph')||null;
@@ -224,6 +277,13 @@ try{
   $('#boldToggle').addEventListener('mousedown',event=>event.preventDefault());
   $('#boldToggle').addEventListener('click',()=>toggleBold(selectionInfo));
   $('#boldOnlyToggle').addEventListener('click',()=>{boldOnly=!boldOnly;hideSelectionTools();render()});
+  $('#exportBold').addEventListener('click',exportBoldBackup);
+  $('#importBold').addEventListener('click',()=>$('#importBoldFile').click());
+  $('#importBoldFile').addEventListener('change',async event=>{
+    const file=event.target.files?.[0];
+    event.target.value='';
+    try{await importBoldBackup(file)}catch(error){console.error(error);setBackupStatus(error.message||'导入失败，请检查文件',true)}
+  });
   document.addEventListener('mousedown',event=>{if(!event.target.closest('#selectionTools')&&!event.target.closest('#answer'))hideSelectionTools()});
   document.addEventListener('keydown',event=>{
     if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='b'){
