@@ -10,6 +10,7 @@ let selectedQ=Number(storage.get('p2-v12-q'))||GROUPS[0]?.topics[0];
 let selectionInfo=null;
 let boldOnly=false;
 let boldState={};
+let selectionTimer=null;
 try{boldState=JSON.parse(storage.get(BOLD_KEY)||'{}')||{}}catch(e){boldState={}}
 
 function recordFor(n){
@@ -171,9 +172,18 @@ function showSelectionTools(){
   const button=$('#boldToggle');
   button.textContent=isFullyBold(info)?'取消加粗':'加粗';
   tools.hidden=false;
+  if(window.matchMedia('(max-width:850px)').matches){
+    tools.classList.toggle('mobile-top',info.rect.top>window.innerHeight/2);
+    return;
+  }
+  tools.classList.remove('mobile-top');
   const width=tools.offsetWidth;
   tools.style.left=`${Math.max(8,Math.min(info.rect.left+(info.rect.width-width)/2,window.innerWidth-width-8))}px`;
   tools.style.top=`${Math.min(info.rect.bottom+8,window.innerHeight-tools.offsetHeight-8)}px`;
+}
+function scheduleSelectionTools(delay=0){
+  clearTimeout(selectionTimer);
+  selectionTimer=setTimeout(showSelectionTools,delay);
 }
 function toggleBold(info){
   if(!info)return;
@@ -272,8 +282,14 @@ try{
   if(foot)foot.textContent='v12 · 相似内容尽量共用 · 每题保留扣题角度 · 加粗自动保存在当前浏览器';
   if(!GROUPS.find(g=>g.id===selectedGroup)){selectedGroup=GROUPS[0].id;selectedQ=GROUPS[0].topics[0];}
   $('#search').addEventListener('input',event=>buildNav(event.target.value.trim()));
-  $('#answer').addEventListener('mouseup',()=>setTimeout(showSelectionTools,0));
-  $('#answer').addEventListener('keyup',()=>setTimeout(showSelectionTools,0));
+  $('#answer').addEventListener('mouseup',()=>scheduleSelectionTools(0));
+  $('#answer').addEventListener('keyup',()=>scheduleSelectionTools(0));
+  $('#answer').addEventListener('touchend',()=>scheduleSelectionTools(350),{passive:true});
+  document.addEventListener('selectionchange',()=>{
+    const selection=window.getSelection();
+    if(selection&&!selection.isCollapsed)scheduleSelectionTools(250);
+  });
+  $('#selectionTools').addEventListener('touchstart',()=>clearTimeout(selectionTimer),{passive:true});
   $('#boldToggle').addEventListener('mousedown',event=>event.preventDefault());
   $('#boldToggle').addEventListener('click',()=>toggleBold(selectionInfo));
   $('#boldOnlyToggle').addEventListener('click',()=>{boldOnly=!boldOnly;hideSelectionTools();render()});
@@ -284,7 +300,9 @@ try{
     event.target.value='';
     try{await importBoldBackup(file)}catch(error){console.error(error);setBackupStatus(error.message||'导入失败，请检查文件',true)}
   });
-  document.addEventListener('mousedown',event=>{if(!event.target.closest('#selectionTools')&&!event.target.closest('#answer'))hideSelectionTools()});
+  const hideToolsOutside=event=>{if(!event.target.closest('#selectionTools')&&!event.target.closest('#answer'))hideSelectionTools()};
+  document.addEventListener('touchstart',hideToolsOutside,{passive:true});
+  document.addEventListener('mousedown',hideToolsOutside);
   document.addEventListener('keydown',event=>{
     if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='b'){
       const info=captureSelection();
