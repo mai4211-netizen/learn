@@ -27,6 +27,13 @@ const categoryInfo = {
   'Cities & transport': ['城市与交通', '城市化、住房与公共交通', 'urban development'],
   'Globalisation & tourism': ['全球化与旅游', '国际交流、贸易与旅行', 'globalisation'],
   'Society & equality': ['社会与平等', '个人责任、福利与社会关系', 'social development'],
+  'Core words': ['核心名词', '观点、原因、影响与解决方案', 'core academic vocabulary'],
+  'High-frequency verbs': ['高频动词', '写作中最常调用的动作词', 'high-frequency academic verbs'],
+  'Useful modifiers': ['实用修饰词', '准确表达程度、评价与变化', 'useful modifiers'],
+  'Education & work words': ['教育与工作单词', '教育、技能、职业与收入', 'education and work'],
+  'Technology & media words': ['科技与媒体单词', '数字科技、信息与媒体', 'technology and media'],
+  'Environment & city words': ['环境与城市单词', '环境、资源、交通与城市', 'environment and cities'],
+  'Health & society words': ['健康与社会单词', '健康、社会、文化与家庭', 'health and society'],
   'Process': ['流程图', '步骤、原料、加工与循环', 'a process diagram'],
   'Trends': ['趋势图', '上升、下降、波动与稳定', 'a line graph'],
   'Comparison': ['比较与占比', '柱状图、饼图、表格与对比', 'a comparative chart'],
@@ -34,6 +41,258 @@ const categoryInfo = {
   'Overview': ['Overview 总览', '概括最大趋势和主要特征', 'an overview'],
   'Data language': ['数据表达', '时间、数值、近似与幅度', 'statistical data']
 };
+
+function addWords(category, text) {
+  text.trim().split('\n').forEach((line) => {
+    const [english, chinese, level, pos, collocation, example, warning = ''] = line.split('|');
+    vocabulary.push({
+      id: `words-${category}-${english}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      task: 'Words', category, level, kind: 'word', english, chinese, pos, collocation, example, warning
+    });
+  });
+}
+
+// WORDS — 220 standalone words. These support accurate phrasing rather than rare-word display.
+addWords('Core words', `
+benefit|好处；使受益|A|名词/动词|bring benefits to|The policy can bring substantial benefits to local residents.
+drawback|缺点|A|名词|a major drawback|A major drawback is the high cost of implementation.
+advantage|优势|A|名词|have an advantage over|Public transport has an advantage over private cars in crowded cities.
+disadvantage|劣势；不利条件|A|名词|put someone at a disadvantage|High tuition fees may put poorer students at a disadvantage.
+impact|影响|A|名词/动词|have an impact on|Technology has a significant impact on the way people work.
+effect|影响；效果|A|名词|have an effect on|Regular exercise has a positive effect on mental health.
+consequence|后果|A|名词|serious consequences|Poor planning can have serious consequences for local communities.
+factor|因素|A|名词|a key factor|Cost is a key factor in people’s housing decisions.
+cause|原因；导致|A|名词/动词|the main cause of|Traffic is one of the main causes of air pollution.
+solution|解决方案|A|名词|a practical solution to|Better public transport is a practical solution to congestion.
+approach|方法；处理方式|A|名词|adopt an approach|Schools should adopt a more practical approach to learning.
+measure|措施|A|名词|take measures to|Governments should take measures to protect vulnerable groups.
+policy|政策|A|名词|implement a policy|The government introduced a policy to reduce plastic waste.
+issue|问题；议题|A|名词|address an issue|This issue requires cooperation between governments and individuals.
+challenge|挑战|A|名词|face a challenge|Many cities face the challenge of providing affordable housing.
+opportunity|机会|A|名词|provide an opportunity to|Online courses provide an opportunity to learn new skills.
+responsibility|责任|A|名词|take responsibility for|Individuals should take responsibility for their daily choices.
+priority|优先事项|A|名词|give priority to|Public health should be a national priority.
+resource|资源|A|名词|allocate resources to|More resources should be allocated to preventive healthcare.
+access|获得机会；使用权|A|名词|have access to|All children should have access to quality education.
+awareness|意识|A|名词|raise awareness of|Campaigns can raise awareness of environmental problems.
+behaviour|行为|A|名词|influence behaviour|Advertising can influence consumer behaviour.
+attitude|态度|A|名词|change attitudes towards|Education can change attitudes towards people with disabilities.
+trend|趋势|A|名词|an upward trend|The chart shows an upward trend in internet use.
+demand|需求|A|名词/动词|meet demand for|Cities must meet the growing demand for housing.
+evidence|证据|A|名词|provide evidence that|The research provides evidence that early intervention is effective.
+research|研究|A|名词/动词|conduct research into|More research is needed into the long-term effects of automation.
+development|发展|A|名词|sustainable development|Education plays a central role in economic development.
+growth|增长|A|名词|economic growth|Investment in infrastructure can support economic growth.
+decline|下降；衰退|A|名词/动词|a gradual decline|The graph shows a gradual decline in car use.
+improvement|改善|A|名词|a significant improvement|The new system led to a significant improvement in service quality.
+reduction|减少|A|名词|a reduction in|The policy resulted in a reduction in household waste.
+increase|增加|A|名词/动词|an increase in|There was a sharp increase in online shopping.
+change|变化；改变|A|名词/动词|bring about change|Collective action can bring about lasting change.
+choice|选择|A|名词|make a choice|Consumers should be able to make an informed choice.
+decision|决定|A|名词|make a decision|Reliable information helps people make better decisions.
+support|支持|A|名词/动词|provide support for|Local authorities should provide support for small businesses.
+pressure|压力|A|名词|place pressure on|Population growth can place pressure on public services.
+risk|风险|A|名词/动词|reduce the risk of|Safety rules can reduce the risk of injury.
+harm|伤害|A|名词/动词|cause harm to|Misleading information can cause harm to the public.
+need|需要|A|名词/动词|meet the needs of|Schools should meet the needs of different learners.
+outcome|结果|B|名词|positive outcomes|Early support can lead to better educational outcomes.
+balance|平衡|B|名词/动词|strike a balance|Governments must strike a balance between growth and conservation.
+standard|标准；水平|B|名词|raise standards|Teacher training can raise educational standards.
+quality|质量|B|名词|improve the quality of|Investment can improve the quality of public services.
+equality|平等|B|名词|promote equality|Equal pay policies can promote gender equality.
+inequality|不平等|B|名词|reduce inequality|Progressive taxation may help reduce income inequality.
+participation|参与|B|名词|encourage participation|Free facilities can encourage public participation in sport.
+cooperation|合作|B|名词|international cooperation|Climate change requires international cooperation.
+regulation|监管；规定|B|名词|stricter regulation|Online platforms may require stricter regulation.
+`);
+
+addWords('High-frequency verbs', `
+improve|改善；提高|A|动词|improve access to|Governments should improve access to affordable healthcare.
+enhance|提升；增强|B|动词|enhance efficiency|Digital systems can enhance workplace efficiency.|不要为了替换 improve 而滥用
+reduce|减少|A|动词|reduce the cost of|Public transport can reduce the cost of commuting.
+boost|促进；提高|B|动词|boost productivity|Better training can boost employee productivity.
+address|处理；解决|A|动词|address a problem|Policies should address the causes of educational inequality.|address 后不加 with
+tackle|处理；应对|B|动词|tackle a problem|Long-term investment is needed to tackle housing shortages.
+assist|帮助；协助|B|动词|assist someone with|Career advisers can assist students with employment decisions.
+provide|提供|A|动词|provide access to|Libraries provide access to reliable information.
+ensure|确保|A|动词|ensure equal access|Governments should ensure equal access to essential services.
+encourage|鼓励|A|动词|encourage people to|Tax incentives can encourage people to use clean energy.
+promote|促进；推广|A|动词|promote healthy habits|Schools can promote healthy eating habits.
+prevent|防止|A|动词|prevent someone from doing|Education may prevent young people from committing crimes.
+protect|保护|A|动词|protect someone from|Strong laws can protect consumers from dishonest advertising.
+regulate|监管|B|动词|regulate an industry|Authorities should regulate industries that produce harmful waste.
+invest|投资|A|动词|invest in|Governments should invest in public transport.
+allocate|分配|B|动词|allocate funds to|More funds should be allocated to rural schools.
+implement|实施|B|动词|implement a policy|Effective policies must be implemented consistently.
+enforce|执行；强制实施|B|动词|enforce the law|The police are responsible for enforcing the law.
+maintain|维持|A|动词|maintain standards|Regular inspections help maintain safety standards.
+achieve|实现|A|动词|achieve a goal|Countries must cooperate to achieve sustainable growth.
+acquire|获得；习得|B|动词|acquire skills|Students need opportunities to acquire practical skills.
+adapt|适应；调整|A|动词|adapt to change|Workers must adapt to rapid technological change.
+enable|使能够|A|动词|enable someone to do|Online services enable people to work from home.
+affect|影响|A|动词|affect quality of life|Noise pollution can affect residents’ quality of life.
+influence|影响|A|动词|influence decisions|Social media can influence purchasing decisions.
+shape|塑造|B|动词|shape attitudes|Parents and teachers shape children’s attitudes.
+create|创造；造成|A|动词|create opportunities|Technology can create new employment opportunities.
+generate|产生|B|动词|generate income|Tourism can generate income for rural communities.
+replace|替代|A|动词|replace A with B|Some routine jobs may be replaced by automation.
+limit|限制|A|动词|limit access to|High prices can limit access to healthy food.
+require|需要|A|动词|require investment|Improving infrastructure requires substantial investment.
+involve|涉及|A|动词|involve several stages|The manufacturing process involves several stages.
+contribute|促成；贡献|A|动词|contribute to|Regular exercise contributes to better mental health.|to 后接名词或动名词
+facilitate|促进；使更容易|B|动词|facilitate communication|Technology can facilitate communication across long distances.
+overcome|克服|B|动词|overcome barriers|Financial support helps poorer students overcome barriers to education.
+strengthen|加强|B|动词|strengthen relationships|Shared activities can strengthen family relationships.
+weaken|削弱|B|动词|weaken social ties|Excessive screen time may weaken social ties.
+raise|提高；筹集|A|动词|raise awareness|Campaigns can raise awareness of public health risks.
+fluctuate|波动|B|动词|fluctuate considerably|Fuel prices fluctuated considerably during the period.
+vary|变化；不同|B|动词|vary considerably|Housing costs vary considerably between regions.
+`);
+
+addWords('Useful modifiers', `
+significant|显著的；重要的|A|形容词|a significant impact|The policy had a significant impact on low-income families.
+considerable|相当大的|B|形容词|considerable pressure|Rapid growth placed considerable pressure on local services.
+substantial|大量的；实质性的|B|形容词|substantial investment|The project requires substantial public investment.
+gradual|逐渐的|A|形容词|a gradual increase|The chart shows a gradual increase in employment.
+rapid|快速的|A|形容词|rapid development|Rapid technological development has changed the labour market.
+stable|稳定的|A|形容词|remain stable|The unemployment rate remained stable throughout the period.
+effective|有效的|A|形容词|an effective solution|Prevention is often a more effective solution than treatment.
+practical|实际的；可行的|A|形容词|a practical approach|Vocational courses provide practical training.
+essential|必不可少的|A|形容词|be essential for|Clean water is essential for public health.
+beneficial|有益的|A|形容词|be beneficial to|Regular exercise is beneficial to people of all ages.
+harmful|有害的|A|形容词|be harmful to|Air pollution is harmful to human health.
+negative|负面的|A|形容词|a negative effect|Long working hours can have a negative effect on family life.
+positive|积极的|A|形容词|a positive outcome|Early support can produce positive outcomes.
+affordable|负担得起的|A|形容词|affordable housing|Cities need more affordable housing.
+accessible|容易获得的；无障碍的|B|形容词|make services accessible|Online platforms make education more accessible.
+reliable|可靠的|A|形容词|reliable information|People need reliable information to make informed decisions.
+sustainable|可持续的|A|形容词|sustainable development|Public policy should support sustainable development.
+responsible|负责任的|A|形容词|responsible behaviour|Schools should encourage responsible behaviour.
+equal|平等的|A|形容词|equal opportunities|Every child should have equal educational opportunities.
+fair|公平的|A|形容词|fair treatment|Workers should receive fair treatment and adequate pay.
+flexible|灵活的|B|形容词|flexible working hours|Flexible working hours can improve work-life balance.
+efficient|高效的|B|形容词|an efficient system|An efficient transport system saves time and energy.
+productive|富有成效的；高产的|B|形容词|a productive workforce|Training helps create a more productive workforce.
+competitive|有竞争力的|B|形容词|a competitive market|A competitive market may lead to better services.
+vulnerable|易受伤害的|B|形容词|vulnerable groups|Policies should protect vulnerable groups.
+disadvantaged|处境不利的|B|形容词|disadvantaged children|Extra support should be provided for disadvantaged children.
+widespread|广泛的|B|形容词|widespread concern|There is widespread concern about data privacy.
+long-term|长期的|A|形容词|long-term consequences|Poor planning can have long-term consequences.
+short-term|短期的|A|形容词|short-term benefits|Short-term benefits should be weighed against future costs.
+overall|总体的；总体上|A|形容词/副词|the overall trend|The overall trend was upward.
+relatively|相对地|A|副词|remain relatively stable|The figure remained relatively stable after 2015.
+approximately|大约|A|副词|approximately 50 percent|Approximately 50 percent of residents used public transport.
+significantly|显著地|A|副词|increase significantly|The number of users increased significantly.
+gradually|逐渐地|A|副词|decline gradually|The figure declined gradually over the period.
+sharply|急剧地|A|副词|rise sharply|House prices rose sharply in 2020.
+steadily|稳定地；持续地|A|副词|grow steadily|The population grew steadily throughout the decade.
+increasingly|越来越|B|副词|become increasingly common|Remote work has become increasingly common.
+particularly|尤其|A|副词|particularly important|This is particularly important for older people.
+directly|直接地|B|副词|directly affect|Transport costs directly affect household budgets.
+indirectly|间接地|B|副词|indirectly influence|Advertising may indirectly influence children’s choices.
+`);
+
+addWords('Education & work words', `
+curriculum|课程设置|B|名词|school curriculum|Financial literacy should be included in the school curriculum.
+literacy|读写能力；素养|B|名词|digital literacy|Schools should teach both basic and digital literacy.
+tuition|学费；教学|B|名词|tuition fees|High tuition fees may discourage poorer students.
+graduate|毕业生；毕业|A|名词/动词|university graduates|Many university graduates struggle to find suitable work.
+qualification|资格；学历|A|名词|professional qualifications|Professional qualifications can improve career prospects.
+skill|技能|A|名词|practical skills|Employers value practical skills and work experience.
+knowledge|知识|A|名词|acquire knowledge|Education enables students to acquire specialist knowledge.
+discipline|纪律；学科|B|名词|school discipline|Clear rules can improve school discipline.
+motivation|动力|A|名词|student motivation|Supportive teachers can increase student motivation.
+creativity|创造力|B|名词|encourage creativity|Art education can encourage creativity.
+productivity|生产力|A|名词|increase productivity|Better training can increase workplace productivity.
+employment|就业|A|名词|employment opportunities|Investment can create employment opportunities.
+unemployment|失业|A|名词|reduce unemployment|Job training may help reduce youth unemployment.
+career|职业生涯|A|名词|career development|Employees need opportunities for career development.
+salary|工资|A|名词|a competitive salary|A competitive salary helps attract skilled workers.
+income|收入|A|名词|household income|Rising living costs place pressure on household income.
+workplace|工作场所|A|名词|workplace safety|Employers are responsible for workplace safety.
+workforce|劳动力队伍|B|名词|a skilled workforce|Education helps build a skilled workforce.
+profession|职业；专业|B|名词|enter a profession|Graduates need training before entering the profession.
+occupation|职业|B|名词|a skilled occupation|Automation affects some occupations more than others.
+employer|雇主|A|名词|employer responsibility|Employers should provide safe working conditions.
+employee|雇员|A|名词|employee satisfaction|Flexible hours can improve employee satisfaction.
+training|培训|A|名词|vocational training|Vocational training prepares people for practical work.
+experience|经验；经历|A|名词|gain experience|Part-time work allows students to gain experience.
+flexibility|灵活性|B|名词|workplace flexibility|Workplace flexibility can help working parents.
+`);
+
+addWords('Technology & media words', `
+technology|科技|A|名词|digital technology|Technology has transformed communication and work.
+innovation|创新|B|名词|technological innovation|Innovation can improve the quality of public services.
+automation|自动化|B|名词|workplace automation|Automation may replace some routine jobs.
+algorithm|算法|C|名词|algorithmic decisions|Algorithms should be checked for unfair bias.
+privacy|隐私|A|名词|protect privacy|Online companies must protect users’ privacy.
+security|安全|A|名词|data security|Strong passwords improve data security.
+data|数据|A|名词|personal data|Companies should not misuse personal data.
+platform|平台|A|名词|online platform|Online platforms can spread information rapidly.
+device|设备|A|名词|digital devices|Excessive use of digital devices may affect sleep.
+internet|互联网|A|名词|internet access|Reliable internet access is essential for remote learning.
+communication|交流；通信|A|名词|facilitate communication|Technology can facilitate communication across borders.
+information|信息|A|名词|reliable information|Citizens need reliable information from trusted sources.
+media|媒体|A|名词|mass media|The media can shape public opinion.
+advertising|广告活动|A|名词|online advertising|Online advertising strongly influences consumer behaviour.
+misinformation|错误信息|B|名词|spread misinformation|Platforms should prevent the spread of misinformation.
+bias|偏见；偏向|B|名词|media bias|Media bias can affect how events are understood.
+content|内容|A|名词|harmful content|Children should be protected from harmful online content.
+audience|受众|B|名词|a wider audience|Digital media can reach a wider audience.
+journalism|新闻业|C|名词|responsible journalism|Responsible journalism supports informed public debate.
+censorship|审查制度|C|名词|government censorship|Excessive censorship may restrict freedom of expression.
+`);
+
+addWords('Environment & city words', `
+pollution|污染|A|名词|air pollution|Air pollution is a serious threat to public health.
+emission|排放物|A|名词|carbon emissions|Public transport can reduce carbon emissions.
+climate|气候|A|名词|climate change|Climate change requires coordinated international action.
+energy|能源；能量|A|名词|renewable energy|Countries should invest in renewable energy.
+ecosystem|生态系统|B|名词|protect ecosystems|Industrial waste can damage fragile ecosystems.
+renewable|可再生的|B|形容词|renewable sources|Energy from renewable sources is becoming cheaper.
+biodiversity|生物多样性|C|名词|protect biodiversity|Habitat loss threatens biodiversity.
+habitat|栖息地|B|名词|natural habitats|Urban development can destroy natural habitats.
+wildlife|野生动物|B|名词|protect wildlife|National parks help protect wildlife.
+conservation|保护；节约|B|名词|environmental conservation|Economic growth should be balanced with conservation.
+consumption|消费；消耗|B|名词|energy consumption|Better insulation can reduce energy consumption.
+waste|废物；浪费|A|名词/动词|household waste|Cities need better systems for managing household waste.
+recycling|回收利用|A|名词|encourage recycling|Deposit schemes can encourage recycling.
+transport|交通运输|A|名词|public transport|Reliable public transport can reduce congestion.
+infrastructure|基础设施|B|名词|public infrastructure|Rapid growth requires investment in infrastructure.
+congestion|拥堵|B|名词|traffic congestion|Better rail services can reduce traffic congestion.
+housing|住房|A|名词|affordable housing|Local authorities should build more affordable housing.
+urbanisation|城市化|B|名词|rapid urbanisation|Rapid urbanisation places pressure on city services.
+population|人口|A|名词|an ageing population|An ageing population increases demand for healthcare.
+resident|居民|A|名词|local residents|New developments should meet the needs of local residents.
+`);
+
+addWords('Health & society words', `
+healthcare|医疗保健|A|名词|healthcare services|Rural communities need better healthcare services.
+treatment|治疗|A|名词|medical treatment|Prevention is often cheaper than medical treatment.
+prevention|预防|A|名词|disease prevention|Governments should invest more in disease prevention.
+disease|疾病|A|名词|chronic disease|Poor diet increases the risk of chronic disease.
+obesity|肥胖|B|名词|childhood obesity|Schools can help address childhood obesity.
+fitness|健康状况；体能|B|名词|physical fitness|Regular exercise improves physical fitness.
+wellbeing|福祉；身心健康|B|名词|mental wellbeing|Social contact is important for mental wellbeing.
+stress|压力|A|名词|work-related stress|Long working hours can cause work-related stress.
+lifestyle|生活方式|A|名词|a healthy lifestyle|Public campaigns should promote a healthy lifestyle.
+diet|饮食|A|名词|a balanced diet|Children need a balanced diet.
+exercise|锻炼|A|名词/动词|regular exercise|Regular exercise reduces the risk of disease.
+poverty|贫困|A|名词|reduce poverty|Employment programmes can help reduce poverty.
+welfare|福利|B|名词|social welfare|Social welfare protects people during difficult periods.
+crime|犯罪|A|名词|crime rate|Better opportunities may help lower the crime rate.
+punishment|惩罚|A|名词|strict punishment|Strict punishment alone may not prevent crime.
+rehabilitation|改造；康复|B|名词|offender rehabilitation|Education is central to offender rehabilitation.
+offender|罪犯|B|名词|repeat offenders|Training can reduce the risk of offenders committing crimes again.
+victim|受害者|A|名词|support victims|The justice system should support victims of crime.
+tradition|传统|A|名词|preserve traditions|Communities should preserve valuable cultural traditions.
+culture|文化|A|名词|local culture|Tourism can support or damage local culture.
+diversity|多样性|B|名词|cultural diversity|Cultural diversity can enrich society.
+identity|身份认同|B|名词|cultural identity|Language is an important part of cultural identity.
+family|家庭|A|名词|family relationships|Long working hours may weaken family relationships.
+generation|一代人|A|名词|future generations|Environmental decisions affect future generations.
+tourism|旅游业|A|名词|tourism industry|The tourism industry creates jobs for local residents.
+`);
 
 // TASK 2 — 600 expressions
 addBlock('Task 2', 'Core arguments', 'A', 'verb', `
@@ -931,7 +1190,7 @@ the rate rose by|比率上升了
 `);
 addBlock('Task 1', 'Data language', 'C', 'data', `
 in the order shown|按照图示顺序
-approximately|大约
+around|大约
 marginally|略微
 considerably|显著地
 in percentage terms|按百分比计算
@@ -1050,7 +1309,7 @@ const dataExamples = {
   'the proportion fell to': 'The proportion fell to 18 percent in 2020.',
   'the rate rose by': 'The rate rose by 12 percentage points.',
   'in the order shown': 'The values were 20, 35 and 50, in the order shown.',
-  'approximately': 'The total was approximately 600 units.',
+  'around': 'The total was around 600 units.',
   'marginally': 'The figure for Group A was marginally higher than that for Group B.',
   'considerably': 'Spending on housing was considerably higher in 2020.',
   'in percentage terms': 'In percentage terms, Category A experienced the largest increase.',
@@ -1077,6 +1336,7 @@ function fillTrailingSlot(phrase) {
 
 function makeExample(item) {
   const phrase = item.english;
+  if (item.task === 'Words') return item.example;
   if (frameExamples[phrase]) return frameExamples[phrase];
   if (item.task === 'Task 2') {
     if (item.kind === 'verb') {
@@ -1168,8 +1428,12 @@ function makeExample(item) {
 }
 
 vocabulary.forEach((item) => {
-  item.usage = categoryInfo[item.category]?.[1] || item.category;
-  item.example = makeExample(item);
+  if (item.task === 'Words') {
+    item.usage = `${item.pos} · ${item.collocation}`;
+  } else {
+    item.usage = categoryInfo[item.category]?.[1] || item.category;
+    item.example = makeExample(item);
+  }
 });
 
 const state = {
@@ -1210,10 +1474,11 @@ function updateProgress() {
 function renderNav() {
   const nav = $('#categoryNav');
   nav.innerHTML = '';
-  ['Task 2', 'Task 1'].forEach((task) => {
+  ['Words', 'Task 2', 'Task 1'].forEach((task) => {
     const group = document.createElement('div');
     group.className = 'nav-group';
-    group.innerHTML = `<div class="nav-group-title">${task === 'Task 2' ? 'TASK 2 大作文' : 'TASK 1 小作文'}</div>`;
+    const taskTitle = task === 'Words' ? 'WORDS 高频单词' : task === 'Task 2' ? 'TASK 2 大作文' : 'TASK 1 小作文';
+    group.innerHTML = `<div class="nav-group-title">${taskTitle}</div>`;
     [...new Set(vocabulary.filter((v) => v.task === task).map((v) => v.category))].forEach((category) => {
       const count = vocabulary.filter((v) => v.category === category).length;
       const button = document.createElement('button');
@@ -1222,6 +1487,7 @@ function renderNav() {
       button.addEventListener('click', () => {
         state.category = state.category === category ? 'all' : category;
         state.task = task;
+        state.level = 'all';
         state.visible = 40;
         syncControls(); render(); closeDrawer();
       });
@@ -1242,6 +1508,7 @@ function renderCard(item) {
   node.querySelector('.expression').textContent = item.english;
   node.querySelector('.chinese').textContent = item.chinese;
   node.querySelector('.usage').textContent = item.usage;
+  node.querySelector('.usage-label').textContent = item.task === 'Words' ? '词性/搭配' : '适用';
   node.querySelector('.example').textContent = item.example;
   node.querySelector('.warning').textContent = item.warning;
   node.querySelector('.warning-row').hidden = !item.warning;
@@ -1298,7 +1565,7 @@ function closeDrawer() {
 }
 
 document.querySelectorAll('#taskFilter button').forEach((button) => button.addEventListener('click', () => {
-  state.task = button.dataset.task; state.category = 'all'; state.visible = 40; syncControls(); render();
+  state.task = button.dataset.task; state.category = 'all'; state.level = 'all'; state.visible = 40; syncControls(); render();
 }));
 document.querySelectorAll('#levelFilter button').forEach((button) => button.addEventListener('click', () => {
   state.level = button.dataset.level; state.visible = 40; syncControls(); render();
