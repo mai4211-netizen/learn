@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f0e8">
+  <title>IELTS Writing Vocabulary Bank</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="回到词库顶部">
+      <span class="brand-mark">W</span>
+      <span><strong>IELTS Writing</strong><small>Vocabulary Bank</small></span>
+    </a>
+    <button class="icon-button mobile-filter" id="mobileFilter" aria-label="打开分类">分类</button>
+    <div class="progress-summary" aria-label="学习进度">
+      <span id="progressText">0 / 780 已掌握</span>
+      <span class="progress-track"><i id="progressBar"></i></span>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <p class="eyebrow">写作调用库</p>
+        <h1>先会用，再扩充</h1>
+        <p>重点记自然搭配，不背孤立难词。</p>
+      </div>
+      <nav id="categoryNav" aria-label="词库分类"></nav>
+      <div class="sidebar-tip">
+        <strong>A 级优先</strong>
+        <span>建议先把 A 级练到看到中文就能写出英文。</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">FOR BAND 6.5 → 7</p>
+          <h2>把词组变成<br><em>写得出来的句子</em></h2>
+          <p class="hero-copy">Task 2 主动词组 600 条 + Task 1 描述表达 180 条。按主题找、按等级背、随时抽查。</p>
+        </div>
+        <div class="hero-stats">
+          <div><strong id="totalCount">780</strong><span>全部表达</span></div>
+          <div><strong id="aCount">—</strong><span>A 级优先</span></div>
+          <div><strong id="masteredCount">0</strong><span>已经掌握</span></div>
+        </div>
+      </section>
+
+      <section class="toolbar" aria-label="筛选工具">
+        <label class="search-box">
+          <span aria-hidden="true">⌕</span>
+          <input id="searchInput" type="search" placeholder="搜索英文、中文或主题…" autocomplete="off">
+          <kbd>⌘ K</kbd>
+        </label>
+        <div class="toolbar-actions">
+          <button class="tool-button" id="toggleChinese" aria-pressed="false">隐藏中文</button>
+          <button class="tool-button" id="randomReview">随机抽词</button>
+          <button class="tool-button" id="resetFilters">清空筛选</button>
+        </div>
+        <div class="filter-row">
+          <div class="segmented" id="taskFilter" aria-label="作文类型">
+            <button data-task="all" class="active">全部</button>
+            <button data-task="Task 2">Task 2</button>
+            <button data-task="Task 1">Task 1</button>
+          </div>
+          <div class="segmented" id="levelFilter" aria-label="掌握等级">
+            <button data-level="all" class="active">全部等级</button>
+            <button data-level="A">A 必会</button>
+            <button data-level="B">B 熟悉</button>
+            <button data-level="C">C 认识</button>
+          </div>
+          <label class="switch"><input id="unmasteredOnly" type="checkbox"><span></span>只看未掌握</label>
+        </div>
+      </section>
+
+      <section class="result-head">
+        <div><p class="eyebrow" id="sectionTask">ALL VOCABULARY</p><h3 id="sectionTitle">全部表达</h3></div>
+        <p id="resultCount">共 780 条</p>
+      </section>
+      <section class="cards" id="cards" aria-live="polite"></section>
+      <div class="empty-state" id="emptyState" hidden>
+        <span>⌕</span><h3>没有找到匹配内容</h3><p>换个关键词，或清空筛选再试。</p>
+      </div>
+      <button class="load-more" id="loadMore" hidden>再显示 40 条</button>
+    </main>
+  </div>
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <dialog class="review-dialog" id="reviewDialog">
+    <button class="dialog-close" id="dialogClose" aria-label="关闭">×</button>
+    <p class="eyebrow" id="reviewMeta">RANDOM REVIEW</p>
+    <div class="review-level" id="reviewLevel">A</div>
+    <h3 id="reviewEnglish">play a crucial role in</h3>
+    <button class="reveal-button" id="revealAnswer">显示答案</button>
+    <div class="review-answer" id="reviewAnswer" hidden>
+      <p id="reviewChinese"></p>
+      <div><small>写作场景</small><p id="reviewUsage"></p></div>
+      <div><small>例句</small><p id="reviewExample"></p></div>
+    </div>
+    <div class="review-actions">
+      <button id="reviewMastered">标为已掌握</button>
+      <button class="primary" id="reviewNext">下一条</button>
+    </div>
+  </dialog>
+
+  <template id="cardTemplate">
+    <article class="vocab-card">
+      <div class="card-top">
+        <div class="badges"><span class="level-badge"></span><span class="task-badge"></span></div>
+        <button class="master-button" aria-label="切换掌握状态"><span>✓</span></button>
+      </div>
+      <h4 class="expression"></h4>
+      <p class="chinese"></p>
+      <div class="card-divider"></div>
+      <dl>
+        <div><dt>适用</dt><dd class="usage"></dd></div>
+        <div><dt>例句</dt><dd class="example"></dd></div>
+        <div class="warning-row"><dt>提醒</dt><dd class="warning"></dd></div>
+      </dl>
+    </article>
+  </template>
+
+  <script src="vocabulary.js"></script>
+</body>
+</html>
