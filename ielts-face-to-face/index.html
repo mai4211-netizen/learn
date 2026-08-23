@@ -47,7 +47,11 @@
 <section class="card">
 <h3>实时转写</h3>
 <div class="transcript" id="transcript">开始后，如果浏览器支持英语语音识别，会在这里转写。你也可以完全不看它。</div>
-<div class="controls"><button class="btn" id="copy">复制给 ChatGPT</button><button class="btn" disabled id="saveAudio">保存录音</button></div>
+<div class="controls">
+<button class="btn primary wide" disabled id="sendChatGPT">完成本场后发送到 ChatGPT</button>
+<button class="btn" id="copy">复制纯文本</button><button class="btn" disabled id="saveAudio">单独保存录音</button>
+</div>
+<div class="mini">iPhone 会打开系统分享菜单，并自动附上整场录音和按 Part 1 / 2 / 3 整理好的逐题文本。选择 ChatGPT 即可；网页无法指定一定进入当前这一个会话。</div>
 </section>
 <section class="card settings" id="settings">
 <h3>设置</h3>
@@ -82,5 +86,5 @@
 </div>
 </div>
 </div>
-<script src="data.js"></script><script src="app.js"></script><script src="mobile-fix.js"></script>
+<script src="data.js"></script><script src="app.js"></script><script src="mobile-fix.js"></script><script src="share-chatgpt.js"></script>
 </body></html>
