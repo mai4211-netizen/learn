@@ -21,7 +21,6 @@ function primeSpeech(){
   }
 }
 
-// Prime on a real tap. This is deliberately synchronous so iOS keeps the user gesture.
 document.addEventListener("pointerdown", () => {
   if (!mobileSpeechPrimed) primeSpeech();
 }, {passive:true});
@@ -29,7 +28,6 @@ document.addEventListener("touchstart", () => {
   if (!mobileSpeechPrimed) primeSpeech();
 }, {passive:true, once:true});
 
-// Replace the original speak() with a Safari-safe version.
 speak = function(text, after){
   stopRecognition();
   if (!("speechSynthesis" in window)) {
@@ -57,11 +55,14 @@ speak = function(text, after){
 
   let settled = false;
   let started = false;
+  let startWatchdog = null;
+  let hardWatchdog = null;
+
   const finishSpeech = () => {
     if (settled) return;
     settled = true;
-    clearTimeout(startWatchdog);
-    clearTimeout(hardWatchdog);
+    if (startWatchdog) clearTimeout(startWatchdog);
+    if (hardWatchdog) clearTimeout(hardWatchdog);
     $("status").textContent = "LISTENING";
     $("bars").classList.remove("on");
     after && after();
@@ -73,7 +74,6 @@ speak = function(text, after){
 
   try {
     speechSynthesis.speak(u);
-    // Safari occasionally stays paused after cancel() or after a permission sheet closes.
     setTimeout(() => { try { speechSynthesis.resume(); } catch(e){} }, 80);
     setTimeout(() => { try { speechSynthesis.resume(); } catch(e){} }, 350);
   } catch (e) {
@@ -81,24 +81,19 @@ speak = function(text, after){
     return;
   }
 
-  // If Safari silently refuses to start TTS, never leave the interface frozen.
-  const startWatchdog = setTimeout(() => {
+  startWatchdog = setTimeout(() => {
     if (!settled && !started && !speechSynthesis.speaking && !speechSynthesis.pending) {
       $("status").textContent = "TAP REPEAT FOR VOICE";
       finishSpeech();
     }
   }, 1400);
 
-  // Long-stop safety: buttons must always recover even if Safari misses onend.
   const estimatedMs = Math.max(6500, Math.min(30000, text.trim().split(/\s+/).length * 520));
-  const hardWatchdog = setTimeout(() => {
+  hardWatchdog = setTimeout(() => {
     if (!settled) finishSpeech();
   }, estimatedMs + 3500);
 };
 
-// Replace startTest(): speech is triggered immediately from the user's tap.
-// Microphone permission is requested only after the first examiner question finishes,
-// so it cannot consume the activation needed for speech synthesis.
 startTest = function(){
   primeSpeech();
   buildQueue();
@@ -118,7 +113,6 @@ startTest = function(){
   $("count").textContent = "—";
 
   speak("Good afternoon. My name is Alex. Can you tell me your full name, please?", () => {
-    // Start recording after TTS has begun/finished; do not block the exam UI on permission.
     initRecorder();
     $("done").disabled = false;
     $("repeat").disabled = false;
@@ -129,17 +123,14 @@ startTest = function(){
   });
 };
 
-// Rebind handlers because app.js attached them before this patch replaced startTest().
 $("go").onclick = () => { $("mode").value = "full"; startTest(); };
 $("startBtn").onclick = startTest;
 
-// Make setup and all test actions respond to taps as ordinary buttons on iOS.
 ["done","repeat","pause","end","settingsBtn","setupFirst","copy","saveAudio","resetHist"].forEach(id => {
   const el = $(id);
   if (el) el.style.touchAction = "manipulation";
 });
 
-// If Safari restores the page from bfcache with speech paused, resume it.
 window.addEventListener("pageshow", () => {
   try { if ("speechSynthesis" in window) speechSynthesis.resume(); } catch(e){}
 });
