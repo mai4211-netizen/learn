@@ -42,6 +42,8 @@ displayItem = function(item) {
   // including any current interim recognition text.
   commitShareRecord();
   originalDisplayItemForShare(item);
+  const transcriptEl = $("transcript");
+  if (transcriptEl) transcriptEl.textContent = "Listening…";
   shareCurrentIndex = idx;
 };
 
