@@ -462,32 +462,28 @@
       let lastFrameTime = 0;
       let lastImpactTime = 0;
       let lastMotionTime = 0;
-      let motionSamples = 0;
       let distanceSinceImpact = 0;
       let rotation = 0;
       let audioContext = null;
       let toastTimer = 0;
       let gravity = { x: 0, y: 0, z: 0 };
+      let gravityForce = { x: 0, y: 9.81 };
       let gravityReady = false;
       let previousAcceleration = { x: 0, y: 0, z: 0 };
-      let motionBias = { x: 0, y: 0, z: 0 };
       let sensorForce = { x: 0, y: 0 };
       let wallContact = { left: false, right: false, top: false, bottom: false };
       let pointer = { active: false, id: null, lastX: 0, lastY: 0, lastTime: 0 };
       let body = { x: 0, y: 0, vx: 0, vy: 0 };
 
       const MOTION = {
-        pixelsPerMeter: 255,
-        activeDamping: 4.6,
-        idleDamping: 13,
-        spring: 18,
-        maxSpeed: 680,
-        restitution: .16,
-        sensorTimeout: 95,
-        settleAcceleration: 1120,
-        rangeX: 62,
-        rangeY: 84,
-        wallRelease: 14
+        pixelsPerMeter: 108,
+        shakeGain: 3.15,
+        damping: 1.45,
+        maxSpeed: 1450,
+        restitution: .42,
+        wallFriction: .82,
+        sensorTimeout: 90,
+        wallRelease: 18
       };
 
       const rewardData = ['永久', '永久', '永久', '1天', '1天', '1天', '1天', '1天'];
@@ -517,15 +513,11 @@
       function motionBounds() {
         const area = arenaSize();
         const box = boxSize();
-        const homeX = (area.width - box.width) / 2;
-        const homeY = (area.height - box.height) / 2;
         return {
-          homeX,
-          homeY,
-          minX: Math.max(0, homeX - MOTION.rangeX),
-          maxX: Math.min(Math.max(0, area.width - box.width), homeX + MOTION.rangeX),
-          minY: Math.max(0, homeY - MOTION.rangeY),
-          maxY: Math.min(Math.max(0, area.height - box.height), homeY + MOTION.rangeY)
+          minX: 0,
+          maxX: Math.max(0, area.width - box.width),
+          minY: 0,
+          maxY: Math.max(0, area.height - box.height)
         };
       }
 
@@ -621,7 +613,7 @@
       function beginSettle() {
         prepareRound();
         const bounds = motionBounds();
-        body.x = bounds.homeX;
+        body.x = (bounds.minX + bounds.maxX) / 2;
         body.y = bounds.minY;
         body.vx = 0;
         body.vy = 0;
@@ -650,10 +642,11 @@
         animationFrame = requestAnimationFrame(tick);
       }
 
-      function registerImpact(speedBeforeImpact) {
+      function registerImpact(speedBeforeImpact, wall) {
         const now = performance.now();
         const settling = state === 'settling';
         if (now - lastImpactTime < 170 || (!settling && state !== 'running')) return;
+        if (settling && wall !== 'bottom') return;
         if (speedBeforeImpact < 135 || distanceSinceImpact < 24) return;
         lastImpactTime = now;
 
@@ -671,9 +664,6 @@
 
         if (settling) {
           state = 'armed';
-          body.vx = 0;
-          body.vy = 0;
-          sensorForce = { x: 0, y: 0 };
           setStatus(`已落底 · 1/${targetHits}`);
           startButton.disabled = false;
           startButton.textContent = '现在开始摇';
@@ -690,32 +680,28 @@
       }
 
       function tick(time) {
-        if (state !== 'running' && state !== 'settling') return;
-        const settling = state === 'settling';
+        if (state !== 'running' && state !== 'settling' && state !== 'armed') return;
         const dt = clamp((time - lastFrameTime) / 1000, .008, .032);
         lastFrameTime = time;
         const bounds = motionBounds();
-        const { homeX, homeY, minX, maxX, minY, maxY } = bounds;
+        const { minX, maxX, minY, maxY } = bounds;
 
-        if (pointer.active && !settling) {
+        if (pointer.active && state !== 'settling') {
           animationFrame = requestAnimationFrame(tick);
           return;
         }
 
         const sensorAge = performance.now() - lastMotionTime;
-        const sensorFade = settling ? 0 : clamp(1 - Math.max(0, sensorAge - 35) / MOTION.sensorTimeout, 0, 1);
-        const forceX = settling ? 0 : sensorForce.x * sensorFade;
-        const forceY = settling ? MOTION.settleAcceleration / MOTION.pixelsPerMeter : sensorForce.y * sensorFade;
-        const inputStrength = Math.hypot(forceX, forceY);
+        const sensorFade = clamp(1 - Math.max(0, sensorAge - 32) / MOTION.sensorTimeout, 0, 1);
+        const phoneAx = sensorForce.x * sensorFade;
+        const phoneAy = sensorForce.y * sensorFade;
+        const bodyAx = gravityForce.x - phoneAx * MOTION.shakeGain;
+        const bodyAy = gravityForce.y - phoneAy * MOTION.shakeGain;
 
-        // The box is loose inside the moving phone: its relative acceleration is
-        // opposite to the phone, then friction settles it when the hand stops.
-        const springX = settling ? 0 : (homeX - body.x) * MOTION.spring;
-        const springY = settling ? 0 : (homeY - body.y) * MOTION.spring;
-        body.vx += (forceX * MOTION.pixelsPerMeter + springX) * dt;
-        body.vy += (forceY * MOTION.pixelsPerMeter + springY) * dt;
+        body.vx += bodyAx * MOTION.pixelsPerMeter * dt;
+        body.vy += bodyAy * MOTION.pixelsPerMeter * dt;
 
-        const damping = Math.exp(-(inputStrength > .22 ? MOTION.activeDamping : MOTION.idleDamping) * dt);
+        const damping = Math.exp(-MOTION.damping * dt);
         body.vx *= damping;
         body.vy *= damping;
         const speed = Math.hypot(body.vx, body.vy);
@@ -736,6 +722,7 @@
 
         let collided = false;
         let impactSpeed = 0;
+        let impactWall = '';
         let newWallContact = false;
         if (body.x > minX + MOTION.wallRelease) wallContact.left = false;
         if (body.x < maxX - MOTION.wallRelease) wallContact.right = false;
@@ -743,42 +730,58 @@
         if (body.y < maxY - MOTION.wallRelease) wallContact.bottom = false;
 
         if (body.x < minX && body.vx < 0) {
-          impactSpeed = Math.max(impactSpeed, -body.vx);
+          const freshImpact = !wallContact.left;
+          impactSpeed = -body.vx;
+          impactWall = 'left';
           body.x = minX;
-          body.vx = wallContact.left ? 0 : Math.abs(body.vx) * MOTION.restitution;
-          newWallContact = newWallContact || !wallContact.left;
+          body.vx = freshImpact ? Math.abs(body.vx) * MOTION.restitution : 0;
+          if (freshImpact) body.vy *= MOTION.wallFriction;
+          newWallContact = newWallContact || freshImpact;
           wallContact.left = true;
           collided = true;
         } else if (body.x > maxX && body.vx > 0) {
-          impactSpeed = Math.max(impactSpeed, body.vx);
+          const freshImpact = !wallContact.right;
+          impactSpeed = body.vx;
+          impactWall = 'right';
           body.x = maxX;
-          body.vx = wallContact.right ? 0 : -Math.abs(body.vx) * MOTION.restitution;
-          newWallContact = newWallContact || !wallContact.right;
+          body.vx = freshImpact ? -Math.abs(body.vx) * MOTION.restitution : 0;
+          if (freshImpact) body.vy *= MOTION.wallFriction;
+          newWallContact = newWallContact || freshImpact;
           wallContact.right = true;
           collided = true;
         }
         if (body.y < minY && body.vy < 0) {
-          impactSpeed = Math.max(impactSpeed, -body.vy);
+          const freshImpact = !wallContact.top;
+          if (-body.vy > impactSpeed) {
+            impactSpeed = -body.vy;
+            impactWall = 'top';
+          }
           body.y = minY;
-          body.vy = wallContact.top ? 0 : Math.abs(body.vy) * MOTION.restitution;
-          newWallContact = newWallContact || !wallContact.top;
+          body.vy = freshImpact ? Math.abs(body.vy) * MOTION.restitution : 0;
+          if (freshImpact) body.vx *= MOTION.wallFriction;
+          newWallContact = newWallContact || freshImpact;
           wallContact.top = true;
           collided = true;
         } else if (body.y > maxY && body.vy > 0) {
-          impactSpeed = Math.max(impactSpeed, body.vy);
+          const freshImpact = !wallContact.bottom;
+          if (state === 'settling' || body.vy > impactSpeed) {
+            impactSpeed = body.vy;
+            impactWall = 'bottom';
+          }
           body.y = maxY;
-          body.vy = wallContact.bottom ? 0 : -Math.abs(body.vy) * MOTION.restitution;
-          newWallContact = newWallContact || !wallContact.bottom;
+          body.vy = freshImpact ? -Math.abs(body.vy) * MOTION.restitution : 0;
+          if (freshImpact) body.vx *= MOTION.wallFriction;
+          newWallContact = newWallContact || freshImpact;
           wallContact.bottom = true;
           collided = true;
         }
 
-        const targetRotation = clamp(body.vx * .004 + forceX * .18, -5, 5);
+        const targetRotation = clamp(body.vx * .004 - phoneAx * .18, -7, 7);
         rotation += (targetRotation - rotation) * clamp(dt * 18, 0, 1);
         paintBox(collided ? .982 : 1);
-        if (collided && newWallContact) registerImpact(impactSpeed);
+        if (collided && newWallContact) registerImpact(impactSpeed, impactWall);
 
-        if (state === 'running' || state === 'settling') animationFrame = requestAnimationFrame(tick);
+        if (state === 'running' || state === 'settling' || state === 'armed') animationFrame = requestAnimationFrame(tick);
       }
 
       function revealResult() {
@@ -802,26 +805,40 @@
       }
 
       function normalizeMotion(event) {
-        const raw = event.acceleration;
-        if (raw && [raw.x, raw.y, raw.z].some(Number.isFinite)) {
-          return { x: raw.x || 0, y: raw.y || 0, z: raw.z || 0 };
+        const withGravity = event.accelerationIncludingGravity;
+        if (withGravity) {
+          const measuredGravity = {
+            x: withGravity.x || 0,
+            y: withGravity.y || 0,
+            z: withGravity.z || 0
+          };
+          if (!gravityReady) {
+            gravity = measuredGravity;
+            gravityReady = true;
+          } else {
+            const alpha = .965;
+            gravity.x = alpha * gravity.x + (1 - alpha) * measuredGravity.x;
+            gravity.y = alpha * gravity.y + (1 - alpha) * measuredGravity.y;
+            gravity.z = alpha * gravity.z + (1 - alpha) * measuredGravity.z;
+          }
         }
 
-        const withGravity = event.accelerationIncludingGravity;
-        if (!withGravity) return null;
-        if (!gravityReady) {
-          gravity = { x: withGravity.x || 0, y: withGravity.y || 0, z: withGravity.z || 0 };
-          gravityReady = true;
-          return { x: 0, y: 0, z: 0 };
+        const raw = event.acceleration;
+        if (raw && [raw.x, raw.y, raw.z].some(Number.isFinite)) {
+          return {
+            linear: { x: raw.x || 0, y: raw.y || 0, z: raw.z || 0 },
+            gravity
+          };
         }
-        const alpha = .94;
-        gravity.x = alpha * gravity.x + (1 - alpha) * (withGravity.x || 0);
-        gravity.y = alpha * gravity.y + (1 - alpha) * (withGravity.y || 0);
-        gravity.z = alpha * gravity.z + (1 - alpha) * (withGravity.z || 0);
+
+        if (!withGravity || !gravityReady) return null;
         return {
-          x: (withGravity.x || 0) - gravity.x,
-          y: (withGravity.y || 0) - gravity.y,
-          z: (withGravity.z || 0) - gravity.z
+          linear: {
+            x: (withGravity.x || 0) - gravity.x,
+            y: (withGravity.y || 0) - gravity.y,
+            z: (withGravity.z || 0) - gravity.z
+          },
+          gravity
         };
       }
 
@@ -837,33 +854,20 @@
       }
 
       function handleMotion(event) {
-        const acceleration = normalizeMotion(event);
-        if (!acceleration) return;
+        const motion = normalizeMotion(event);
+        if (!motion) return;
         const now = performance.now();
-        const measured = toScreenVector(acceleration);
-
-        if (motionSamples < 10) {
-          motionBias.x += measured.x / 10;
-          motionBias.y += measured.y / 10;
-          motionBias.z += measured.z / 10;
-          motionSamples += 1;
-          previousAcceleration = { x: 0, y: 0, z: 0 };
-          lastMotionTime = now;
-          return;
-        }
-
-        const corrected = {
-          x: measured.x - motionBias.x,
-          y: measured.y - motionBias.y,
-          z: measured.z - motionBias.z
-        };
+        const measured = toScreenVector(motion.linear);
+        const measuredGravity = toScreenVector(motion.gravity);
+        gravityForce.x = -measuredGravity.x;
+        gravityForce.y = -measuredGravity.y;
 
         const sampleDt = clamp((now - lastMotionTime) / 1000, .008, .05);
-        const smoothing = 1 - Math.exp(-sampleDt * 34);
+        const smoothing = 1 - Math.exp(-sampleDt * 28);
         const screenAcceleration = {
-          x: previousAcceleration.x + (corrected.x - previousAcceleration.x) * smoothing,
-          y: previousAcceleration.y + (corrected.y - previousAcceleration.y) * smoothing,
-          z: previousAcceleration.z + (corrected.z - previousAcceleration.z) * smoothing
+          x: previousAcceleration.x + (measured.x - previousAcceleration.x) * smoothing,
+          y: previousAcceleration.y + (measured.y - previousAcceleration.y) * smoothing,
+          z: previousAcceleration.z + (measured.z - previousAcceleration.z) * smoothing
         };
         const deltaX = screenAcceleration.x - previousAcceleration.x;
         const deltaY = screenAcceleration.y - previousAcceleration.y;
@@ -873,13 +877,7 @@
         previousAcceleration = screenAcceleration;
         lastMotionTime = now;
 
-        if (state === 'armed' && accelerationStrength < .55) {
-          motionBias.x += (measured.x - motionBias.x) * .018;
-          motionBias.y += (measured.y - motionBias.y) * .018;
-          motionBias.z += (measured.z - motionBias.z) * .018;
-        }
-
-        const removeNoise = value => Math.abs(value) < .12 ? 0 : Math.sign(value) * (Math.abs(value) - .12);
+        const removeNoise = value => Math.abs(value) < .1 ? 0 : Math.sign(value) * (Math.abs(value) - .1);
         sensorForce.x = clamp(removeNoise(screenAcceleration.x), -24, 24);
         sensorForce.y = clamp(removeNoise(screenAcceleration.y), -24, 24);
 
@@ -974,9 +972,9 @@
         const enabled = await attachMotion();
 
         if (enabled) {
-          motionSamples = 0;
           gravityReady = false;
-          motionBias = { x: 0, y: 0, z: 0 };
+          gravity = { x: 0, y: 0, z: 0 };
+          gravityForce = { x: 0, y: 9.81 };
           sensorForce = { x: 0, y: 0 };
           centerBox();
           beginSettle();
@@ -997,10 +995,10 @@
         movingBox.classList.remove('dragging');
         sensorForce = { x: 0, y: 0 };
         previousAcceleration = { x: 0, y: 0, z: 0 };
-        motionBias = { x: 0, y: 0, z: 0 };
+        gravity = { x: 0, y: 0, z: 0 };
+        gravityForce = { x: 0, y: 9.81 };
         gravityReady = false;
         wallContact = { left: false, right: false, top: false, bottom: false };
-        motionSamples = 0;
         lastMotionTime = 0;
         distanceSinceImpact = 0;
         targetHits = 0;
