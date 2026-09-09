@@ -468,10 +468,22 @@
       let audioContext = null;
       let toastTimer = 0;
       let gravity = { x: 0, y: 0, z: 0 };
+      let gravityReady = false;
       let previousAcceleration = { x: 0, y: 0, z: 0 };
       let sensorForce = { x: 0, y: 0 };
+      let wallContact = { left: false, right: false, top: false, bottom: false };
       let pointer = { active: false, id: null, lastX: 0, lastY: 0, lastTime: 0 };
       let body = { x: 0, y: 0, vx: 0, vy: 0 };
+
+      const MOTION = {
+        pixelsPerMeter: 760,
+        activeDamping: 1.05,
+        idleDamping: 5.4,
+        maxSpeed: 1750,
+        restitution: .32,
+        sensorTimeout: 140,
+        wallRelease: 10
+      };
 
       const rewardData = ['永久', '永久', '永久', '1天', '1天', '1天', '1天', '1天'];
       rewards.innerHTML = rewardData.map((time, index) => `
@@ -551,11 +563,14 @@
         playImpactSound(strength, final);
         if (!hasVibration) return;
         if (final) {
-          navigator.vibrate([90, 24, 150]);
+          navigator.vibrate([80, 25, 130, 28, 190]);
           return;
         }
-        const duration = Math.round(14 + strength * 54);
-        navigator.vibrate(duration);
+        if (strength > .72) {
+          navigator.vibrate([38, 12, 54]);
+          return;
+        }
+        navigator.vibrate(Math.round(12 + strength * 48));
       }
 
       function pulseImpact(strength, final = false) {
@@ -581,11 +596,12 @@
         hitCount = 0;
         distanceSinceImpact = 0;
         lastImpactTime = 0;
+        wallContact = { left: false, right: false, top: false, bottom: false };
         renderDots();
         setStatus(`摇动中 · 0/${targetHits}`);
         startButton.disabled = true;
         startButton.textContent = '继续摇动手机';
-        hint.textContent = '你的每次加速和转向都会实时改变盒子的轨迹';
+        hint.textContent = '手机一变向，盒子会因惯性向反方向冲撞';
         lastFrameTime = performance.now();
         cancelAnimationFrame(animationFrame);
         animationFrame = requestAnimationFrame(tick);
@@ -598,9 +614,11 @@
         lastImpactTime = now;
 
         const area = arenaSize();
-        const travelStrength = clamp(distanceSinceImpact / Math.max(1, Math.hypot(area.width, area.height) * .72), .12, 1);
-        const speedStrength = clamp((speedBeforeImpact - 120) / 980, .12, 1);
-        const strength = clamp(travelStrength * .68 + speedStrength * .32, .14, .96);
+        const box = boxSize();
+        const availableTravel = Math.max(1, area.width - box.width, area.height - box.height);
+        const travelStrength = clamp(distanceSinceImpact / availableTravel, .1, 1);
+        const speedStrength = clamp((speedBeforeImpact - 120) / 1380, .1, 1);
+        const strength = clamp(travelStrength * .82 + speedStrength * .18, .12, .96);
         distanceSinceImpact = 0;
         hitCount += 1;
         renderDots();
@@ -631,13 +649,28 @@
         }
 
         const sensorAge = performance.now() - lastMotionTime;
-        const sensorFade = clamp(1 - Math.max(0, sensorAge - 50) / 150, 0, 1);
-        body.vx += sensorForce.x * 230 * sensorFade * dt;
-        body.vy += sensorForce.y * 230 * sensorFade * dt;
+        const sensorFade = clamp(1 - Math.max(0, sensorAge - 45) / MOTION.sensorTimeout, 0, 1);
+        const forceX = sensorForce.x * sensorFade;
+        const forceY = sensorForce.y * sensorFade;
+        const inputStrength = Math.hypot(forceX, forceY);
 
-        const drag = Math.pow(.985, dt * 60);
-        body.vx = clamp(body.vx * drag, -1550, 1550);
-        body.vy = clamp(body.vy * drag, -1550, 1550);
+        // The box is loose inside the moving phone: its relative acceleration is
+        // opposite to the phone, then friction settles it when the hand stops.
+        body.vx += forceX * MOTION.pixelsPerMeter * dt;
+        body.vy += forceY * MOTION.pixelsPerMeter * dt;
+
+        const damping = Math.exp(-(inputStrength > .22 ? MOTION.activeDamping : MOTION.idleDamping) * dt);
+        body.vx *= damping;
+        body.vy *= damping;
+        const speed = Math.hypot(body.vx, body.vy);
+        if (speed > MOTION.maxSpeed) {
+          const speedScale = MOTION.maxSpeed / speed;
+          body.vx *= speedScale;
+          body.vy *= speedScale;
+        } else if (sensorFade === 0 && speed < 14) {
+          body.vx = 0;
+          body.vy = 0;
+        }
         const oldX = body.x;
         const oldY = body.y;
 
@@ -647,33 +680,47 @@
 
         let collided = false;
         let impactSpeed = 0;
-        const restitution = .48;
+        let newWallContact = false;
+        if (body.x > MOTION.wallRelease) wallContact.left = false;
+        if (body.x < maxX - MOTION.wallRelease) wallContact.right = false;
+        if (body.y > MOTION.wallRelease) wallContact.top = false;
+        if (body.y < maxY - MOTION.wallRelease) wallContact.bottom = false;
+
         if (body.x < 0 && body.vx < 0) {
           impactSpeed = Math.max(impactSpeed, -body.vx);
           body.x = 0;
-          body.vx = Math.abs(body.vx) * restitution;
+          body.vx = wallContact.left ? 0 : Math.abs(body.vx) * MOTION.restitution;
+          newWallContact = newWallContact || !wallContact.left;
+          wallContact.left = true;
           collided = true;
         } else if (body.x > maxX && body.vx > 0) {
           impactSpeed = Math.max(impactSpeed, body.vx);
           body.x = maxX;
-          body.vx = -Math.abs(body.vx) * restitution;
+          body.vx = wallContact.right ? 0 : -Math.abs(body.vx) * MOTION.restitution;
+          newWallContact = newWallContact || !wallContact.right;
+          wallContact.right = true;
           collided = true;
         }
         if (body.y < 0 && body.vy < 0) {
           impactSpeed = Math.max(impactSpeed, -body.vy);
           body.y = 0;
-          body.vy = Math.abs(body.vy) * restitution;
+          body.vy = wallContact.top ? 0 : Math.abs(body.vy) * MOTION.restitution;
+          newWallContact = newWallContact || !wallContact.top;
+          wallContact.top = true;
           collided = true;
         } else if (body.y > maxY && body.vy > 0) {
           impactSpeed = Math.max(impactSpeed, body.vy);
           body.y = maxY;
-          body.vy = -Math.abs(body.vy) * restitution;
+          body.vy = wallContact.bottom ? 0 : -Math.abs(body.vy) * MOTION.restitution;
+          newWallContact = newWallContact || !wallContact.bottom;
+          wallContact.bottom = true;
           collided = true;
         }
 
-        rotation = clamp(body.vx / 78 + sensorForce.x * .34, -17, 17);
+        const targetRotation = clamp(body.vx * .006 + forceX * .55, -12, 12);
+        rotation += (targetRotation - rotation) * clamp(dt * 18, 0, 1);
         paintBox(collided ? .965 : 1);
-        if (collided) registerImpact(impactSpeed);
+        if (collided && newWallContact) registerImpact(impactSpeed);
 
         if (state === 'running') animationFrame = requestAnimationFrame(tick);
       }
@@ -706,7 +753,12 @@
 
         const withGravity = event.accelerationIncludingGravity;
         if (!withGravity) return null;
-        const alpha = .82;
+        if (!gravityReady) {
+          gravity = { x: withGravity.x || 0, y: withGravity.y || 0, z: withGravity.z || 0 };
+          gravityReady = true;
+          return { x: 0, y: 0, z: 0 };
+        }
+        const alpha = .94;
         gravity.x = alpha * gravity.x + (1 - alpha) * (withGravity.x || 0);
         gravity.y = alpha * gravity.y + (1 - alpha) * (withGravity.y || 0);
         gravity.z = alpha * gravity.z + (1 - alpha) * (withGravity.z || 0);
@@ -732,15 +784,22 @@
         const acceleration = normalizeMotion(event);
         if (!acceleration) return;
         const now = performance.now();
-        const screenAcceleration = toScreenVector(acceleration);
+        const measured = toScreenVector(acceleration);
 
         if (motionSamples < 8) {
           motionSamples += 1;
-          previousAcceleration = screenAcceleration;
+          previousAcceleration = measured;
           lastMotionTime = now;
           return;
         }
 
+        const sampleDt = clamp((now - lastMotionTime) / 1000, .008, .05);
+        const smoothing = 1 - Math.exp(-sampleDt * 24);
+        const screenAcceleration = {
+          x: previousAcceleration.x + (measured.x - previousAcceleration.x) * smoothing,
+          y: previousAcceleration.y + (measured.y - previousAcceleration.y) * smoothing,
+          z: previousAcceleration.z + (measured.z - previousAcceleration.z) * smoothing
+        };
         const deltaX = screenAcceleration.x - previousAcceleration.x;
         const deltaY = screenAcceleration.y - previousAcceleration.y;
         const deltaZ = screenAcceleration.z - previousAcceleration.z;
@@ -749,16 +808,12 @@
         previousAcceleration = screenAcceleration;
         lastMotionTime = now;
 
-        sensorForce.x = sensorForce.x * .28 + screenAcceleration.x * .72;
-        sensorForce.y = sensorForce.y * .28 + screenAcceleration.y * .72;
+        const removeNoise = value => Math.abs(value) < .18 ? 0 : Math.sign(value) * (Math.abs(value) - .18);
+        sensorForce.x = clamp(removeNoise(screenAcceleration.x), -24, 24);
+        sensorForce.y = clamp(removeNoise(screenAcceleration.y), -24, 24);
 
-        if (state === 'armed' && (accelerationStrength > 2.3 || jerk > 4.6)) {
+        if (state === 'armed' && (accelerationStrength > 2.1 || jerk > 2.8)) {
           beginRun();
-        }
-
-        if (state === 'running') {
-          body.vx = clamp(body.vx + deltaX * 7.5, -1550, 1550);
-          body.vy = clamp(body.vy + deltaY * 7.5, -1550, 1550);
         }
       }
 
@@ -790,12 +845,12 @@
         const area = arenaSize();
         const box = boxSize();
 
-        body.vx = clamp(dx / dt, -1550, 1550);
-        body.vy = clamp(dy / dt, -1550, 1550);
+        body.vx = clamp(dx / dt, -MOTION.maxSpeed, MOTION.maxSpeed);
+        body.vy = clamp(dy / dt, -MOTION.maxSpeed, MOTION.maxSpeed);
         body.x = clamp(body.x + dx, -2, Math.max(0, area.width - box.width) + 2);
         body.y = clamp(body.y + dy, -2, Math.max(0, area.height - box.height) + 2);
         distanceSinceImpact += Math.hypot(dx, dy);
-        rotation = clamp(body.vx / 78, -17, 17);
+        rotation = clamp(body.vx * .006, -12, 12);
         paintBox();
 
         pointer.lastX = event.clientX;
@@ -851,12 +906,13 @@
         if (enabled) {
           state = 'armed';
           motionSamples = 0;
+          gravityReady = false;
           sensorForce = { x: 0, y: 0 };
           setStatus('已开启 · 等待摇动');
           startButton.textContent = '现在摇动手机';
           hint.textContent = hasVibration
-            ? '盒子实时跟随手机运动，撞得越远、越快，震动越强'
-            : '盒子实时跟随手机运动，撞得越远、越快，反馈越强';
+            ? '快速左右或上下摇动；移动越远，撞击震动越强'
+            : '快速左右或上下摇动；撞击会用画面和声音反馈';
           startButton.disabled = false;
           return;
         }
@@ -875,6 +931,8 @@
         movingBox.classList.remove('dragging');
         sensorForce = { x: 0, y: 0 };
         previousAcceleration = { x: 0, y: 0, z: 0 };
+        gravityReady = false;
+        wallContact = { left: false, right: false, top: false, bottom: false };
         motionSamples = 0;
         lastMotionTime = 0;
         distanceSinceImpact = 0;
@@ -889,7 +947,7 @@
         setStatus(motionAttached ? '已开启 · 等待摇动' : '准备摇盒');
         startButton.textContent = motionAttached ? '现在摇动手机' : '开启摇一摇';
         hint.textContent = motionAttached
-          ? '盒子实时跟随手机运动，撞得越远、越快，反馈越强'
+          ? '快速左右或上下摇动；盒子会因惯性反向冲撞'
           : '点击允许动作感应，然后拿起手机快速摇动';
       }
 
@@ -899,7 +957,7 @@
           return;
         }
         if (state === 'armed') {
-          showToast(motionAttached ? '直接摇动手机，盒子会实时跟随' : '请按住盒子，快速甩向屏幕边缘');
+          showToast(motionAttached ? '直接摇动手机，盒子会因惯性反向冲撞' : '请按住盒子，快速甩向屏幕边缘');
         }
       });
 
