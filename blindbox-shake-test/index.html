@@ -374,6 +374,88 @@
 
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+    .physics-debug {
+      position: absolute;
+      z-index: 100;
+      right: 8px;
+      bottom: max(8px, env(safe-area-inset-bottom));
+      width: min(390px, calc(100% - 16px));
+      color: #eef2ff;
+      font: 11px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .physics-debug > summary {
+      width: max-content;
+      margin-left: auto;
+      padding: 8px 11px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 10px;
+      background: rgba(18, 15, 31, .9);
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+
+    .physics-debug > summary::-webkit-details-marker { display: none; }
+
+    .physics-debug[open] > summary {
+      margin-bottom: 6px;
+      border-radius: 10px 10px 4px 4px;
+    }
+
+    .debug-panel {
+      max-height: min(76vh, 720px);
+      padding: 10px;
+      overflow: auto;
+      overscroll-behavior: contain;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 12px;
+      background: rgba(18, 15, 31, .94);
+      box-shadow: 0 14px 36px rgba(0,0,0,.32);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .debug-metrics,
+    .debug-json {
+      display: block;
+      margin: 0 0 10px;
+      padding: 8px;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      border-radius: 8px;
+      color: #c7f9dc;
+      background: rgba(0,0,0,.34);
+    }
+
+    .debug-control {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 3px 8px;
+      align-items: center;
+      margin: 0 0 8px;
+    }
+
+    .debug-control output { color: #f9a8d4; }
+    .debug-control input { grid-column: 1 / -1; width: 100%; margin: 0; accent-color: #a78bfa; }
+
+    .debug-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .debug-actions button {
+      min-height: 36px;
+      padding: 5px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+      color: #fff;
+      background: #4c3b76;
+      font: inherit;
+    }
+
     @media (max-height: 720px) {
       .result-content { padding-top: 1vh; }
       .result-hero { width: clamp(150px, 42vw, 186px); }
@@ -430,6 +512,20 @@
       </div>
     </section>
 
+    <details class="physics-debug" id="physicsDebug">
+      <summary>Physics Debug</summary>
+      <div class="debug-panel">
+        <pre class="debug-metrics" id="physicsMetrics">等待传感器数据…</pre>
+        <div id="physicsControls"></div>
+        <div class="debug-actions">
+          <button id="restorePhysics" type="button">恢复当前默认值</button>
+          <button id="togglePhysics" type="button">暂停物理</button>
+          <button id="copyPhysics" type="button">复制参数</button>
+        </div>
+        <output class="debug-json" id="physicsJson"></output>
+      </div>
+    </details>
+
     <div class="toast" id="toast" role="status"></div>
   </main>
 
@@ -449,6 +545,13 @@
       const flash = document.querySelector('#impactFlash');
       const rewards = document.querySelector('#rewards');
       const toast = document.querySelector('#toast');
+      const physicsDebug = document.querySelector('#physicsDebug');
+      const physicsMetrics = document.querySelector('#physicsMetrics');
+      const physicsControls = document.querySelector('#physicsControls');
+      const restorePhysicsButton = document.querySelector('#restorePhysics');
+      const togglePhysicsButton = document.querySelector('#togglePhysics');
+      const copyPhysicsButton = document.querySelector('#copyPhysics');
+      const physicsJson = document.querySelector('#physicsJson');
 
       const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
       const randomInt = (min, max) => Math.floor(min + Math.random() * (max - min + 1));
@@ -474,16 +577,31 @@
       let wallContact = { left: false, right: false, top: false, bottom: false };
       let pointer = { active: false, id: null, lastX: 0, lastY: 0, lastTime: 0 };
       let body = { x: 0, y: 0, vx: 0, vy: 0 };
+      let physicsPaused = false;
+      let rawAcceleration = { x: NaN, y: NaN, z: NaN };
+      let bodyAcceleration = { x: 0, y: 9.81 };
+      let latestImpactSpeed = 0;
+      let sensorHz = 0;
+      let sensorSampleCount = 0;
+      let sensorWindowStart = performance.now();
+      let orientation = { beta: NaN, gamma: NaN };
+
+      const PHYSICS_DEFAULTS = Object.freeze({
+        shakeGain: 3.15,
+        gravityScale: 1,
+        damping: 1.45,
+        smoothing: 28,
+        deadzone: .1,
+        restitution: .42,
+        wallFriction: .82,
+        maxSpeed: 1450
+      });
 
       const MOTION = {
         pixelsPerMeter: 108,
-        shakeGain: 3.15,
-        damping: 1.45,
-        maxSpeed: 1450,
-        restitution: .42,
-        wallFriction: .82,
         sensorTimeout: 90,
-        wallRelease: 18
+        wallRelease: 18,
+        ...PHYSICS_DEFAULTS
       };
 
       const rewardData = ['永久', '永久', '永久', '1天', '1天', '1天', '1天', '1天'];
@@ -683,6 +801,12 @@
         if (state !== 'running' && state !== 'settling' && state !== 'armed') return;
         const dt = clamp((time - lastFrameTime) / 1000, .008, .032);
         lastFrameTime = time;
+
+        if (physicsPaused) {
+          animationFrame = requestAnimationFrame(tick);
+          return;
+        }
+
         const bounds = motionBounds();
         const { minX, maxX, minY, maxY } = bounds;
 
@@ -695,8 +819,10 @@
         const sensorFade = clamp(1 - Math.max(0, sensorAge - 32) / MOTION.sensorTimeout, 0, 1);
         const phoneAx = sensorForce.x * sensorFade;
         const phoneAy = sensorForce.y * sensorFade;
-        const bodyAx = gravityForce.x - phoneAx * MOTION.shakeGain;
-        const bodyAy = gravityForce.y - phoneAy * MOTION.shakeGain;
+        const bodyAx = gravityForce.x * MOTION.gravityScale - phoneAx * MOTION.shakeGain;
+        const bodyAy = gravityForce.y * MOTION.gravityScale - phoneAy * MOTION.shakeGain;
+        bodyAcceleration.x = bodyAx;
+        bodyAcceleration.y = bodyAy;
 
         body.vx += bodyAx * MOTION.pixelsPerMeter * dt;
         body.vy += bodyAy * MOTION.pixelsPerMeter * dt;
@@ -779,7 +905,10 @@
         const targetRotation = clamp(body.vx * .004 - phoneAx * .18, -7, 7);
         rotation += (targetRotation - rotation) * clamp(dt * 18, 0, 1);
         paintBox(collided ? .982 : 1);
-        if (collided && newWallContact) registerImpact(impactSpeed, impactWall);
+        if (collided && newWallContact) {
+          latestImpactSpeed = impactSpeed;
+          registerImpact(impactSpeed, impactWall);
+        }
 
         if (state === 'running' || state === 'settling' || state === 'armed') animationFrame = requestAnimationFrame(tick);
       }
@@ -857,13 +986,28 @@
         const motion = normalizeMotion(event);
         if (!motion) return;
         const now = performance.now();
+        const raw = event.acceleration;
+        rawAcceleration = raw ? {
+          x: Number.isFinite(raw.x) ? raw.x : NaN,
+          y: Number.isFinite(raw.y) ? raw.y : NaN,
+          z: Number.isFinite(raw.z) ? raw.z : NaN
+        } : { x: NaN, y: NaN, z: NaN };
+
+        sensorSampleCount += 1;
+        const sensorWindowMs = now - sensorWindowStart;
+        if (sensorWindowMs >= 500) {
+          sensorHz = sensorSampleCount * 1000 / sensorWindowMs;
+          sensorSampleCount = 0;
+          sensorWindowStart = now;
+        }
+
         const measured = toScreenVector(motion.linear);
         const measuredGravity = toScreenVector(motion.gravity);
         gravityForce.x = -measuredGravity.x;
         gravityForce.y = -measuredGravity.y;
 
         const sampleDt = clamp((now - lastMotionTime) / 1000, .008, .05);
-        const smoothing = 1 - Math.exp(-sampleDt * 28);
+        const smoothing = 1 - Math.exp(-sampleDt * MOTION.smoothing);
         const screenAcceleration = {
           x: previousAcceleration.x + (measured.x - previousAcceleration.x) * smoothing,
           y: previousAcceleration.y + (measured.y - previousAcceleration.y) * smoothing,
@@ -877,7 +1021,7 @@
         previousAcceleration = screenAcceleration;
         lastMotionTime = now;
 
-        const removeNoise = value => Math.abs(value) < .1 ? 0 : Math.sign(value) * (Math.abs(value) - .1);
+        const removeNoise = value => Math.abs(value) < MOTION.deadzone ? 0 : Math.sign(value) * (Math.abs(value) - MOTION.deadzone);
         sensorForce.x = clamp(removeNoise(screenAcceleration.x), -24, 24);
         sensorForce.y = clamp(removeNoise(screenAcceleration.y), -24, 24);
 
@@ -1001,6 +1145,7 @@
         wallContact = { left: false, right: false, top: false, bottom: false };
         lastMotionTime = 0;
         distanceSinceImpact = 0;
+        latestImpactSpeed = 0;
         targetHits = 0;
         hitCount = 0;
         renderDots();
@@ -1017,6 +1162,114 @@
           hint.textContent = '点击允许动作感应，然后拿起手机快速摇动';
         }
       }
+
+      const physicsControlDefs = [
+        { key: 'shakeGain', label: '摇动力 / shakeGain', min: 1, max: 10, step: .05, digits: 2 },
+        { key: 'gravityScale', label: '重力强度 / gravityScale', min: 0, max: 1.2, step: .05, digits: 2 },
+        { key: 'damping', label: '阻尼 / damping', min: 0, max: 3, step: .05, digits: 2 },
+        { key: 'smoothing', label: '输入响应 / smoothing', min: 5, max: 60, step: 1, digits: 0 },
+        { key: 'deadzone', label: '输入死区 / deadzone', min: 0, max: .5, step: .01, digits: 2 },
+        { key: 'restitution', label: '反弹 / restitution', min: 0, max: .8, step: .01, digits: 2 },
+        { key: 'wallFriction', label: '墙面摩擦 / wallFriction', min: .5, max: 1, step: .01, digits: 2 },
+        { key: 'maxSpeed', label: '最高速度 / maxSpeed', min: 600, max: 2500, step: 10, digits: 0 }
+      ];
+
+      function physicsParameters() {
+        return Object.fromEntries(physicsControlDefs.map(({ key }) => [key, MOTION[key]]));
+      }
+
+      function syncPhysicsControls() {
+        physicsControlDefs.forEach(({ key, digits }) => {
+          const input = physicsControls.querySelector(`[data-physics-input="${key}"]`);
+          const output = physicsControls.querySelector(`[data-physics-value="${key}"]`);
+          input.value = MOTION[key];
+          output.textContent = Number(MOTION[key]).toFixed(digits);
+        });
+        physicsJson.textContent = JSON.stringify(physicsParameters());
+      }
+
+      physicsControls.innerHTML = physicsControlDefs.map(({ key, label, min, max, step }) => `
+        <label class="debug-control">
+          <span>${label}</span>
+          <output data-physics-value="${key}"></output>
+          <input data-physics-input="${key}" type="range" min="${min}" max="${max}" step="${step}" value="${MOTION[key]}">
+        </label>
+      `).join('');
+
+      physicsControls.addEventListener('input', event => {
+        const input = event.target.closest('[data-physics-input]');
+        if (!input) return;
+        const key = input.dataset.physicsInput;
+        const definition = physicsControlDefs.find(item => item.key === key);
+        MOTION[key] = Number(input.value);
+        physicsControls.querySelector(`[data-physics-value="${key}"]`).textContent = MOTION[key].toFixed(definition.digits);
+        physicsJson.textContent = JSON.stringify(physicsParameters());
+      });
+
+      restorePhysicsButton.addEventListener('click', () => {
+        Object.assign(MOTION, PHYSICS_DEFAULTS);
+        syncPhysicsControls();
+      });
+
+      togglePhysicsButton.addEventListener('click', () => {
+        physicsPaused = !physicsPaused;
+        togglePhysicsButton.textContent = physicsPaused ? '继续物理' : '暂停物理';
+        lastFrameTime = performance.now();
+      });
+
+      copyPhysicsButton.addEventListener('click', async () => {
+        const json = JSON.stringify(physicsParameters());
+        physicsJson.textContent = json;
+        try {
+          await navigator.clipboard.writeText(json);
+        } catch (error) {
+          const field = document.createElement('textarea');
+          field.value = json;
+          field.style.position = 'fixed';
+          field.style.opacity = '0';
+          document.body.appendChild(field);
+          field.select();
+          document.execCommand('copy');
+          field.remove();
+        }
+        copyPhysicsButton.textContent = '已复制';
+        setTimeout(() => { copyPhysicsButton.textContent = '复制参数'; }, 900);
+      });
+
+      function updatePhysicsDebug() {
+        if (!physicsDebug.open) return;
+        const number = (value, digits = 2) => Number.isFinite(value) ? value.toFixed(digits) : '—';
+        const speed = Math.hypot(body.vx, body.vy);
+        const sensorAge = lastMotionTime ? performance.now() - lastMotionTime : NaN;
+        const walls = [
+          wallContact.left && 'left',
+          wallContact.right && 'right',
+          wallContact.top && 'top',
+          wallContact.bottom && 'bottom'
+        ].filter(Boolean).join(' + ') || 'none';
+
+        physicsMetrics.textContent = [
+          `raw ax/ay/az     ${number(rawAcceleration.x)}  ${number(rawAcceleration.y)}  ${number(rawAcceleration.z)}`,
+          `filtered ax/ay   ${number(sensorForce.x)}  ${number(sensorForce.y)}`,
+          `gravity gx/gy    ${number(gravityForce.x)}  ${number(gravityForce.y)}`,
+          `body ax/ay       ${number(bodyAcceleration.x)}  ${number(bodyAcceleration.y)}`,
+          `vx/vy/speed      ${number(body.vx, 1)}  ${number(body.vy, 1)}  ${number(speed, 1)}`,
+          `x/y              ${number(body.x, 1)}  ${number(body.y, 1)}`,
+          `sensor Hz/age    ${number(sensorHz, 1)} Hz  ${number(sensorAge, 0)} ms`,
+          `wall             ${walls}`,
+          `impact speed     ${number(latestImpactSpeed, 1)}`,
+          `beta/gamma       ${number(orientation.beta, 1)}  ${number(orientation.gamma, 1)}`,
+          `physics          ${physicsPaused ? 'paused' : 'running'}`
+        ].join('\n');
+      }
+
+      window.addEventListener('deviceorientation', event => {
+        orientation.beta = Number.isFinite(event.beta) ? event.beta : NaN;
+        orientation.gamma = Number.isFinite(event.gamma) ? event.gamma : NaN;
+      }, { passive: true });
+
+      syncPhysicsControls();
+      setInterval(updatePhysicsDebug, 80);
 
       startButton.addEventListener('click', async () => {
         if (state === 'idle') {
