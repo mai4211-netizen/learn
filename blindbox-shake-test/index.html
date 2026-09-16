@@ -658,7 +658,7 @@
         if (recordActive) { stopRecording(); return; }
         recordStarted = performance.now();
         recording = {
-          format: 'blindbox-physics-recording', schemaVersion: 1, engineVersion: 'rigid-155de11-recorder-v1',
+          format: 'blindbox-physics-recording', schemaVersion: 1, engineVersion: 'rigid-shake-during-settle-v2',
           createdAt: new Date().toISOString(), timeOrigin: performance.timeOrigin, startTime: recordStarted,
           units: { sensor: 'm/s²', bodyAcceleration: 'px/s²', velocity: 'px/s', rotation: 'degrees', angularVelocity: 'rad/s', time: 'ms' },
           device: { userAgent: navigator.userAgent, pixelRatio: devicePixelRatio, screenAngle: screen.orientation?.angle ?? window.orientation ?? 0 },
@@ -920,7 +920,7 @@
         setStatus(`自然落底 · 0/${targetHits}`);
         startButton.disabled = true;
         startButton.textContent = '盲盒落下中…';
-        hint.textContent = '先让盲盒在重力下落底，记为第 1 次撞击';
+        hint.textContent = '自然落下计第 1 次；也可以直接摇动，真实碰壁就计数';
         lastFrameTime = performance.now();
         cancelAnimationFrame(animationFrame);
         animationFrame = requestAnimationFrame(tick);
@@ -941,12 +941,16 @@
       }
 
       function registerImpact(speedBeforeImpact, wall) {
-        if (recordActive && speedBeforeImpact > 30) recordEvent('collision', { speed: speedBeforeImpact, wall, snapshot: captureState() });
         const now = performance.now();
         const settling = state === 'settling';
-        if (now - lastImpactTime < 170 || (!settling && state !== 'running')) return;
-        if (settling && wall !== 'bottom') return;
-        if (speedBeforeImpact < 135 || distanceSinceImpact < 24) return;
+        const reason = (!settling && state !== 'running') ? 'waiting-for-shake'
+          : now - lastImpactTime < 170 ? 'impact-cooldown'
+          : speedBeforeImpact < 135 ? 'low-impact-speed'
+          : distanceSinceImpact < 24 ? 'short-travel' : null;
+        if (recordActive && speedBeforeImpact > 30) recordEvent('collision', {
+          speed: speedBeforeImpact, wall, counted: reason === null, ignoredReason: reason, snapshot: captureState()
+        });
+        if (reason) return;
         lastImpactTime = now;
 
         const bounds = motionBounds();
@@ -964,10 +968,10 @@
 
         if (settling) {
           state = 'armed';
-          setStatus(`已落底 · 1/${targetHits}`);
+          setStatus(`${wall === 'bottom' ? '已落底' : '首次碰壁'} · 1/${targetHits}`);
           startButton.disabled = false;
           startButton.textContent = '现在开始摇';
-          hint.textContent = '落底已算第 1 次；下一次必须摇到边缘才触发';
+          hint.textContent = '首次碰壁已算第 1 次；现在摇动手机继续';
           return;
         }
 
@@ -1124,7 +1128,8 @@
         sensorForce.x = clamp(removeNoise(screenAcceleration.x), -24, 24);
         sensorForce.y = clamp(removeNoise(screenAcceleration.y), -24, 24);
 
-        if (state === 'armed' && (accelerationStrength > 1.55 || jerk > 2.2)) {
+        // User input may interrupt the initial drop; it must never wait for the bottom wall.
+        if ((state === 'armed' || state === 'settling') && (accelerationStrength > 1.55 || jerk > 2.2)) {
           beginRun();
         }
       }
@@ -1136,7 +1141,7 @@
           return;
         }
         if (state === 'revealing' || state === 'result') return;
-        if (state === 'armed') beginRun();
+        if (state === 'armed' || state === 'settling') beginRun();
 
         pointer.active = true;
         pointer.id = event.pointerId;
