@@ -515,6 +515,11 @@
     <details class="physics-debug" id="physicsDebug">
       <summary>Physics Debug</summary>
       <div class="debug-panel">
+        <div class="debug-actions">
+          <button id="recordTest" type="button">录制测试</button>
+          <button id="exportTest" type="button" disabled>导出记录</button>
+        </div>
+        <p id="recordStatus" role="status">录制后正常摇动 10–15 秒，最长 30 秒。数据只保存在本页，导出前请勿刷新。</p>
         <pre class="debug-metrics" id="physicsMetrics">等待传感器数据…</pre>
         <div id="physicsControls"></div>
         <div class="debug-actions">
@@ -607,6 +612,87 @@
         sensorTimeout: 90,
         ...PHYSICS_DEFAULTS
       };
+
+      const recordButton = document.querySelector('#recordTest');
+      const exportButton = document.querySelector('#exportTest');
+      const recordStatus = document.querySelector('#recordStatus');
+      let recording = null;
+      let recordStarted = 0;
+      let recordTimer = 0;
+      let recordActive = false;
+      const motionVector = value => value ? Object.fromEntries(
+        ['x','y','z'].map(key => [key, Number.isFinite(value[key]) ? value[key] : null])
+      ) : null;
+
+      function captureState() {
+        return {
+          state, body: { ...body }, rotation, angularVelocity, physicsAccumulator,
+          gravity: { ...gravity }, gravityReady, gravityForce: { ...gravityForce },
+          previousAcceleration: { ...previousAcceleration }, sensorForce: { ...sensorForce },
+          phoneAcceleration: { ...phoneAcceleration }, inertiaAcceleration: { ...inertiaAcceleration },
+          bodyAcceleration: { ...bodyAcceleration }, deltaVelocity: { ...deltaVelocity },
+          wallContact: { ...wallContact }, latestImpactSpeed, hitCount, targetHits,
+          distanceSinceImpact, physicsPaused, pointer: { ...pointer },
+          lastMotionTime, lastFrameTime, lastImpactTime, orientation: { ...orientation }
+        };
+      }
+
+      function recordEvent(type, data) {
+        if (!recordActive) return;
+        recording.events.push({ t: performance.now() - recordStarted, type, ...data });
+      }
+
+      function stopRecording() {
+        if (!recordActive) return;
+        recordEvent('stop', { snapshot: captureState() });
+        recordActive = false;
+        clearTimeout(recordTimer);
+        recording.durationMs = performance.now() - recordStarted;
+        recordButton.textContent = '重新录制';
+        exportButton.disabled = false;
+        const samples = recording.events.filter(e => e.type === 'sensor').length;
+        recordStatus.textContent = `已录制 ${(recording.durationMs / 1000).toFixed(1)} 秒 · ${samples} 个传感器样本。请导出后发给我。${samples ? '' : ' 未收到动作数据，请先开启摇一摇并允许动作权限。'}`;
+      }
+
+      recordButton.addEventListener('click', () => {
+        if (recordActive) { stopRecording(); return; }
+        recordStarted = performance.now();
+        recording = {
+          format: 'blindbox-physics-recording', schemaVersion: 1, engineVersion: 'rigid-155de11-recorder-v1',
+          createdAt: new Date().toISOString(), timeOrigin: performance.timeOrigin, startTime: recordStarted,
+          units: { sensor: 'm/s²', bodyAcceleration: 'px/s²', velocity: 'px/s', rotation: 'degrees', angularVelocity: 'rad/s', time: 'ms' },
+          device: { userAgent: navigator.userAgent, pixelRatio: devicePixelRatio, screenAngle: screen.orientation?.angle ?? window.orientation ?? 0 },
+          geometry: { arena: arenaSize(), box: boxSize(), viewport: { width: innerWidth, height: innerHeight } },
+          parameters: { ...MOTION }, initial: captureState(), events: []
+        };
+        recordActive = true;
+        recordButton.textContent = '停止录制';
+        exportButton.disabled = true;
+        recordStatus.textContent = '正在录制…可以收起面板，正常摇动；30 秒后自动停止。未开启动作感应时，请先点开启摇一摇。';
+        recordTimer = setTimeout(stopRecording, 30000);
+      });
+
+      exportButton.addEventListener('click', async () => {
+        if (!recording || recordActive) return;
+        const filename = `blindbox-test-${recording.createdAt.replace(/[:.]/g, '-')}.json`;
+        const file = new File([JSON.stringify(recording)], filename, { type: 'application/json' });
+        try {
+          if (navigator.canShare?.({ files: [file] })) {
+            await navigator.share({ files: [file], title: '盲盒实机测试记录' });
+            return;
+          }
+        } catch (error) {
+          if (error.name === 'AbortError') return;
+        }
+        const url = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      });
 
       const rewardData = ['永久', '永久', '永久', '1天', '1天', '1天', '1天', '1天'];
       rewards.innerHTML = rewardData.map((time, index) => `
@@ -819,6 +905,7 @@
       }
 
       function beginSettle() {
+        recordEvent('beginSettle', {});
         prepareRound();
         angularVelocity = 0;
         physicsAccumulator = 0;
@@ -840,6 +927,7 @@
       }
 
       function beginRun() {
+        recordEvent('beginRun', {});
         if (state === 'running' || state === 'revealing') return;
         if (!targetHits) prepareRound();
         state = 'running';
@@ -853,6 +941,7 @@
       }
 
       function registerImpact(speedBeforeImpact, wall) {
+        if (recordActive && speedBeforeImpact > 30) recordEvent('collision', { speed: speedBeforeImpact, wall, snapshot: captureState() });
         const now = performance.now();
         const settling = state === 'settling';
         if (now - lastImpactTime < 170 || (!settling && state !== 'running')) return;
@@ -867,6 +956,7 @@
         const strength = clamp(travelStrength * .82 + speedStrength * .18, .12, .96);
         distanceSinceImpact = 0;
         hitCount += 1;
+        recordEvent('countedImpact', { speed: speedBeforeImpact, wall, strength, hitCount, targetHits });
         renderDots();
         setStatus(`撞击 ${hitCount}/${targetHits} · ${strength > .72 ? '强' : strength > .42 ? '中' : '轻'}`);
         haptic(strength);
@@ -908,10 +998,12 @@
           }
           paintBox();
         }
+        if (recordActive) recordEvent('frame', { frameTime: time, elapsed, snapshot: captureState() });
         if (['running', 'settling', 'armed'].includes(state)) animationFrame = requestAnimationFrame(tick);
       }
 
       function revealResult() {
+        recordEvent('result', {});
         haptic(1, true);
         pulseImpact(1, true);
         setStatus('开奖 · 最强');
@@ -983,6 +1075,13 @@
       }
 
       function handleMotion(event) {
+        recordEvent('sensor', {
+          acceleration: motionVector(event.acceleration),
+          accelerationIncludingGravity: motionVector(event.accelerationIncludingGravity),
+          rotationRate: event.rotationRate ? { alpha: event.rotationRate.alpha, beta: event.rotationRate.beta, gamma: event.rotationRate.gamma } : null,
+          interval: event.interval, eventTime: event.timeStamp,
+          screenAngle: screen.orientation?.angle ?? window.orientation ?? 0
+        });
         const motion = normalizeMotion(event);
         if (!motion) return;
         const now = performance.now();
@@ -1031,6 +1130,7 @@
       }
 
       function startPointerControl(event) {
+        recordEvent('pointerdown', { x: event.clientX, y: event.clientY, id: event.pointerId });
         if (state === 'idle') {
           showToast('先点“开启摇一摇”');
           return;
@@ -1051,6 +1151,7 @@
       }
 
       function moveWithPointer(event) {
+        recordEvent('pointermove', { x: event.clientX, y: event.clientY, id: event.pointerId });
         if (!pointer.active || pointer.id !== event.pointerId || state !== 'running') return;
         const now = performance.now();
         const dt = clamp((now - pointer.lastTime) / 1000, .008, .05);
@@ -1071,6 +1172,7 @@
       }
 
       function stopPointerControl(event) {
+        recordEvent('pointerup', { x: event.clientX, y: event.clientY, id: event.pointerId });
         if (!pointer.active || pointer.id !== event.pointerId) return;
         pointer.active = false;
         pointer.id = null;
@@ -1132,6 +1234,7 @@
       }
 
       function reset() {
+        recordEvent('reset', {});
         cancelAnimationFrame(animationFrame);
         state = motionAttached ? 'armed' : 'idle';
         pointer.active = false;
@@ -1205,17 +1308,20 @@
         const key = input.dataset.physicsInput;
         const definition = physicsControlDefs.find(item => item.key === key);
         MOTION[key] = Number(input.value);
+        recordEvent('parameters', { parameters: { ...MOTION } });
         physicsControls.querySelector(`[data-physics-value="${key}"]`).textContent = MOTION[key].toFixed(definition.digits);
         physicsJson.textContent = JSON.stringify(physicsParameters());
       });
 
       restorePhysicsButton.addEventListener('click', () => {
         Object.assign(MOTION, PHYSICS_DEFAULTS);
+        recordEvent('parameters', { parameters: { ...MOTION } });
         syncPhysicsControls();
       });
 
       togglePhysicsButton.addEventListener('click', () => {
         physicsPaused = !physicsPaused;
+        recordEvent('pause', { paused: physicsPaused });
         togglePhysicsButton.textContent = physicsPaused ? '继续物理' : '暂停物理';
         lastFrameTime = performance.now();
       });
@@ -1270,6 +1376,7 @@
       }
 
       window.addEventListener('deviceorientation', event => {
+        recordEvent('orientation', { alpha: event.alpha, beta: event.beta, gamma: event.gamma });
         orientation.beta = Number.isFinite(event.beta) ? event.beta : NaN;
         orientation.gamma = Number.isFinite(event.gamma) ? event.gamma : NaN;
       }, { passive: true });
@@ -1300,10 +1407,12 @@
       });
 
       window.addEventListener('resize', () => {
+        recordEvent('resize', { arena: arenaSize(), box: boxSize(), width: innerWidth, height: innerHeight });
         if (state === 'idle') centerBox();
       });
 
       document.addEventListener('visibilitychange', () => {
+        recordEvent('visibility', { hidden: document.hidden });
         physicsAccumulator = 0;
         lastFrameTime = performance.now();
         if (document.hidden && hasVibration) navigator.vibrate(0);
