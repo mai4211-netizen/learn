@@ -526,6 +526,7 @@
           <button id="restorePhysics" type="button">恢复当前默认值</button>
           <button id="togglePhysics" type="button">暂停物理</button>
           <button id="copyPhysics" type="button">复制参数</button>
+          <button id="toggleRotationInertia" type="button">转腕惯性：开（点此对比）</button>
         </div>
         <output class="debug-json" id="physicsJson"></output>
       </div>
@@ -574,6 +575,10 @@
       let rotation = 0;
       let angularVelocity = 0;
       let physicsAccumulator = 0;
+      let containerRate = { x: 0, y: 0, z: 0 };
+      let appliedSpinZ = 0;
+      let rotationAcceleration = { x: 0, y: 0 };
+      let lastVisibleGeometry = null;
       let audioContext = null;
       let toastTimer = 0;
       let gravity = { x: 0, y: 0, z: 0 };
@@ -597,6 +602,7 @@
       let orientation = { beta: NaN, gamma: NaN };
 
       const PHYSICS_DEFAULTS = Object.freeze({
+        rotationInertia: true,
         inertiaGain: 800,
         gravityScale: 1,
         damping: 1.45,
@@ -627,6 +633,7 @@
       function captureState() {
         return {
           state, body: { ...body }, rotation, angularVelocity, physicsAccumulator,
+          containerRate: { ...containerRate }, appliedSpinZ, rotationAcceleration: { ...rotationAcceleration },
           gravity: { ...gravity }, gravityReady, gravityForce: { ...gravityForce },
           previousAcceleration: { ...previousAcceleration }, sensorForce: { ...sensorForce },
           phoneAcceleration: { ...phoneAcceleration }, inertiaAcceleration: { ...inertiaAcceleration },
@@ -658,11 +665,11 @@
         if (recordActive) { stopRecording(); return; }
         recordStarted = performance.now();
         recording = {
-          format: 'blindbox-physics-recording', schemaVersion: 1, engineVersion: 'rigid-shake-during-settle-v2',
+          format: 'blindbox-physics-recording', schemaVersion: 2, engineVersion: 'rotating-container-v3',
           createdAt: new Date().toISOString(), timeOrigin: performance.timeOrigin, startTime: recordStarted,
           units: { sensor: 'm/s²', bodyAcceleration: 'px/s²', velocity: 'px/s', rotation: 'degrees', angularVelocity: 'rad/s', time: 'ms' },
           device: { userAgent: navigator.userAgent, pixelRatio: devicePixelRatio, screenAngle: screen.orientation?.angle ?? window.orientation ?? 0 },
-          geometry: { arena: arenaSize(), box: boxSize(), viewport: { width: innerWidth, height: innerHeight } },
+          geometry: recordingGeometry(),
           parameters: { ...MOTION }, initial: captureState(), events: []
         };
         recordActive = true;
@@ -718,6 +725,12 @@
         return { width: arena.clientWidth, height: arena.clientHeight };
       }
 
+      function recordingGeometry() {
+        const current = { arena: arenaSize(), box: boxSize(), viewport: { width: innerWidth, height: innerHeight } };
+        if (current.arena.width > 0 && current.box.width > 0) lastVisibleGeometry = current;
+        return lastVisibleGeometry || current;
+      }
+
       function motionBounds() {
         const area = arenaSize();
         const box = boxSize();
@@ -738,6 +751,7 @@
         body.vy = 0;
         rotation = 0;
         angularVelocity = 0;
+        appliedSpinZ = MOTION.rotationInertia ? containerRate.z : 0;
         physicsAccumulator = 0;
         paintBox();
       }
@@ -757,14 +771,27 @@
         });
       }
 
-      function stepPhysics(dt, phoneAx, phoneAy) {
+      function stepPhysics(dt, phoneAx, phoneAy, sensorFade = 1) {
         const size = boxSize(), area = arenaSize();
         const inverseInertia = 12 / (size.width ** 2 + size.height ** 2);
         phoneAcceleration = { x: phoneAx, y: phoneAy };
         inertiaAcceleration = { x: -phoneAx * MOTION.inertiaGain, y: -phoneAy * MOTION.inertiaGain };
+        // A moving reference frame needs rotation as well as translation.
+        // Screen coordinates are right-handed: +x right, +y down, +z into screen.
+        const rateFade = MOTION.rotationInertia ? sensorFade : 0;
+        const wx = containerRate.x * rateFade, wy = containerRate.y * rateFade, wz = containerRate.z * rateFade;
+        const rx = body.x + size.width / 2 - area.width / 2;
+        const ry = body.y + size.height / 2 - area.height / 2;
+        const deltaSpin = wz - appliedSpinZ;
+        appliedSpinZ = wz;
+        rotationAcceleration = {
+          x: 2*wz*body.vy + (wy*wy+wz*wz)*rx - wx*wy*ry + deltaSpin*ry/dt,
+          y: -2*wz*body.vx + (wx*wx+wz*wz)*ry - wx*wy*rx - deltaSpin*rx/dt
+        };
+        angularVelocity -= deltaSpin;
         bodyAcceleration = {
-          x: gravityForce.x * MOTION.gravityScale * MOTION.gravityPixelScale + inertiaAcceleration.x,
-          y: gravityForce.y * MOTION.gravityScale * MOTION.gravityPixelScale + inertiaAcceleration.y
+          x: gravityForce.x * MOTION.gravityScale * MOTION.gravityPixelScale + inertiaAcceleration.x + rotationAcceleration.x,
+          y: gravityForce.y * MOTION.gravityScale * MOTION.gravityPixelScale + inertiaAcceleration.y + rotationAcceleration.y
         };
         deltaVelocity.x += bodyAcceleration.x * dt;
         deltaVelocity.y += bodyAcceleration.y * dt;
@@ -905,9 +932,10 @@
       }
 
       function beginSettle() {
-        recordEvent('beginSettle', {});
+        recordEvent('beginSettle', { geometry: recordingGeometry() });
         prepareRound();
         angularVelocity = 0;
+        appliedSpinZ = MOTION.rotationInertia ? containerRate.z : 0;
         physicsAccumulator = 0;
         const bounds = motionBounds();
         body.x = (bounds.minX + bounds.maxX) / 2;
@@ -996,7 +1024,7 @@
           const fade = clamp(1-Math.max(0,sensorAge-32)/MOTION.sensorTimeout,0,1);
           const step = 1/240;
           while (physicsAccumulator + 1e-9 >= step) {
-            stepPhysics(step, sensorForce.x*fade, sensorForce.y*fade);
+            stepPhysics(step, sensorForce.x*fade, sensorForce.y*fade, fade);
             physicsAccumulator -= step;
             if (state === 'revealing') { physicsAccumulator=0; break; }
           }
@@ -1111,6 +1139,15 @@
 
         const sampleDt = clamp((now - lastMotionTime) / 1000, .008, .05);
         const smoothing = 1 - Math.exp(-sampleDt * MOTION.smoothing);
+        // DeviceMotion rotationRate alpha/beta/gamma are rates about X/Y/Z,
+        // unlike DeviceOrientation's similarly named Euler angles.
+        const rate = event.rotationRate;
+        if (rate && [rate.alpha, rate.beta, rate.gamma].every(Number.isFinite)) {
+          const mapped = toScreenVector({ x: rate.alpha, y: rate.beta, z: -rate.gamma });
+          for (const axis of ['x','y','z']) containerRate[axis] += (mapped[axis]*Math.PI/180-containerRate[axis])*smoothing;
+        } else {
+          containerRate = { x: 0, y: 0, z: 0 };
+        }
         const screenAcceleration = {
           x: previousAcceleration.x + (measured.x - previousAcceleration.x) * smoothing,
           y: previousAcceleration.y + (measured.y - previousAcceleration.y) * smoothing,
@@ -1129,7 +1166,8 @@
         sensorForce.y = clamp(removeNoise(screenAcceleration.y), -24, 24);
 
         // User input may interrupt the initial drop; it must never wait for the bottom wall.
-        if ((state === 'armed' || state === 'settling') && (accelerationStrength > 1.55 || jerk > 2.2)) {
+        const turning = MOTION.rotationInertia && Math.hypot(containerRate.x, containerRate.y, containerRate.z) > .6;
+        if ((state === 'armed' || state === 'settling') && (accelerationStrength > 1.55 || jerk > 2.2 || turning)) {
           beginRun();
         }
       }
@@ -1286,10 +1324,11 @@
       ];
 
       function physicsParameters() {
-        return Object.fromEntries(physicsControlDefs.map(({ key }) => [key, MOTION[key]]));
+        return { ...Object.fromEntries(physicsControlDefs.map(({ key }) => [key, MOTION[key]])), rotationInertia: MOTION.rotationInertia };
       }
 
       function syncPhysicsControls() {
+        document.querySelector('#toggleRotationInertia').textContent = `转腕惯性：${MOTION.rotationInertia ? '开' : '关'}（点此对比）`;
         physicsControlDefs.forEach(({ key, digits }) => {
           const input = physicsControls.querySelector(`[data-physics-input="${key}"]`);
           const output = physicsControls.querySelector(`[data-physics-value="${key}"]`);
@@ -1320,6 +1359,14 @@
 
       restorePhysicsButton.addEventListener('click', () => {
         Object.assign(MOTION, PHYSICS_DEFAULTS);
+        appliedSpinZ = containerRate.z;
+        recordEvent('parameters', { parameters: { ...MOTION } });
+        syncPhysicsControls();
+      });
+
+      document.querySelector('#toggleRotationInertia').addEventListener('click', () => {
+        MOTION.rotationInertia = !MOTION.rotationInertia;
+        appliedSpinZ = MOTION.rotationInertia ? containerRate.z : 0;
         recordEvent('parameters', { parameters: { ...MOTION } });
         syncPhysicsControls();
       });
@@ -1368,6 +1415,8 @@
           `phone ax/ay      ${number(phoneAcceleration.x)}  ${number(phoneAcceleration.y)}`,
           `gravity gx/gy    ${number(gravityForce.x)}  ${number(gravityForce.y)}`,
           `inertia ax/ay    ${number(inertiaAcceleration.x, 1)}  ${number(inertiaAcceleration.y, 1)}`,
+          `rotation ax/ay   ${number(rotationAcceleration.x, 1)}  ${number(rotationAcceleration.y, 1)}`,
+          `container ω xyz  ${number(containerRate.x)}  ${number(containerRate.y)}  ${number(containerRate.z)} rad/s`,
           `body ax/ay       ${number(bodyAcceleration.x, 1)}  ${number(bodyAcceleration.y, 1)}`,
           `Δvx/Δvy          ${number(deltaVelocity.x, 2)}  ${number(deltaVelocity.y, 2)}`,
           `vx/vy/speed      ${number(body.vx, 1)}  ${number(body.vy, 1)}  ${number(speed, 1)}`,
@@ -1412,7 +1461,7 @@
       });
 
       window.addEventListener('resize', () => {
-        recordEvent('resize', { arena: arenaSize(), box: boxSize(), width: innerWidth, height: innerHeight });
+        recordEvent('resize', { geometry: recordingGeometry(), width: innerWidth, height: innerHeight });
         if (state === 'idle') centerBox();
       });
 
