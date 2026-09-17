@@ -552,6 +552,7 @@
       const rewards = document.querySelector('#rewards');
       const toast = document.querySelector('#toast');
       const physicsDebug = document.querySelector('#physicsDebug');
+      physicsDebug.hidden = new URLSearchParams(window.location?.search || '').get('debug') !== '1';
       const physicsMetrics = document.querySelector('#physicsMetrics');
       const physicsControls = document.querySelector('#physicsControls');
       const restorePhysicsButton = document.querySelector('#restorePhysics');
@@ -587,6 +588,7 @@
       let previousAcceleration = { x: 0, y: 0, z: 0 };
       let sensorForce = { x: 0, y: 0 };
       let wallContact = { left: false, right: false, top: false, bottom: false };
+      let impactReady = { left: true, right: true, top: true, bottom: true };
       let pointer = { active: false, id: null, lastX: 0, lastY: 0, lastTime: 0 };
       let body = { x: 0, y: 0, vx: 0, vy: 0 };
       let physicsPaused = false;
@@ -638,7 +640,7 @@
           previousAcceleration: { ...previousAcceleration }, sensorForce: { ...sensorForce },
           phoneAcceleration: { ...phoneAcceleration }, inertiaAcceleration: { ...inertiaAcceleration },
           bodyAcceleration: { ...bodyAcceleration }, deltaVelocity: { ...deltaVelocity },
-          wallContact: { ...wallContact }, latestImpactSpeed, hitCount, targetHits,
+          wallContact: { ...wallContact }, impactReady: { ...impactReady }, latestImpactSpeed, hitCount, targetHits,
           distanceSinceImpact, physicsPaused, pointer: { ...pointer },
           lastMotionTime, lastFrameTime, lastImpactTime, orientation: { ...orientation }
         };
@@ -665,7 +667,7 @@
         if (recordActive) { stopRecording(); return; }
         recordStarted = performance.now();
         recording = {
-          format: 'blindbox-physics-recording', schemaVersion: 2, engineVersion: 'rotating-container-v3',
+          format: 'blindbox-physics-recording', schemaVersion: 2, engineVersion: 'rotating-container-contact-v4',
           createdAt: new Date().toISOString(), timeOrigin: performance.timeOrigin, startTime: recordStarted,
           units: { sensor: 'm/s²', bodyAcceleration: 'px/s²', velocity: 'px/s', rotation: 'degrees', angularVelocity: 'rad/s', time: 'ms' },
           device: { userAgent: navigator.userAgent, pixelRatio: devicePixelRatio, screenAngle: screen.orientation?.angle ?? window.orientation ?? 0 },
@@ -815,6 +817,11 @@
           { name:'top', nx:0, ny:1, gap:p=>p.y },
           { name:'bottom', nx:0, ny:-1, gap:p=>area.height-p.y }
         ];
+        const incomingCorners = bodyCorners();
+        for (const wall of walls) {
+          // This gate only controls feedback; it never changes physical impulses.
+          if (Math.min(...incomingCorners.map(wall.gap)) > 2) impactReady[wall.name] = true;
+        }
         // Iterative contact impulses also support resting corners, without suppressing rebounds.
         for (let pass = 0; pass < 8; pass++) {
           for (const wall of walls) {
@@ -833,9 +840,14 @@
             const vy = body.vy + angularVelocity * rx;
             const normalSpeed = vx * wall.nx + vy * wall.ny;
             if (normalSpeed >= 0) continue;
-            if (-normalSpeed > strongest) { strongest = -normalSpeed; hitWall = wall.name; }
+            if (pass === 0 && impactReady[wall.name] && -normalSpeed > strongest) {
+              strongest = -normalSpeed; hitWall = wall.name;
+            }
+            if (pass === 0) impactReady[wall.name] = false;
             const lever = rx * wall.ny - ry * wall.nx;
-            const bounce = -normalSpeed > 30 ? MOTION.restitution : 0;
+            // Restitution applies to the incoming collision only. Later solver
+            // passes remove residual penetration, not create another bounce.
+            const bounce = pass === 0 && -normalSpeed > 30 ? MOTION.restitution : 0;
             const impulse = -(1 + bounce) * normalSpeed / (1 + lever * lever * inverseInertia);
             body.vx += impulse * wall.nx;
             body.vy += impulse * wall.ny;
@@ -912,17 +924,11 @@
         flash.style.setProperty('--flash-strength', (.08 + strength * .23).toFixed(2));
         flash.classList.add(final ? 'final' : 'pulse');
 
-        const shake = final ? 6 : .8 + strength * 3.2;
-        app.animate([
-          { transform: 'translate3d(0,0,0)' },
-          { transform: `translate3d(${-shake}px,${shake * .5}px,0)`, offset: .24 },
-          { transform: `translate3d(${shake * .75}px,${-shake * .45}px,0)`, offset: .52 },
-          { transform: `translate3d(${-shake * .35}px,${shake * .2}px,0)`, offset: .76 },
-          { transform: 'translate3d(0,0,0)' }
-        ], { duration: final ? 330 : 140 + strength * 90, easing: 'ease-out' });
+        // The arena stays fixed: all travel comes from the physics state.
       }
 
       function prepareRound() {
+        impactReady = { left: true, right: true, top: true, bottom: true };
         targetHits = randomInt(2, 5);
         hitCount = 0;
         distanceSinceImpact = 0;

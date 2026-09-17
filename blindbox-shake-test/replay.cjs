@@ -42,14 +42,14 @@ const context = {
   devicePixelRatio: data.device.pixelRatio, innerWidth: data.geometry.viewport.width,
   innerHeight: data.geometry.viewport.height,
   Math: Object.assign(Object.create(Math), { random: () => ((roundTargets.shift() || 2)-2+.01)/4 }),
-  Date, URL, initial: data.initial, parameters: data.parameters, recordingStart: data.startTime
+  Date, URL, URLSearchParams, initial: data.initial, parameters: data.parameters, recordingStart: data.startTime
 };
 vm.createContext(context);
 const restored = ['state','body','rotation','angularVelocity','physicsAccumulator','gravity','gravityReady',
   'gravityForce','previousAcceleration','sensorForce','phoneAcceleration','inertiaAcceleration',
   'bodyAcceleration','deltaVelocity','wallContact','latestImpactSpeed','hitCount','targetHits',
   'distanceSinceImpact','physicsPaused','pointer','lastMotionTime','lastFrameTime','lastImpactTime','orientation'];
-for (const key of ['containerRate','appliedSpinZ','rotationAcceleration']) {
+for (const key of ['containerRate','appliedSpinZ','rotationAcceleration','impactReady']) {
   if (Object.hasOwn(data.initial,key)) restored.push(key);
 }
 let script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
