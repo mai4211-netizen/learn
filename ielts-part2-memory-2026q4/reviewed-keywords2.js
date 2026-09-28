@@ -13,6 +13,7 @@ set("Q50",["Claire","online art business","artists","preview","painting","AR pre
 set("Q27",["Hong Kong","tickets sold out","early flight","three in the morning","passport","dark outside","airport","coffee","night person","did not miss the show"]);
 set("Q38",["working overtime","K-pop group","regret","day off","tickets","train was already sold out","early flight","three in the morning","concert on time"]);
 set("Q45",["important decision","concert","working overtime","finish the work later","only once","day off","urgent tasks","train was sold out","early flight","memory","regretted"]);
+set("Q26",["new law","public transport","city centres","private cars","congestion fee","peak hours","cheaper buses","another option","traffic","emissions"]);
 set("Q22",["Zootopia","many kinds of animals","rabbit","police officer","fox","stereotype","working together","trust","cooperate","judge someone"]);
 set("Q37",["ice hockey","Vancouver","best friend","poster","tickets","team jerseys","puck","quickly","team I supported","live atmosphere"]);
 set("Q31",["Zootopia 2","first film","high expectations","Judy","Nick","new case","new characters","city's history","animal city","background details","lost track","disappointed","easier to follow"]);
