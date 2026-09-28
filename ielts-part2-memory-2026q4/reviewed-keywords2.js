@@ -1,0 +1,21 @@
+(()=>{
+const groups=window.P2_2026Q4_GROUPS||[];
+const byQ={};for(const g of groups)for(const t of g.topics)byQ[t.q]=t;
+const set=(q,arr)=>{if(byQ[q])byQ[q].keywords=arr};
+set("Q06",["older person","pottery craftsperson","small studio","creative","piece of clay","teaches","mistakes","patience","beginners","confident"]);
+set("Q24",["Mid-Autumn advertisement","Chinese member","K-pop group","coffee brand","snow-skin mooncake","filling","mould","green","white","brand's coffee"]);
+set("Q08",["environmental law","congestion-fee law","city centres","private cars","peak hours","public transport","cheaper buses","leave the car at home","unnecessary driving","traffic emissions"]);
+set("Q21",["congestion-fee law","city centres","private car","peak hours","ban cars","unnecessary trips","buses","public transport","traffic","emissions"]);
+set("Q20",["smartwatch","exercise","sleep","payday","separate account","online shopping","Apple Store","models","planned","use the watch every day"]);
+set("Q33",["Claire","final goal","each day","to-do list","laptop","unfinished tasks","languages","weekly speaking target","system","study routine"]);
+set("Q51",["Claire","school","ten years","after school","music","drawing","busier","interests have also changed","talking naturally","friendship"]);
+set("Q50",["Claire","online art business","artists","preview","painting","AR preview","social media","audience","exhibitions overseas","buy art","suit their room","platform"]);
+set("Q27",["Hong Kong","tickets sold out","early flight","three in the morning","passport","dark outside","airport","coffee","night person","did not miss the show"]);
+set("Q38",["working overtime","K-pop group","regret","day off","tickets","train was already sold out","early flight","three in the morning","concert on time"]);
+set("Q45",["important decision","concert","working overtime","finish the work later","only once","day off","urgent tasks","train was sold out","early flight","memory","regretted"]);
+set("Q22",["Zootopia","many kinds of animals","rabbit","police officer","fox","stereotype","working together","trust","cooperate","judge someone"]);
+set("Q37",["ice hockey","Vancouver","best friend","poster","tickets","team jerseys","puck","quickly","team I supported","live atmosphere"]);
+set("Q31",["Zootopia 2","first film","high expectations","Judy","Nick","new case","new characters","city's history","animal city","background details","lost track","disappointed","easier to follow"]);
+set("Q10",["local news","pottery market","young artists","colourful cups","small sculptures","clay","kiln","traditional crafts","younger people","designer","pottery studio","modern image"]);
+set("Q42",["pottery friend","small studio","clay","colourful cups","small sculptures","traditional methods","kiln","small animal","control","neat and detailed","small shape"]);
+})();
