@@ -65,13 +65,14 @@ function fallbackRecallRanges(text,baseRanges){
     const candidates=[];
     for(let i=0;i<words.length;i++){
       const x=words[i],low=x.w.toLowerCase();
-      if(low.length<4||RECALL_STOP.has(low)||RECALL_WEAK.has(low))continue;
-      let a=x.a,b=x.b,label=x.w,score=low.length>=7?3:2;
+      if(low.length<3||RECALL_STOP.has(low))continue;
+      const weak=RECALL_WEAK.has(low)||low.length===3;
+      let a=x.a,b=x.b,label=x.w,score=weak?0.5:(low.length>=7?3:2);
       const n=words[i+1],gap=n?text.slice(x.b,n.a):'';
       if(n){
         const nl=n.w.toLowerCase();
-        if(gap===' '&&!RECALL_STOP.has(nl)&&!RECALL_WEAK.has(nl)&&nl.length>=4&&b-a+n.w.length+1<=28){
-          b=n.b;label=text.slice(a,b);score+=2;
+        if(gap===' '&&!RECALL_STOP.has(nl)&&nl.length>=3&&b-a+n.w.length+1<=28){
+          b=n.b;label=text.slice(a,b);score+=RECALL_WEAK.has(nl)?0.5:1.5;
         }
       }
       if(/^[A-Z]/.test(x.w))score+=2;
