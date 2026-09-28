@@ -12,6 +12,14 @@ function group(){return GROUPS.find(g=>g.id===selectedGroup)||GROUPS[0]}
 function topic(){const g=group();return g.topics.find(t=>t.q===selectedQ)||g.topics[0]}
 function save(){storage.set('p2-2026q4-group',selectedGroup);storage.set('p2-2026q4-q',selectedQ);storage.set('p2-2026q4-bold-source',boldSource)}
 function parts(g,t){
+  if(Array.isArray(t.reviewed)&&t.reviewed.length){
+    return t.reviewed.filter(p=>p?.text).map((p,i)=>({
+      text:p.text,
+      type:p.type||'own',
+      adjusted:!!p.adjusted,
+      source:'reviewed-'+i
+    }));
+  }
   const omit=new Set(t.omit||[]);
   const out=[{text:t.intro,type:'own',source:'intro'}];
   g.shared.forEach((baseText,i)=>{
@@ -33,32 +41,32 @@ function normalizeRanges(ranges,len){
   const merged=[];for(const r of clean){const last=merged[merged.length-1];if(last&&r[0]<=last[1])last[1]=Math.max(last[1],r[1]);else merged.push([...r])}return merged;
 }
 function mineRanges(key,len){return normalizeRanges(boldState[key]||[],len)}
-function recommendedRanges(text){
-  if(!text)return[];
-  let start=0;
-  const prefix="I'd like to talk about ";
-  if(text.startsWith(prefix))start=prefix.length;
-  let slice=text.slice(start);
-  const punctuation=[...slice.matchAll(/[,.;!?]/g)].find(m=>m.index>=18&&m.index<=95);
-  let end;
-  if(punctuation)end=start+punctuation.index+1;
-  else{
-    const words=[...slice.matchAll(/[A-Za-z]+(?:'[A-Za-z]+)?/g)];
-    if(!words.length)return[];
-    const idx=Math.min(words.length-1,8);
-    end=start+words[idx].index+words[idx][0].length;
+function recommendedRanges(text,t){
+  if(!text||!Array.isArray(t?.keywords)||!t.keywords.length)return[];
+  const lower=text.toLowerCase(),ranges=[];
+  for(const raw of t.keywords){
+    const needle=String(raw||'').trim().toLowerCase();
+    if(!needle)continue;
+    let from=0;
+    while(from<lower.length){
+      const at=lower.indexOf(needle,from);
+      if(at<0)break;
+      const before=at===0?'':lower[at-1],after=at+needle.length>=lower.length?'':lower[at+needle.length];
+      const leftOk=!/[a-z]/.test(before),rightOk=!/[a-z]/.test(after);
+      if(leftOk&&rightOk)ranges.push([at,at+needle.length]);
+      from=at+needle.length;
+    }
   }
-  if(end-start<8){start=0;end=Math.min(text.length,65)}
-  return [[start,end]];
+  return normalizeRanges(ranges,text.length);
 }
-function sourceRanges(text,key){return boldSource==='recommended'?recommendedRanges(text):mineRanges(key,text.length)}
-function marked(text,key){
-  const ranges=sourceRanges(text,key);let html='',cursor=0,klass=boldSource==='recommended'?'rec-mark':'mine-mark';
+function sourceRanges(text,key,t){return boldSource==='recommended'?recommendedRanges(text,t):mineRanges(key,text.length)}
+function marked(text,key,t){
+  const ranges=sourceRanges(text,key,t);let html='',cursor=0,klass=boldSource==='recommended'?'rec-mark':'mine-mark';
   for(const [a,b] of ranges){html+=esc(text.slice(cursor,a));html+='<strong class="'+klass+'">'+esc(text.slice(a,b))+'</strong>';cursor=b}
   return html+esc(text.slice(cursor));
 }
-function boldOnlyHtml(text,key){
-  const ranges=sourceRanges(text,key),klass=boldSource==='recommended'?'rec-mark':'mine-mark';
+function boldOnlyHtml(text,key,t){
+  const ranges=sourceRanges(text,key,t),klass=boldSource==='recommended'?'rec-mark':'mine-mark';
   return ranges.map(([a,b])=>'<strong class="'+klass+'">'+esc(text.slice(a,b))+'</strong>').join('<span class="excerpt-gap">…</span>');
 }
 function persist(){storage.set(BOLD_KEY,JSON.stringify(boldState))}
@@ -128,11 +136,11 @@ function render(){
   const ps=parts(g,t).map((p,i)=>{
     const key=t.q+':'+p.source;
     if(boldOnly){
-      const html=boldOnlyHtml(p.text,key);
+      const html=boldOnlyHtml(p.text,key,t);
       return html?'<p class="bold-only-paragraph">'+html+'</p>':'';
     }
     const klass='answer-paragraph '+p.type+(p.adjusted?' adjusted':'');
-    return '<p class="'+klass+'" data-key="'+key+'">'+marked(p.text,key)+'</p>';
+    return '<p class="'+klass+'" data-key="'+key+'">'+marked(p.text,key,t)+'</p>';
   }).filter(Boolean);
   const emptyText=boldSource==='recommended'?'当前答案没有可生成的推荐加粗。':'当前答案还没有我的加粗内容。请先显示完整答案并选中文字加粗。';
   answer.innerHTML=ps.length?ps.join(''):'<div class="bold-empty">'+emptyText+'</div>';
