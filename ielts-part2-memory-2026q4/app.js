@@ -131,9 +131,8 @@ function render(){
       const html=boldOnlyHtml(p.text,key);
       return html?'<p class="bold-only-paragraph">'+html+'</p>':'';
     }
-    const badge=p.adjusted?'<span class="adjusted-badge">微调</span>':'';
     const klass='answer-paragraph '+p.type+(p.adjusted?' adjusted':'');
-    return '<p class="'+klass+'" data-key="'+key+'">'+badge+marked(p.text,key)+'</p>';
+    return '<p class="'+klass+'" data-key="'+key+'">'+marked(p.text,key)+'</p>';
   }).filter(Boolean);
   const emptyText=boldSource==='recommended'?'当前答案没有可生成的推荐加粗。':'当前答案还没有我的加粗内容。请先显示完整答案并选中文字加粗。';
   answer.innerHTML=ps.length?ps.join(''):'<div class="bold-empty">'+emptyText+'</div>';
