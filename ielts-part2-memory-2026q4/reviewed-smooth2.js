@@ -17,4 +17,5 @@ rep("Q26",2,"The fee would help pay for cheaper buses and better public transpor
 rep("Q42",3,"Watching her work showed me how much control the skill needs. She can turn a soft piece of clay into something neat and detailed in a few minutes, while I needed much longer just to fix one small shape.");
 
 rep("Q50",3,"I see her as successful because people do not only follow her online; they actually use the service and buy art through it. The AR preview helps them decide whether a painting would suit their room, which gives the platform a clear purpose.");
+rep("Q22",3,"What I like most is the animal world because it feels fresh and imaginative. The film also plays with common stereotypes, because the rabbit and the fox are both different from what others expect. So it reminds me not to judge someone too quickly.");
 })();
