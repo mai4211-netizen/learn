@@ -30,7 +30,7 @@ set("Q31",[
  {type:"own",text:"A movie I did not enjoy very much was Zootopia 2. I had liked the first film a lot, so I went into the second one with quite high expectations."},
  {type:"shared",text:"The story still follows Judy and Nick on a new case, but it introduces more characters and more background about the city. I understood what the film was trying to do, but the plot felt busier and less focused to me."},
  {type:"own",text:"The first movie had a strong sense of discovery because the animal city was completely new. In the second one, that surprise was smaller, and I found myself paying more attention to the amount of information than to the mystery itself."},
- {type:"own",text:"I would not call it a terrible movie. I was simply disappointed because it did not give me the same clear and fresh feeling as the first one."}
+ {type:"own",text:"I would not call it a terrible movie. I was simply disappointed afterwards because it did not give me the same clear and fresh feeling as the first one."}
 ],["Zootopia 2","first film","high expectations","Judy","Nick","new case","more characters","busier","discovery","disappointed"]);
 set("Q32",[
  {type:"own",text:"I'd like to talk about a time when I listened to my pottery friend talking about a topic I was not interested in. She was explaining different kinds of clay, firing temperatures and traditional patterns."},
