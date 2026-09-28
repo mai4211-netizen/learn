@@ -41,10 +41,64 @@ function normalizeRanges(ranges,len){
   const merged=[];for(const r of clean){const last=merged[merged.length-1];if(last&&r[0]<=last[1])last[1]=Math.max(last[1],r[1]);else merged.push([...r])}return merged;
 }
 function mineRanges(key,len){return normalizeRanges(boldState[key]||[],len)}
+const RECALL_STOP=new Set(("a an the and or but so because if when while where who which that this these those i you he she it we they me him her us them my your his our their is am are was were be been being do does did have has had can could will would should may might must to of in on at for from with by as than then very really just also still only much more most some any one two there here about into over after before during each every own same other another something anything someone people person place thing time way part kind good bad nice big small new old first last later now today yesterday tomorrow get got getting make made making go went gone going come came coming see saw seen seeing know knew known think thought thinking feel felt feeling like liked liking want wanted wanting need needed needing use used using look looked looking say said saying tell told telling talk talked talking work worked working").split(/\s+/));
+const RECALL_WEAK=new Set(("friend friends group place thing person people story movie film activity experience idea problem reason result way part time day week year area city home work").split(/\s+/));
+function sentenceSpans(text){
+  const out=[];let start=0;
+  const re=/[^.!?]+[.!?]?/g;let m;
+  while((m=re.exec(text))){
+    const raw=m[0],lead=raw.search(/\S/);if(lead<0)continue;
+    const s=m.index+lead,e=m.index+raw.length;
+    out.push([s,e]);
+  }
+  return out;
+}
+function overlapsRange(a,b,ranges){return ranges.some(([x,y])=>Math.max(a,x)<Math.min(b,y))}
+function fallbackRecallRanges(text,baseRanges){
+  const ranges=[...baseRanges],sentences=sentenceSpans(text);
+  for(const [s,e] of sentences){
+    const sent=text.slice(s,e),words=[...sent.matchAll(/[A-Za-z][A-Za-z'-]*/g)].map(m=>({w:m[0],a:s+m.index,b:s+m.index+m[0].length}));
+    const wordCount=words.length;
+    const desired=wordCount>=22?4:wordCount>=11?3:wordCount>=6?2:1;
+    let current=ranges.filter(([a,b])=>a<e&&b>s).length;
+    if(current>=desired)continue;
+    const candidates=[];
+    for(let i=0;i<words.length;i++){
+      const x=words[i],low=x.w.toLowerCase();
+      if(low.length<4||RECALL_STOP.has(low)||RECALL_WEAK.has(low))continue;
+      let a=x.a,b=x.b,label=x.w,score=low.length>=7?3:2;
+      const n=words[i+1],gap=n?text.slice(x.b,n.a):'';
+      if(n){
+        const nl=n.w.toLowerCase();
+        if(gap===' '&&!RECALL_STOP.has(nl)&&!RECALL_WEAK.has(nl)&&nl.length>=4&&b-a+n.w.length+1<=28){
+          b=n.b;label=text.slice(a,b);score+=2;
+        }
+      }
+      if(/^[A-Z]/.test(x.w))score+=2;
+      if(/ing$|ed$|ly$/.test(low))score+=1;
+      candidates.push({a,b,label,score,pos:(a-s)/Math.max(1,e-s)});
+    }
+    candidates.sort((p,q)=>q.score-p.score||Math.abs(p.pos-.5)-Math.abs(q.pos-.5));
+    while(current<desired&&candidates.length){
+      let pickIndex=-1,best=-1;
+      for(let i=0;i<candidates.length;i++){
+        const c=candidates[i];if(overlapsRange(c.a,c.b,ranges))continue;
+        const local=ranges.filter(([a,b])=>a<e&&b>s);
+        const minDist=local.length?Math.min(...local.map(([a,b])=>Math.abs((a+b)/2-(c.a+c.b)/2))):999;
+        const spreadBonus=Math.min(4,minDist/18);
+        const total=c.score+spreadBonus;
+        if(total>best){best=total;pickIndex=i}
+      }
+      if(pickIndex<0)break;
+      const c=candidates.splice(pickIndex,1)[0];ranges.push([c.a,c.b]);current++;
+    }
+  }
+  return normalizeRanges(ranges,text.length);
+}
 function recommendedRanges(text,t){
-  if(!text||!Array.isArray(t?.keywords)||!t.keywords.length)return[];
+  if(!text)return[];
   const lower=text.toLowerCase(),ranges=[];
-  for(const raw of t.keywords){
+  for(const raw of (t?.keywords||[])){
     const needle=String(raw||'').trim().toLowerCase();
     if(!needle)continue;
     let from=0;
@@ -52,12 +106,11 @@ function recommendedRanges(text,t){
       const at=lower.indexOf(needle,from);
       if(at<0)break;
       const before=at===0?'':lower[at-1],after=at+needle.length>=lower.length?'':lower[at+needle.length];
-      const leftOk=!/[a-z]/.test(before),rightOk=!/[a-z]/.test(after);
-      if(leftOk&&rightOk)ranges.push([at,at+needle.length]);
+      if(!/[a-z]/.test(before)&&!/[a-z]/.test(after))ranges.push([at,at+needle.length]);
       from=at+needle.length;
     }
   }
-  return normalizeRanges(ranges,text.length);
+  return fallbackRecallRanges(text,normalizeRanges(ranges,text.length));
 }
 function sourceRanges(text,key,t){return boldSource==='recommended'?recommendedRanges(text,t):mineRanges(key,text.length)}
 function marked(text,key,t){
