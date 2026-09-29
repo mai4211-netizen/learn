@@ -237,3 +237,12 @@ try{
   document.addEventListener('mousedown',e=>{if(!e.target.closest('#selectionTools')&&!e.target.closest('#answer'))hideTools()});
   render();
 }catch(err){console.error(err);$('#card').style.display='none';$('#empty').style.display='block';$('#empty').textContent='加载失败：'+err.message}
+
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(err => {
+      console.warn("Offline mode registration failed:", err);
+    });
+  });
+}
