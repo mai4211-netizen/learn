@@ -131,9 +131,9 @@ def build():
 
     story += [Spacer(1, 95)]
     story += [Paragraph("IELTS Part 2<br/>2026 Sep-Dec", styles["Cover"])]
-    story += [Paragraph("爱听写 52 题 · 手机离线备份", styles["CoverSub"])]
+    story += [Paragraph("爱听写 52 题 / 手机离线备份", styles["CoverSub"])]
     story += [Spacer(1, 12)]
-    story += [Paragraph("目标 6-6.5 · 中文记忆链 + 完整答案 + 推荐记忆锚点", styles["CoverSub"])]
+    story += [Paragraph("目标 6-6.5 / 中文记忆链 + 完整答案 + 推荐记忆锚点", styles["CoverSub"])]
     story += [Spacer(1, 28)]
     story += [Paragraph("这份 PDF 是网页 PWA 的离线备份。网页用于切题、搜索和自定义加粗；PDF 用于飞机上或缓存异常时直接阅读。", styles["CoverSub"])]
     story += [PageBreak()]
