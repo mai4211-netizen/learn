@@ -45,7 +45,7 @@ def topic_num(q):
     return int(m.group(1)) if m else 999
 
 def clean(s):
-    return (s or "").replace("→", " > ").replace("–", "-").replace("—", "-")
+    return (s or "").replace("→", " > ").replace("–", "-").replace("—", "-").replace("·", " / ").replace("•", "-")
 
 pdfmetrics.registerFont(UnicodeCIDFont("STSong-Light"))
 
@@ -64,7 +64,7 @@ styles.add(ParagraphStyle(
     textColor=HexColor("#766E65"), spaceAfter=3
 ))
 styles.add(ParagraphStyle(
-    name="ENPrompt", fontName="STSong-Light", fontSize=11.2, leading=15.5,
+    name="ENPrompt", fontName="Helvetica", fontSize=10.8, leading=15.2,
     textColor=HexColor("#26231F"), spaceAfter=7
 ))
 styles.add(ParagraphStyle(
@@ -78,16 +78,16 @@ styles.add(ParagraphStyle(
     spaceAfter=10
 ))
 styles.add(ParagraphStyle(
-    name="Body", fontName="STSong-Light", fontSize=10.4, leading=15.4,
+    name="Body", fontName="Helvetica", fontSize=10.2, leading=15.2,
     textColor=HexColor("#24211E"), spaceAfter=7
 ))
 styles.add(ParagraphStyle(
-    name="Keywords", fontName="STSong-Light", fontSize=8.8, leading=12.5,
+    name="Keywords", fontName="Helvetica", fontSize=8.5, leading=12.2,
     textColor=HexColor("#556B57"), backColor=HexColor("#F2F7F1"),
     borderPadding=6, spaceBefore=5, spaceAfter=2
 ))
 styles.add(ParagraphStyle(
-    name="Cover", fontName="STSong-Light", fontSize=24, leading=31,
+    name="Cover", fontName="Helvetica-Bold", fontSize=24, leading=31,
     alignment=TA_CENTER, textColor=HexColor("#201E1B"), spaceAfter=12
 ))
 styles.add(ParagraphStyle(
@@ -159,7 +159,7 @@ def build():
         story.append(Paragraph(zh, styles["CNTitle"]))
         story.append(Paragraph(en, styles["ENPrompt"]))
         if cues:
-            cue_text="<br/>".join(["• "+x for x in cues])
+            cue_text="<br/>".join(["- "+x for x in cues])
             story.append(Paragraph(cue_text, styles["Index"]))
             story.append(Spacer(1,5))
         story.append(Paragraph("中文记忆链", styles["Label"]))
