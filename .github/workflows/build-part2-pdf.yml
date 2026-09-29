@@ -6,14 +6,13 @@ on:
       - "ielts-part2-memory-2026q4/**"
       - "tools/build_part2_pdf.py"
       - ".github/workflows/build-part2-pdf.yml"
-    paths-ignore:
-      - "ielts-part2-memory-2026q4/IELTS_Part2_2026Q4_Offline.pdf"
 
 permissions:
   contents: write
 
 jobs:
   build:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
