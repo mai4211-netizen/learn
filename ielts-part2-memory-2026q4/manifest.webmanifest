@@ -1,0 +1,19 @@
+{
+  "name": "IELTS Part 2 口语复习",
+  "short_name": "IELTS P2",
+  "description": "2026 Sep-Dec IELTS Part 2 口语题库离线复习",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f5f1",
+  "theme_color": "#f7f5f1",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
