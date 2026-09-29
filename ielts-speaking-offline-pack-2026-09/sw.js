@@ -1,0 +1,5 @@
+const CACHE="ielts-speaking-offline-pack-2026-09-v1";
+const FILES=["./","./index.html","./manifest.webmanifest","./icon.svg"];
+self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())));
+self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
+self.addEventListener("fetch",e=>{if(e.request.method!=="GET")return;e.respondWith(fetch(e.request).then(r=>{if(r&&r.ok){const x=r.clone();caches.open(CACHE).then(c=>c.put(e.request,x));}return r;}).catch(async()=>{const h=await caches.match(e.request,{ignoreSearch:true});if(h)return h;if(e.request.mode==="navigate")return(await caches.match("./index.html"))||(await caches.match("./"));throw new Error("offline");}))});
