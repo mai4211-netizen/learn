@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>UK Trip 2026｜行程检索版</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root{--bg:#f4f1eb;--paper:#fffdfa;--ink:#22221f;--muted:#746f66;--line:#ddd6ca;--dark:#252520;--edin:#587589;--stir:#788b58;--lon:#a05d50;--east:#6e7994}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
@@ -17,6 +18,22 @@
 .note{background:#f1ece3;border-radius:9px;padding:8px;margin-top:8px;font-size:9.5px;color:#5d5851}.empty{display:none;text-align:center;padding:25px;color:var(--muted)}
 body{font-size:15.5px;line-height:1.5}.hero p{font-size:13.5px}.search{font-size:15.5px}button{font-size:11.5px}.stat span{font-size:11px}.date b{font-size:18px}.date span{font-size:9.5px}.title h2{font-size:19px}.title p{font-size:11.5px}.pill{font-size:10.5px}.row{font-size:13px;line-height:1.5}.place b{font-size:14.5px}.place small{font-size:11.5px}.move{font-size:12px}.note{font-size:11.5px}
 @media(max-width:760px){body{font-size:14px}.hero h1{font-size:30px}.hero p{font-size:12.5px}.search{font-size:14px}.filters button{font-size:10px}.date b{font-size:17px}.date span{font-size:8.5px}.title h2{font-size:16.5px}.title p{font-size:10px}.row{font-size:11.5px;line-height:1.45}.place b{font-size:13px}.place small{font-size:10.5px}.move{font-size:10.5px}.note{font-size:10.5px}.pill{font-size:9px}.summary{grid-template-columns:repeat(2,1fr)}.row{grid-template-columns:78px 1fr}.move{grid-column:2}.meta{display:none}}
+
+.map-wrap{margin:12px 0 4px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#f2eee7}
+.map-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;background:#f7f3ec;border-bottom:1px solid var(--line)}
+.map-head b{font-size:12px}.map-head span{font-size:10px;color:var(--muted)}
+.day-map{height:270px;width:100%;background:#ece8df}
+.map-cards{display:flex;gap:7px;overflow-x:auto;padding:8px;background:var(--paper);scrollbar-width:thin}
+.map-card{appearance:none;border:1px solid var(--line);background:#fff;border-radius:11px;padding:7px 9px;display:flex;align-items:center;gap:7px;min-width:155px;text-align:left;color:var(--ink);font-weight:650}
+.map-card:hover{background:#f7f3ec}.map-card .num,.map-pin{width:24px;height:24px;border-radius:999px;display:grid;place-items:center;background:var(--dark);color:#fff;font-size:11px;font-weight:900}
+.map-card small{display:block;color:var(--muted);font-weight:500;margin-top:1px}
+.map-note{padding:0 10px 9px;background:var(--paper);font-size:9.5px;color:var(--muted)}
+.map-popup b{font-size:12px}.map-popup a{display:inline-block;margin-top:5px;color:#315f87;text-decoration:none;font-weight:700}
+.map-pin{border:2px solid white;box-shadow:0 1px 5px rgba(0,0,0,.28)}
+.row.map-linked{cursor:pointer}.row.map-linked:hover{background:#faf7f1}
+.leaflet-control-attribution{font-size:8px!important}
+@media(max-width:760px){.day-map{height:235px}.map-head b{font-size:11.5px}.map-head span{font-size:9px}.map-card{min-width:142px;padding:7px}.map-note{font-size:9px}}
+
 </style></head>
 <body><div class="wrap">
 <section class="hero"><div style="font-size:9px;letter-spacing:.16em;opacity:.55">30 SEP — 12 OCT 2026</div><h1>行程检索版</h1><p>搜索景点 / 日期 / 城市；每天可折叠。到达时间、浏览时长和交通放在同一行。</p></section>
@@ -28,6 +45,7 @@ body{font-size:15.5px;line-height:1.5}.hero p{font-size:13.5px}.search{font-size
 <div class="summary"><div class="stat"><b>13 天</b><span>9/30 → 10/12</span></div><div class="stat"><b>伦敦 9 晚</b><span>City Sleeper · 10/2 入住 → 10/11 退房</span></div><div class="stat"><b>10/2 · 15:26</b><span>Edinburgh Waverley → London King’s Cross · 19:37</span></div><div class="stat"><b>10/12 · 12:00</b><span>Edinburgh Airport · HU408</span></div></div>
 <main id="days"></main><div id="empty" class="empty">没有匹配结果。</div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const DATA=[
 {"date":"9/30","city":"Edinburgh","theme":"城市方位入门","intensity":"★★","mode":"步行","items":[["15:00","Waverley Bridge｜威弗利桥","10–15min","步行 3min"],["15:15","Scott Monument｜司各特纪念塔","外观 15min；登塔 40–50min","步行 3–5min"],["15:40","Princes Street Gardens｜王子街花园","30–45min","花园内步行 12–15min"],["16:30","Ross Fountain｜罗斯喷泉","15–20min","之后 café / 晚饭 / 回住宿"]],"note":"抵达半天，只做 orientation，不安排大型室内景点。"},
@@ -44,12 +62,123 @@ const DATA=[
 {"date":"10/11","city":"London","theme":"Barbican + East London → Edinburgh","intensity":"★★★","mode":"步行 + Tube + 火车","items":[["09:30–10:45","Barbican Centre｜巴比肯艺术中心","1h15min","步行"],["10:45–11:20","Barbican Estate｜巴比肯住宅区","35min","步行 / 公交约 15min"],["11:40–12:30","午饭","50min",""],["12:45–13:45","Shoreditch｜肖尔迪奇","约 1h","步行"],["13:45–14:45","Brick Lane｜砖巷","约 1h","步行约 10min"],["14:55–15:40","Old Spitalfields Market｜老斯皮塔菲尔德市场","45min",""],["15:40–16:30","回酒店取行李","","Tube / 步行"],["16:30–17:15","酒店 → London King’s Cross｜伦敦国王十字站","","Tube / Taxi；预留进站时间"],["17:30–18:30 左右","London King’s Cross → Edinburgh Waverley｜返回爱丁堡","约 4.5–5h；具体车次提前买票后锁定","LNER / 直达优先"],["22:00–23:30 左右","抵达 Edinburgh + 入住","入住 Hampton by Hilton Edinburgh Airport","步行 / Taxi / Tram"]],"note":"10/11 必须回到 Edinburgh 过夜，因为 10/12 12:00 从 Edinburgh Airport 起飞。伦敦住宿为 City Sleeper at Royal National Hotel：10/2 入住、10/11 退房，共 9 晚；10/11 晚回爱丁堡后住 Hampton by Hilton Edinburgh Airport。"},
 {"date":"10/12","city":"Edinburgh","theme":"12:00 Edinburgh Airport 起飞","intensity":"—","mode":"机场交通","items":[["07:30–08:00","起床 / 退房 / 简单早餐","",""],["08:00 左右","Edinburgh 市区 → Edinburgh Airport｜爱丁堡机场","","Tram / Taxi；建议不要晚于这个时间离开市区"],["08:45 左右","到达 Edinburgh Airport｜爱丁堡机场","约提前 3h15min","办理值机 / 托运 / 安检"],["12:00","航班起飞","",""]],"note":"如果 10/11 晚直接住机场酒店，10/12 可以更从容；如果住 Waverley 附近，建议约 08:00 出发去机场，不再安排任何景点。"}
 ];
+
+const MAPS={
+"9/30":{title:"Edinburgh｜城市方位入门",note:"连接线只表示访问顺序，不是步行导航路线。",points:[
+{n:1,name:"Waverley Bridge｜威弗利桥",time:"15:00",lat:55.95213,lng:-3.19183,i:0},
+{n:2,name:"Scott Monument｜司各特纪念塔",time:"15:15",lat:55.95239,lng:-3.19326,i:1},
+{n:3,name:"Princes Street Gardens｜王子街花园",time:"15:40",lat:55.95119,lng:-3.20158,i:2},
+{n:4,name:"Ross Fountain｜罗斯喷泉",time:"16:30",lat:55.94960,lng:-3.20777,i:3}
+]},
+"10/1":{title:"Edinburgh Old Town｜历史主日",note:"连接线只表示访问顺序；Castle → Grassmarket → Victoria Street → Museum → Calton Hill。",points:[
+{n:1,name:"Edinburgh Castle｜爱丁堡城堡",time:"09:30",lat:55.94859,lng:-3.19991,i:1},
+{n:2,name:"Grassmarket｜草市场",time:"12:10",lat:55.94746,lng:-3.19592,i:2},
+{n:3,name:"Victoria Street｜维多利亚街",time:"13:00",lat:55.94815,lng:-3.19408,i:3},
+{n:4,name:"National Museum of Scotland｜苏格兰国家博物馆",time:"13:40",lat:55.94735,lng:-3.18910,i:4},
+{n:5,name:"Calton Hill｜卡尔顿山",time:"17:10",lat:55.95502,lng:-3.18274,i:5}
+]},
+"10/2":{title:"London｜抵达后的本地段",note:"爱丁堡→伦敦的长途铁路不画进本地地图；这里只显示 King’s Cross 到酒店。",points:[
+{n:1,name:"London King’s Cross｜伦敦国王十字站",time:"19:37",lat:51.53082,lng:-0.12384,i:1},
+{n:2,name:"City Sleeper at Royal National Hotel｜城市睡眠者皇家国家酒店",time:"20:00 后",lat:51.52265,lng:-0.12619,i:2}
+]},
+"10/6":{title:"London｜V&A → Marylebone → Soho",note:"下午节点很多；地图用于看区域关系，不要求全部打卡。",points:[
+{n:1,name:"V&A｜维多利亚与阿尔伯特博物馆",time:"10:00",lat:51.49664,lng:-0.17218,i:0},
+{n:2,name:"South Kensington｜南肯辛顿",time:"13:30",lat:51.49407,lng:-0.17390,i:1},
+{n:3,name:"Marylebone｜马里波恩",time:"15:00",lat:51.52056,lng:-0.15166,i:2},
+{n:4,name:"Daunt Books｜道特书店",time:"15:10",lat:51.51994,lng:-0.15239,i:3},
+{n:5,name:"Liberty London｜自由百货",time:"17:30",lat:51.51375,lng:-0.14069,i:6},
+{n:6,name:"Carnaby Street｜卡纳比街",time:"18:15",lat:51.51337,lng:-0.13879,i:7},
+{n:7,name:"Soho｜苏活区",time:"18:45 后",lat:51.51363,lng:-0.13275,i:8}
+]},
+"10/7":{title:"London｜Kensington Gardens → Hyde Park",note:"音乐剧剧院尚未锁定，所以地图只画白天公园段。",points:[
+{n:1,name:"Italian Gardens｜意大利花园",time:"10:05",lat:51.51143,lng:-0.17409,i:1},
+{n:2,name:"Kensington Palace｜肯辛顿宫",time:"10:45",lat:51.50501,lng:-0.18769,i:2},
+{n:3,name:"Albert Memorial｜阿尔伯特纪念碑",time:"11:30",lat:51.50240,lng:-0.17733,i:3},
+{n:4,name:"Serpentine｜蛇形湖",time:"12:00",lat:51.50530,lng:-0.17073,i:4},
+{n:5,name:"Serpentine Galleries｜蛇形画廊",time:"13:00",lat:51.50462,lng:-0.17509,i:5},
+{n:6,name:"Hyde Park｜海德公园",time:"14:00",lat:51.50727,lng:-0.16573,i:6}
+]},
+"10/8":{title:"London｜National Gallery → Covent Garden",note:"这天路线很集中，基本可步行串起来。",points:[
+{n:1,name:"National Gallery｜英国国家美术馆",time:"10:00",lat:51.50893,lng:-0.12830,i:0},
+{n:2,name:"Trafalgar Square｜特拉法加广场",time:"13:00",lat:51.50799,lng:-0.12805,i:1},
+{n:3,name:"Covent Garden｜考文特花园",time:"14:30",lat:51.51173,lng:-0.12294,i:3},
+{n:4,name:"Somerset House｜萨默塞特宫",time:"16:10",lat:51.51111,lng:-0.11713,i:4},
+{n:5,name:"Seven Dials｜七面钟",time:"17:15",lat:51.51398,lng:-0.12709,i:5}
+]},
+"10/9":{title:"London｜Bloomsbury + British Museum",note:"酒店就在 Bloomsbury 附近，这天地图范围很小，适合步行。",points:[
+{n:1,name:"Bloomsbury｜布鲁姆斯伯里",time:"13:30",lat:51.52145,lng:-0.12458,i:0},
+{n:2,name:"Russell Square｜罗素广场",time:"14:30",lat:51.52272,lng:-0.12400,i:1},
+{n:3,name:"Senate House｜参议院大楼",time:"14:30",lat:51.52144,lng:-0.12867,i:1},
+{n:4,name:"British Museum｜大英博物馆",time:"15:00",lat:51.51941,lng:-0.12696,i:2}
+]},
+"10/10":{title:"Seven Sisters｜七姐妹白崖一日",note:"这是区域路线图；悬崖步行请以现场天气、步道开放情况和实际导航为准。",points:[
+{n:1,name:"Seaford｜西福德",time:"09:30",lat:50.77144,lng:0.10290,i:2},
+{n:2,name:"Seaford Head｜西福德岬",time:"10:00",lat:50.76362,lng:0.11253,i:3},
+{n:3,name:"Cuckmere Haven｜库克米尔河口",time:"11:00",lat:50.76475,lng:0.14753,i:4},
+{n:4,name:"Seven Sisters Country Park / Exceat｜七姐妹乡村公园",time:"12:30",lat:50.77556,lng:0.15160,i:5},
+{n:5,name:"Birling Gap｜伯灵隘口",time:"13:30",lat:50.74378,lng:0.20048,i:6},
+{n:6,name:"Eastbourne｜伊斯特本海滨",time:"15:00",lat:50.76501,lng:0.28756,i:7}
+]},
+"10/11":{title:"London｜Barbican → East London → King’s Cross",note:"地图只画伦敦段；17:30 后的 London → Edinburgh 是长途铁路。",points:[
+{n:1,name:"Barbican Centre｜巴比肯艺术中心",time:"09:30",lat:51.52002,lng:-0.09362,i:0},
+{n:2,name:"Barbican Estate｜巴比肯住宅区",time:"10:45",lat:51.52093,lng:-0.09566,i:1},
+{n:3,name:"Shoreditch｜肖尔迪奇",time:"12:45",lat:51.52350,lng:-0.07756,i:3},
+{n:4,name:"Brick Lane｜砖巷",time:"13:45",lat:51.52113,lng:-0.07185,i:4},
+{n:5,name:"Old Spitalfields Market｜老斯皮塔菲尔德市场",time:"14:55",lat:51.51966,lng:-0.07535,i:5},
+{n:6,name:"City Sleeper｜酒店取行李",time:"15:40",lat:51.52265,lng:-0.12619,i:6},
+{n:7,name:"London King’s Cross｜伦敦国王十字站",time:"16:30",lat:51.53082,lng:-0.12384,i:7}
+]},
+"10/12":{title:"Edinburgh Airport｜回程早晨",note:"Hampton 距机场很近；以当天航空公司值机要求为准。",points:[
+{n:1,name:"Hampton by Hilton Edinburgh Airport",time:"早晨",lat:55.94365,lng:-3.36775,i:0},
+{n:2,name:"Edinburgh Airport｜爱丁堡机场",time:"08:45 左右",lat:55.95079,lng:-3.36145,i:2}
+]}
+};
+const mapInstances={};
+const markerStore={};
+function googleMapUrl(p){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.lat+','+p.lng);}
+function mapHtml(d){
+  const m=MAPS[d.date]; if(!m) return '';
+  const id='map-'+d.date.replace('/','-');
+  return `<section class="map-wrap"><div class="map-head"><b>当天地图 · ${m.title}</b><span>点地点可定位</span></div><div class="day-map" id="${id}" aria-label="${m.title} 地图"></div><div class="map-cards">${m.points.map(p=>`<button type="button" class="map-card" data-date="${d.date}" data-n="${p.n}"><span class="num">${p.n}</span><span>${p.name}<small>${p.time}</small></span></button>`).join('')}</div><div class="map-note">${m.note}</div></section>`;
+}
+function initMaps(){
+  if(typeof L==='undefined'){
+    document.querySelectorAll('.day-map').forEach(el=>{el.innerHTML='<div style="padding:18px;color:#746f66">地图暂时加载失败；可使用下方地点卡片配合 Google Maps 搜索。</div>';});
+    return;
+  }
+  Object.entries(MAPS).forEach(([date,m])=>{
+    const id='map-'+date.replace('/','-'),el=document.getElementById(id); if(!el||mapInstances[date])return;
+    const map=L.map(el,{scrollWheelZoom:false,zoomControl:true});
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+    const markers={};
+    const latlngs=m.points.map(p=>{
+      const icon=L.divIcon({className:'',html:`<div class="map-pin">${p.n}</div>`,iconSize:[24,24],iconAnchor:[12,12]});
+      const marker=L.marker([p.lat,p.lng],{icon}).addTo(map);
+      marker.bindPopup(`<div class="map-popup"><b>${p.n}. ${p.name}</b><br><span>${p.time}</span><br><a href="${googleMapUrl(p)}" target="_blank" rel="noopener">Google Maps ↗</a></div>`);
+      markers[p.n]=marker;
+      return [p.lat,p.lng];
+    });
+    if(latlngs.length>1)L.polyline(latlngs,{color:'#5d5850',weight:2,opacity:.6,dashArray:'6 7'}).addTo(map);
+    const bounds=L.latLngBounds(latlngs);
+    map.fitBounds(bounds.pad(.22),{maxZoom:15});
+    mapInstances[date]=map; markerStore[date]=markers;
+  });
+  document.querySelectorAll('.map-card').forEach(btn=>btn.addEventListener('click',()=>{
+    const date=btn.dataset.date,n=Number(btn.dataset.n),m=markerStore[date]?.[n],map=mapInstances[date];
+    if(m&&map){map.setView(m.getLatLng(),Math.max(map.getZoom(),15),{animate:true});m.openPopup();}
+  }));
+  document.querySelectorAll('.row[data-map-n]').forEach(row=>row.addEventListener('click',()=>{
+    const date=row.dataset.date,n=Number(row.dataset.mapN),m=markerStore[date]?.[n],map=mapInstances[date];
+    if(m&&map){map.setView(m.getLatLng(),Math.max(map.getZoom(),15),{animate:true});m.openPopup();}
+  }));
+}
+
 const daysEl=document.getElementById('days');
 const cls=c=>c.includes('Edinburgh')?'edin':c.includes('Stirling')?'stir':c.includes('East Sussex')?'east':'lon';
-function render(){daysEl.innerHTML=DATA.map(d=>`<article class="day" data-city="${d.city}" data-date="${d.date}" data-search="${(d.theme+' '+d.items.flat().join(' ')).toLowerCase()}"><div class="head"><div class="left"><div class="date ${cls(d.city)}"><b>${d.date}</b><span>${d.city}</span></div><div class="title"><h2>${d.theme}</h2><p>${d.city}</p></div></div><div class="meta"><span class="pill">强度 ${d.intensity}</span><span class="pill">${d.mode}</span></div><div class="chev">⌄</div></div><div class="body">${d.items.map(x=>`<div class="row"><div class="time">${x[0]}</div><div class="place"><b>${x[1]}</b><small>${x[2]||''}</small></div><div class="move"><b>${x[3]||''}</b></div></div>`).join('')}<div class="note">${d.note}</div></div></article>`).join('');document.querySelectorAll('.head').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('collapsed'));}
+function render(){daysEl.innerHTML=DATA.map(d=>{const m=MAPS[d.date];return `<article class="day" data-city="${d.city}" data-date="${d.date}" data-search="${(d.theme+' '+d.items.flat().join(' ')).toLowerCase()}"><div class="head"><div class="left"><div class="date ${cls(d.city)}"><b>${d.date}</b><span>${d.city}</span></div><div class="title"><h2>${d.theme}</h2><p>${d.city}</p></div></div><div class="meta"><span class="pill">强度 ${d.intensity}</span><span class="pill">${d.mode}</span></div><div class="chev">⌄</div></div><div class="body">${d.items.map((x,idx)=>{const p=m?.points.find(p=>p.i===idx);return `<div class="row ${p?'map-linked':''}" ${p?`data-date="${d.date}" data-map-n="${p.n}"`:''}><div class="time">${x[0]}</div><div class="place"><b>${x[1]}</b><small>${x[2]||''}</small></div><div class="move"><b>${x[3]||''}</b></div></div>`;}).join('')}${mapHtml(d)}<div class="note">${d.note}</div></div></article>`;}).join('');document.querySelectorAll('.head').forEach(h=>h.onclick=()=>{h.parentElement.classList.toggle('collapsed');setTimeout(()=>Object.values(mapInstances).forEach(m=>m.invalidateSize()),80);});initMaps();}
 render();
 let city='all',date='all';
-function apply(){const q=document.getElementById('q').value.trim().toLowerCase();let n=0;document.querySelectorAll('.day').forEach(el=>{const okCity=city==='all'||el.dataset.city===city;const okDate=date==='all'||el.dataset.date===date;const okQ=!q||(el.dataset.search+' '+el.innerText.toLowerCase()).includes(q);const ok=okCity&&okDate&&okQ;el.classList.toggle('hidden',!ok);if(ok)n++});document.getElementById('empty').style.display=n?'none':'block';}
+function apply(){const q=document.getElementById('q').value.trim().toLowerCase();let n=0;document.querySelectorAll('.day').forEach(el=>{const okCity=city==='all'||el.dataset.city===city;const okDate=date==='all'||el.dataset.date===date;const okQ=!q||(el.dataset.search+' '+el.innerText.toLowerCase()).includes(q);const ok=okCity&&okDate&&okQ;el.classList.toggle('hidden',!ok);if(ok)n++});document.getElementById('empty').style.display=n?'none':'block';setTimeout(()=>Object.values(mapInstances).forEach(m=>m.invalidateSize()),60);}
 document.getElementById('q').oninput=apply;
 document.querySelectorAll('#cityFilters button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#cityFilters button').forEach(x=>x.classList.remove('active'));b.classList.add('active');city=b.dataset.city;apply();});
 document.querySelectorAll('#dateFilters button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#dateFilters button').forEach(x=>x.classList.remove('active'));b.classList.add('active');date=b.dataset.date;apply();});
