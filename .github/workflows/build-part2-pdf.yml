@@ -21,6 +21,12 @@ jobs:
           python-version: "3.12"
       - run: pip install reportlab
       - run: python tools/build_part2_pdf.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IELTS-Part2-Offline-PDF
+          path: ielts-part2-memory-2026q4/IELTS_Part2_2026Q4_Offline.pdf
+          if-no-files-found: error
+          retention-days: 7
       - name: Commit PDF
         run: |
           git config user.name "github-actions[bot]"
