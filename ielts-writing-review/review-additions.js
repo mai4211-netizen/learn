@@ -261,3 +261,61 @@
   `;
   document.head.appendChild(style);
 })();
+
+
+// Task 2 original 25 sentence patterns
+(function(){
+ const essay=document.getElementById('essay');
+ if(!essay)return;
+ const data=[
+ [1,'A <span class="verb">has / have</span> a positive / beneficial / negative / damaging / opposite <span class="link">effect on</span> B.','Watching violent images can have a negative effect on one’s mental health.'],
+ [2,'It <span class="verb">is</span> difficult / easy / important / possible / necessary <span class="link">for sb. to do sth.</span>','It is possible for people to alter their food preparation methods.'],
+ [3,'A can <span class="verb">pose a threat to / present a challenge to / cause damage to</span> B.','Intensive farming technology can pose a threat to the environment.'],
+ [4,'Sth. <span class="verb">enables / allows / encourages / causes / requires</span> sb. <span class="link">to do sth.</span>','Overseas travelling enables people to gain an insight into foreign cultures.'],
+ [5,'Sb. <span class="verb">lays emphasis on / gives importance to / pays closer attention to</span> something.','Primary schools should lay emphasis on moral education.'],
+ [6,'Sth. <span class="verb">plays a vital role in / forms an important part of / holds the key to</span> something.','Reading newspapers has formed an important part of life for many people.'],
+ [7,'Somebody <span class="verb">is</span> likely / willing / unwilling / able <span class="link">to do something.</span>','Local farms are likely to cultivate different varieties or even change their livelihoods.'],
+ [8,'Something <span class="verb">has made it</span> difficult / easy / possible <span class="link">for somebody to do something.</span>','The Internet has made it easy for people to keep abreast of the newest information.'],
+ [9,'Something <span class="verb">has provided somebody with opportunities to do</span> something.','Public libraries have provided people with opportunities to expand their knowledge.'],
+ [10,'Somebody <span class="verb">chooses / decides / tends / fails / intends to do</span> something.','An increasing number of people have chosen to work from home.'],
+ [11,'Something <span class="verb">is</span> important / essential / vital / valuable <span class="link">to somebody.</span>','Financial assistance is essential to those countries where people do not have basic necessities to survive.'],
+ [12,'Something <span class="verb">is regarded as / is considered to be</span> ...','Carbon emissions are considered to be the biggest contributor to global warming.'],
+ [13,'Sb. <span class="verb">considers it necessary to do</span> something / <span class="verb">feels the need to do</span> something / <span class="verb">finds it difficult to do</span> something.','Parents find it difficult to sustain/maintain the children’s interest.'],
+ [14,'Somebody <span class="verb">is encouraged / motivated / required / permitted / urged / persuaded to do</span> something.','Children are encouraged to pursue their hobbies.'],
+ [15,'It <span class="verb">is</span> clear / true / obvious / apparent / unquestionable <span class="link">that</span> ...','It is clear that parents’ behaviour has a direct impact on children’s world view.'],
+ [16,'It <span class="verb">is</span> not surprising / uncommon / unavoidable <span class="link">that</span> ...','It is not surprising that work-life balance is now a challenge to many people.'],
+ [17,'It <span class="verb">is important to realise / recognise / acknowledge / note / remember / bear in mind</span> <span class="link">that</span> ...','It is important to realise that some resources are non-renewable.'],
+ [18,'Sb. <span class="verb">believes / argues / holds / suggests / claims / realises / contends / agrees</span> <span class="link">that</span> ...','People tend to believe that young people’s lack of work experience is a clear disadvantage.'],
+ [19,'One main argument / reason / point <span class="verb">is</span> <span class="link">that</span> ...','One main argument is that online education suits the needs of adult students.'],
+ [20,'The advantage / benefit / consequence / counterargument / difference / problem <span class="verb">is</span> <span class="link">that</span> ...','The main explanation for children’s anti-social behaviour is that children tend to express their dissatisfaction radically.'],
+ [21,'<span class="link">Despite the fact that</span> A, B.','Despite the fact that people hate rules, they in fact accept rules or even set rules from time to time during the course of their lives.'],
+ [22,'<span class="link">Due to the fact that</span> A, B. / <span class="link">In view of the fact that</span> A, B.','Due to the fact that rural economies are normally backward, the rural-to-urban shift is understandable.'],
+ [23,'This <span class="verb">can explain why</span> ... / This <span class="verb">is the reason why</span> ...','This is the reason why these buildings are of cultural and historical value.'],
+ [24,'There <span class="verb">is a growing recognition</span> <span class="link">that</span> ... / There <span class="verb">are growing concerns</span> <span class="link">that</span> ...','There is a growing recognition that more people than ever before vacation overseas.'],
+ [25,'I <span class="verb">am of the view</span> <span class="link">that</span> ...','I am of the view that no society functions properly without rules governing citizens’ behaviour.']
+ ];
+ const existing=new Map();
+ essay.querySelectorAll('.pattern').forEach(p=>{
+   const number=p.querySelector('.use')?.textContent.trim().match(/^(\d+)\s*·/);
+   if(number)existing.set(Number(number[1]),p);
+ });
+ if(existing.size!==23)return;
+ for(const [number,skeleton,example] of data){
+   let p=existing.get(number);
+   if(!p){
+     const host=existing.get(23).parentElement;
+     p=document.createElement('div');p.className='pattern';
+     const use=document.createElement('div');use.className='use';
+     use.textContent=number===24?'24 · 越来越多人认识到 / 关注':'25 · 我认为……';
+     p.appendChild(use);host.appendChild(p);
+   }
+   let sentence=p.querySelector('.sentence');
+   if(!sentence){sentence=document.createElement('div');sentence.className='sentence';p.appendChild(sentence);}
+   sentence.innerHTML=skeleton;
+   let mini=p.querySelector('.mini');
+   if(!mini){mini=document.createElement('div');mini.className='mini';p.appendChild(mini);}
+   mini.textContent=example;
+ }
+ const heading=[...existing.get(23).parentElement.querySelectorAll('.section-label')][0];
+ if(heading)heading.textContent='句型 15–25';
+})();
