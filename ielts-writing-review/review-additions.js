@@ -95,3 +95,169 @@
   `;
   document.head.appendChild(style);
 })();
+
+// Review adjustments 2026-10-29
+(function(){
+  const dynamic = document.getElementById('dynamic');
+  const process = document.getElementById('process');
+  const essay = document.getElementById('essay');
+
+  // 1. Highlight forms that are identical as verbs and nouns.
+  const wordTable = [...(dynamic?.querySelectorAll('table.table') || [])]
+    .find(table => table.querySelector('thead')?.textContent.includes('名词'));
+  if(wordTable){
+    [...wordTable.querySelectorAll('tbody tr')].forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if(cells.length < 4) return;
+      const verb = cells[1].textContent.trim();
+      const noun = cells[3].textContent.trim();
+      if(verb && noun && verb !== '—' && verb.toLowerCase() === noun.toLowerCase()){
+        [cells[1],cells[3]].forEach(td => {
+          if(td.querySelector('.identical-word')) return;
+          const word = document.createElement('strong');
+          word.className = 'identical-word';
+          word.textContent = td.textContent.trim();
+          td.replaceChildren(word);
+        });
+      }
+    });
+  }
+
+  // 2. Preserve all 12 source transitions and group them by their purpose.
+  const transitionCard = [...(process?.querySelectorAll('.card') || [])]
+    .find(card => [...card.querySelectorAll('.section-label')]
+      .some(label => label.textContent.includes('衔接词汇总')));
+  if(transitionCard && !transitionCard.querySelector('.connector-groups')){
+    const grid = transitionCard.querySelector('.connector-grid');
+    if(grid){
+      const items = [...grid.children].filter(x => x.classList.contains('connector'));
+      const byKey = new Map(items.map(item => [item.querySelector('.key')?.textContent.trim(),item]));
+      const groups = [
+        ['引出不同图表',[
+          'According to the first diagram / chart,',
+          'As can be seen from the second diagram / graph,'
+        ]],
+        ['开始 / 结束',[
+          'To begin with,',
+          'At last,'
+        ]],
+        ['进入下一步 / 阶段',[
+          'After that,','Next,',
+          'When it comes to the next / third stage,',
+          'in the next stage',
+          'and then'
+        ]],
+        ['时间间隔 / 先后关系',[
+          'Around ... later,',
+          'Then, after ...,',
+          'after which'
+        ]]
+      ];
+      const wrap = document.createElement('div');
+      wrap.className = 'connector-groups';
+      for(const [heading,keys] of groups){
+        const group = document.createElement('div');
+        group.className = 'connector-group';
+        const label = document.createElement('div');
+        label.className = 'connector-group-title';
+        label.textContent = heading;
+        const sectionGrid = document.createElement('div');
+        sectionGrid.className = 'connector-grid';
+        keys.forEach(key => {
+          const item = byKey.get(key);
+          if(item) sectionGrid.appendChild(item);
+        });
+        group.append(label,sectionGrid);
+        wrap.appendChild(group);
+      }
+      if(wrap.querySelectorAll('.connector').length === items.length){
+        grid.replaceWith(wrap);
+        const heading = transitionCard.querySelector('.section-label');
+        if(heading) heading.textContent='衔接词汇总 · 按用途分组';
+      }
+    }
+  }
+
+  // 3. In Task 2, examples should be plain text, not highlighted.
+  if(essay){
+    essay.querySelectorAll('.mini .verb, .mini .link, .mini .irreg').forEach(el => {
+      el.replaceWith(document.createTextNode(el.textContent));
+    });
+  }
+
+  // 4. Replace the old cause/effect report with the supplied Template #2.
+  const reportCard = [...(essay?.querySelectorAll('.card') || [])]
+    .find(card => [...card.querySelectorAll('.section-label')]
+      .some(label => label.textContent.includes('Report 模板')));
+  if(reportCard && !reportCard.dataset.reportFixed){
+    reportCard.dataset.reportFixed = 'true';
+    reportCard.innerHTML = `
+      <div class="section-label">Report 模板 · 原因/问题 + 解决方案</div>
+      <div class="note report-note">沿用原图 Template #2：原因＋解决方案，或造成的问题＋解决方案。</div>
+      <div class="pattern">
+        <div class="use">开头段 · 引出主题＋交代文章内容</div>
+        <div class="sentence">In the present-day society, there <span class="verb">have been growing concerns</span> that ______.
+          Some possible <span class="link">causes/influences</span> of this phenomenon
+          <span class="verb">will be analysed</span> and some effective solutions
+          <span class="verb">will be proposed</span> in this essay.</div>
+      </div>
+      <div class="pattern">
+        <div class="use">原因 / 问题段 · 1–2 点</div>
+        <div class="sentence"><span class="link">There are many reasons for the issue,</span> /
+          <span class="link">There are many problems caused by this issue,</span>
+          one of which is that ______.
+          <span class="link">Secondly,</span> ______.</div>
+      </div>
+      <div class="pattern">
+        <div class="use">解决方案段 · 1–2 点</div>
+        <div class="sentence">Although this problem is disturbing, some effective measures
+          <span class="verb">can be taken to solve</span> it.
+          The main solution is that ______.
+          Another solution is that ______.</div>
+      </div>
+      <div class="pattern">
+        <div class="use">结尾段 · 重申解决</div>
+        <div class="sentence">In conclusion, various measures
+          <span class="verb">could be implemented to address</span> the problem and
+          <span class="link">only when</span> such actions are carried out with persistence,
+          <span class="verb">can we solve</span> this issue easily.</div>
+      </div>
+      <div class="report-extra">
+        <div class="use">解决方案动词 · 图中补充</div>
+        <div>The government could <strong>impose higher taxes on</strong> ...</div>
+        <div>The government should <strong>invest in</strong> ...</div>
+        <div>The government ought to <strong>introduce laws to</strong> ...</div>
+      </div>`;
+  }
+
+  // 5. Remove the cloze/review switch; review is now the sole view.
+  document.body.classList.remove('cloze');
+  document.querySelector('.mode-switch')?.remove();
+  document.querySelectorAll('.mode').forEach(node => node.remove());
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .identical-word{
+      background:#fff0c8;
+      color:var(--text);
+      border-radius:4px;
+      padding:2px 5px;
+      font-weight:800;
+    }
+    .connector-groups{display:grid;gap:18px}
+    .connector-group{border-top:1px solid var(--line);padding-top:12px}
+    .connector-group:first-child{border-top:0;padding-top:0}
+    .connector-group-title{font-weight:750;font-size:16px;margin-bottom:10px;line-height:1.4}
+    #essay .mini .verb, #essay .mini .link{
+      background:none!important;box-shadow:none!important;text-decoration:none!important;
+      font-weight:inherit!important;padding:0!important;
+    }
+    .report-note{margin-bottom:14px}
+    .report-extra{background:#faf9f6;border:1px solid var(--line);
+      border-radius:12px;padding:12px 14px;margin-top:14px;
+      font-size:13px;line-height:1.85}
+    .report-extra .use{margin-bottom:6px}
+    .mode-switch{display:none!important}
+  `;
+  document.head.appendChild(style);
+})();
