@@ -1,4 +1,4 @@
-const CACHE_NAME="ielts-writing-review-offline-v3";
+const CACHE_NAME="ielts-writing-review-offline-v4";
 const APP_SHELL=[
   "./",
   "./index.html",
