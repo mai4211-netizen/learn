@@ -181,6 +181,9 @@ function render(){
   $('#prompt').innerHTML='<b>'+t.q+' · '+esc(t.zh)+'</b>'+esc(t.en)+cueHtml;
   $('#chain').textContent=t.chain||g.memory;
   $('#answerTitle').textContent=(boldOnly?'加粗内容 · 原答案 ':'完整答案 · ')+wordCount(g,t)+' words';
+  const zh=window.P2_2026Q4_ZH_TRANSLATIONS?.[t.q]||'';
+  $('#zhTranslation').textContent=zh;
+  $('#zhTranslation').hidden=!zh;
 
   $('#mineBoldSource').classList.toggle('on',boldSource==='mine');
   $('#recommendedBoldSource').classList.toggle('on',boldSource==='recommended');
