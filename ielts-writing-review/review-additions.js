@@ -319,3 +319,34 @@
  const heading=[...existing.get(23).parentElement.querySelectorAll('.section-label')][0];
  if(heading)heading.textContent='句型 15–25';
 })();
+
+
+// Restore full source examples for two-phase chart transitions
+(function(){
+  const section=document.getElementById('dynamic');
+  const card=[...(section?.querySelectorAll('.card')||[])].find(c=>
+    [...c.querySelectorAll('.section-label')].some(h=>h.textContent.includes('两段变化怎么接'))
+  );
+  if(!card)return;
+  const examples=[
+    ['and then + 句子','The number of mobile phone users decreased moderately from 5 million in 1990 to 3 million in 1995, <span class="link">and then</span> it rose dramatically to 10 million in 2000.'],
+    ['doing','The quantity of mobile phone users saw a steady fall to no more than 3 million in 1995, <span class="link">then going up</span> to 10 million in 2000.'],
+    ['before doing','The quantity of mobile phone users was in decline from 5 million in 1990 to 3 million in 1995, <span class="link">before soaring</span> to 10 million in 2000.'],
+    ['After doing, + 句子','<span class="link">After a slight decrease</span> of 2 million to 3 million in 1995, the number showed a steep rise to 10 million in 2000.'],
+    ['while + 句子','The number dipped gradually to 3 million in 1995, <span class="link">while</span> it climbed swiftly to a new/record/all-time high, 10 million in 2000.'],
+    ['after which + 句子','The figure dropped to only 3 million in 1995, <span class="link">after which</span> it grew markedly to up to 10 million in 2000.']
+  ];
+  const connectors=[...card.querySelectorAll('.connector')];
+  if(connectors.length!==examples.length)return;
+  const lookup=new Map(connectors.map(c=>[c.querySelector('.key')?.textContent.trim(),c]));
+  if(!examples.every(([key])=>lookup.has(key)))return;
+  for(const [key,html] of examples){
+    const example=lookup.get(key).querySelector('.rule');
+    if(example)example.innerHTML=html;
+  }
+  const grid=card.querySelector('.connector-grid');
+  if(grid)grid.classList.add('two-phase-originals');
+  const style=document.createElement('style');
+  style.textContent='#dynamic .two-phase-originals{grid-template-columns:1fr}#dynamic .two-phase-originals .connector .rule{line-height:1.65;font-size:14px}#dynamic .two-phase-originals .connector .key{margin-bottom:6px}';
+  document.head.appendChild(style);
+})();
