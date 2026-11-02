@@ -1,4 +1,4 @@
-const CACHE_NAME = "ielts-part2-q4-offline-v2";
+const CACHE_NAME = "ielts-part2-q4-offline-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -29,6 +29,7 @@ const APP_SHELL = [
   "./reviewed-merge5.js",
   "./reviewed-q24collab.js",
   "./supplement-q4.js",
+  "./translations-zh.js",
   "./app.js"
 ];
 
