@@ -49,3 +49,8 @@ h2{font-size:24px;line-height:1.35;margin:10px 0 8px}.story-line{font-size:13px;
 .app.foreign-mode .search,.app.foreign-mode .nav,.app.foreign-mode #card,.app.foreign-mode #empty{display:none!important}
 .app.foreign-mode .foreign-panel{display:block}
 @media(max-width:850px){.foreign-grid{grid-template-columns:1fr}.foreign-item{min-height:54px}.foreign-heading h2{font-size:21px}}
+
+/* Small Chinese translation above the untouched English answer. */
+.zh-translation{font-size:12.5px;line-height:1.8;color:#716a62;background:#faf8f5;border-left:2px solid #ded6cb;padding:11px 14px;margin:0 0 18px;border-radius:0 8px 8px 0;white-space:pre-wrap}
+.zh-translation[hidden]{display:none}
+@media(max-width:850px){.zh-translation{font-size:12px;padding:10px 12px;margin-bottom:16px}}
