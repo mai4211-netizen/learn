@@ -54,3 +54,24 @@ h2{font-size:24px;line-height:1.35;margin:10px 0 8px}.story-line{font-size:13px;
 .zh-translation{font-size:12.5px;line-height:1.8;color:#716a62;background:#faf8f5;border-left:2px solid #ded6cb;padding:11px 14px;margin:0 0 18px;border-radius:0 8px 8px 0;white-space:pre-wrap}
 .zh-translation[hidden]{display:none}
 @media(max-width:850px){.zh-translation{font-size:12px;padding:10px 12px;margin-bottom:16px}}
+
+/* Collapsible, resizable topic sidebar; text content stays untouched. */
+.app{grid-template-columns:var(--sidebar-width,340px) minmax(0,1fr)}
+.sidebar{min-width:0}
+.sidebar .brand h1{padding-right:30px}
+.sidebar-collapse{position:absolute;top:15px;right:14px;z-index:4;width:30px;height:32px;display:grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--sub);font-size:23px;line-height:1;cursor:pointer}
+.sidebar-collapse:hover,.sidebar-expand:hover{background:#eee9e2;color:var(--ink)}
+.sidebar-collapse:focus-visible,.sidebar-expand:focus-visible,.sidebar-resizer:focus-visible{outline:2px solid #777;outline-offset:2px}
+.sidebar-resizer{position:fixed;left:calc(var(--sidebar-width,340px) - 5px);top:0;height:100vh;width:10px;z-index:15;cursor:col-resize;touch-action:none;background:transparent}
+.sidebar-resizer::after{content:"";position:absolute;width:3px;height:40px;top:calc(50% - 20px);left:3px;border-radius:3px;background:#b6aea5;opacity:.65;transition:opacity .15s,background .15s}
+.sidebar-resizer:hover::after,.sidebar-resizer:focus-visible::after{opacity:1;background:#77706a}
+html.sidebar-is-resizing,html.sidebar-is-resizing *{cursor:col-resize!important;user-select:none!important}
+.app.sidebar-collapsed{grid-template-columns:minmax(0,1fr)}
+.app.sidebar-collapsed .sidebar,.app.sidebar-collapsed .sidebar-resizer{display:none}
+.sidebar-expand{display:none;position:fixed;top:12px;left:14px;z-index:17;align-items:center;gap:7px;border:1px solid var(--line);border-radius:9px;padding:9px 12px;background:#fff;color:var(--ink);font-size:13px;line-height:1.2;box-shadow:0 3px 12px rgba(0,0,0,.06);cursor:pointer}
+.app.sidebar-collapsed .sidebar-expand:not([hidden]){display:flex}
+@media(max-width:850px){
+  .sidebar-resizer{display:none}
+  .sidebar-collapse{top:16px}
+  .app.sidebar-collapsed .main{padding-top:70px}
+}
