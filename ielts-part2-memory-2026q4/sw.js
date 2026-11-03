@@ -1,4 +1,4 @@
-const CACHE_NAME = "ielts-part2-q4-offline-v4";
+const CACHE_NAME = "ielts-part2-q4-offline-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
