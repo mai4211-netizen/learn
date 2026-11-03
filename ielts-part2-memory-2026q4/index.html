@@ -8,7 +8,8 @@
 </head>
 <body>
 <div class="app">
-  <aside class="sidebar">
+  <aside class="sidebar" id="topicSidebar">
+    <button id="sidebarCollapse" class="sidebar-collapse" type="button" aria-label="收起题目列表" title="收起左侧题目栏" aria-controls="topicSidebar" aria-expanded="true">‹</button>
     <div class="brand">
       <div class="eyebrow">2026 SEP–DEC · 爱听写题库</div>
       <h1>IELTS Part 2<br>故事母版重修版</h1>
@@ -31,6 +32,8 @@
     <div class="search"><input id="search" placeholder="搜索题目，例如：自然 / Claire / Q16"></div>
     <nav class="nav" id="nav"></nav>
   </aside>
+  <div id="sidebarResizer" class="sidebar-resizer" role="separator" aria-label="拖动调整题目列表宽度" title="拖动调整侧栏宽度；也可按左右方向键" aria-orientation="vertical" aria-controls="topicSidebar" aria-valuemin="250" aria-valuemax="560" aria-valuenow="340" tabindex="0"></div>
+  <button id="sidebarExpand" class="sidebar-expand" type="button" aria-label="展开题目列表" aria-controls="topicSidebar" aria-expanded="false" hidden>☰ <span>题目</span></button>
 
   <main class="main">
     <article class="card" id="card">
@@ -125,5 +128,6 @@
 <script src="supplement-q4-extra.js"></script>
 <script src="translations-zh.js"></script>
 <script src="app.js"></script>
+<script src="sidebar-controls.js"></script>
 </body>
 </html>
