@@ -1,4 +1,4 @@
-const CACHE_NAME = "ielts-part2-q4-offline-v5";
+const CACHE_NAME = "ielts-part2-q4-offline-v6";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -31,7 +31,8 @@ const APP_SHELL = [
   "./supplement-q4.js",
   "./supplement-q4-extra.js",
   "./translations-zh.js",
-  "./app.js"
+  "./app.js",
+  "./sidebar-controls.js"
 ];
 
 self.addEventListener("install", event => {
