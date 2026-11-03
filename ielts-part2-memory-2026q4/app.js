@@ -218,13 +218,13 @@ async function importBold(file){
   boldState=backup.boldRanges;persist();boldSource='mine';boldOnly=false;save();render();$('#backupStatus').textContent='已导入加粗记录';
 }
 function validate(){
-  const topics=GROUPS.flatMap(g=>g.topics);if(topics.length!==55)throw new Error('题目数不是 55');
-  const ids=topics.map(t=>t.q);if(new Set(ids).size!==55)throw new Error('题号重复');
-  for(let i=1;i<=55;i++){const q='Q'+String(i).padStart(2,'0');if(!ids.includes(q))throw new Error('缺少 '+q)}
+  const topics=GROUPS.flatMap(g=>g.topics);if(topics.length!==58)throw new Error('题目数不是 58');
+  const ids=topics.map(t=>t.q);if(new Set(ids).size!==58)throw new Error('题号重复');
+  for(let i=1;i<=58;i++){const q='Q'+String(i).padStart(2,'0');if(!ids.includes(q))throw new Error('缺少 '+q)}
   const incomplete=topics.filter(t=>!t.chain||!Array.isArray(t.cue)||t.cue.length<3);if(incomplete.length)throw new Error('题目展开不完整：'+incomplete.map(t=>t.q).join(','));
 }
 try{
-  validate();$('#statTopics').textContent='55';$('#statStories').textContent=String(uniqueStories());$('#statGroups').textContent=String(GROUPS.length);
+  validate();$('#statTopics').textContent='58';$('#statStories').textContent=String(uniqueStories());$('#statGroups').textContent=String(GROUPS.length);
   if(!GROUPS.some(g=>g.id===selectedGroup)){selectedGroup=GROUPS[0].id;selectedQ=GROUPS[0].topics[0].q}
   $('#search').addEventListener('input',e=>buildNav(e.target.value.trim()));
   $('#mineBoldSource').addEventListener('click',()=>setBoldSource('mine'));
