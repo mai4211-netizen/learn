@@ -31,6 +31,9 @@
   byQ.Q51.chain = "Claire → 十多年前在学校认识 → 以前聊音乐、画画 → 现在仍一起规划旅行 → 她容易相处、愿意听建议 → 彼此了解 → 友谊一直很自然";
   for (const q of ['Q43','Q51']) keywords(q, ['Claire','school','ten years','drawing','planning trips','easy-going','change the plan','friends','comfortable','balance']);
 
+  const claire = group('claire-person');
+  if (claire) claire.memory = '认识十多年的 Claire → 做事有目标、列清单 → 学英语日语 → 擅长规划旅行又很随和 → 愿意接受朋友建议 → 画画和种植物 → 大家喜欢和她相处';
+
   // Japanese island: photos are a positive detail; tiring weather remains the reason Q02 was unenjoyable.
   edit('Q19', 3, "At first, I did not notice all the small things she was photographing. But I slowly started to appreciate the details too. Later, she sent me a small album from the trip, and I enjoyed seeing places through her eyes.");
   byQ.Q19.chain = "爱拍照的朋友 → 日本小岛一起骑车 → 海岸、小路、路牌和食物都拍 → 她很会发现细节 → 我也慢慢学会欣赏 → 回来收到照片相册 → 觉得旅行更有意思";
@@ -91,6 +94,9 @@
         .replace(/\bmy pottery friend\b/gi, 'a friend of mine who makes pottery')
         .replace(/\ba pottery friend\b/gi, 'a friend of mine who makes pottery');
     }
+  }
+  if (byQ.Q32?.reviewed?.[0]) {
+    byQ.Q32.reviewed[0].text = "I'd like to talk about a time when I listened to a friend who runs a pottery studio. She was explaining different kinds of clay, firing temperatures and traditional patterns, which I was not interested in.";
   }
   // Avoid "a friend ... a friend" duplication in Q57.
   if(byQ.Q57?.reviewed?.[0]) byQ.Q57.reviewed[0].text = "One of my most creative friends runs a small pottery studio. She is a few years older than me.";
