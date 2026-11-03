@@ -7,7 +7,7 @@
     "q": "Q56",
     "zh": "钦佩的运动员",
     "en": "Describe a sportsperson you admire",
-    "chain": "温哥华看冰球 → 第一次现场看、冰球速度快 → 回去看相关视频 → 了解球员 Quinn Hughes → 移动很快、判断冷静 → 很重视队友配合 → 不只靠个人能力 → 我佩服这种团队意识",
+    "chain": "温哥华与好友看女子冰球 → 加拿大对美国 → 冰球速度快、加拿大全场落败 → 女子职业联赛 PWHL 2024 年才开赛 → 后来认识加拿大女球员 Marie-Philip Poulin → 她是国家队队长 → 佩服她的技术和领导力",
     "cue": [
       "who this sportsperson is",
       "how you learned about him or her",
@@ -15,40 +15,41 @@
       "and explain why you admire this person"
     ],
     "keywords": [
-      "Quinn Hughes",
+      "Marie-Philip Poulin",
+      "women's ice hockey",
       "Vancouver",
-      "ice hockey",
-      "live match",
+      "Canada",
+      "United States",
       "puck",
-      "quickly",
-      "teamwork",
-      "calm",
-      "teammates",
-      "admire"
+      "team jerseys",
+      "PWHL",
+      "2024",
+      "captain",
+      "strong leader"
     ],
     "reviewed": [
       {
-        "text": "An athlete I admire is an ice hockey player called Quinn Hughes. I first became interested in ice hockey when I travelled to Vancouver with my best friend.",
+        "text": "An athlete I admire is Marie-Philip Poulin, a Canadian women's ice hockey player. I first heard about her after a trip to Vancouver with my best friend.",
         "type": "own",
         "adjusted": false
       },
       {
-        "text": "We saw a poster for a game and decided to buy tickets. It was my first live ice hockey match. Many people wore team jerseys, and the crowd was excited even before the game started.",
+        "text": "We saw a poster for a women's ice hockey match between Canada and the United States and decided to buy tickets. It was my first live women's ice hockey match. Many people wore team jerseys, and the crowd was excited even before the game started.",
         "type": "shared",
         "adjusted": false
       },
       {
-        "text": "At first I found it hard to follow the puck because it moved so quickly and looked tiny from our seats. After the trip, I watched some ice hockey videos online and learned about Quinn Hughes.",
+        "text": "At first I found it hard to follow the puck because it moved so quickly and looked tiny from our seats. The US took the lead near the end, and Canada could not score again. Although our team lost, I still enjoyed the atmosphere.",
         "type": "shared",
         "adjusted": false
       },
       {
-        "text": "What I like about him is that he moves quickly but still seems calm. He makes decisions in a very fast game and works well with his teammates. I think that takes a lot of practice.",
+        "text": "Afterwards, I learned that the new professional women's hockey league, the PWHL, had only started in 2024. I also learned about Poulin, who has been captain of Canada's national team for years.",
         "type": "shared",
         "adjusted": false
       },
       {
-        "text": "I admire him because ice hockey is not just about one talented player. You have to trust other people and make quick decisions together. That is what makes the sport interesting to me.",
+        "text": "I admire her because she is a skilled player and a strong leader. She also helped me see how exciting women's ice hockey can be.",
         "type": "own",
         "adjusted": false
       }
@@ -166,4 +167,22 @@
  });
  const labels={"hockey":" / 钦佩的运动员","pottery-person":" / 创造力","smartwatch-life":" / 不会用的科技产品"};
  groups.forEach(g=>{if(labels[g.id]&&!g.title.includes(labels[g.id]))g.title+=labels[g.id]});
+ // Correct the earlier sports story: this was a women's ice hockey game, not men's hockey.
+ const hockey=groups.find(g=>g.id==='hockey');
+ if(hockey){
+   hockey.title='温哥华女子冰球现场比赛 / 钦佩的女运动员';
+   hockey.story='K · 女子冰球比赛';
+   hockey.memory='去温哥华旅行 → 看到加拿大对美国的女子冰球比赛海报 → 与朋友买票 → 第一次现场看女子冰球 → 球很小速度快 → 加拿大最后输了，但现场很刺激';
+   const live=hockey.topics.find(t=>t.q==='Q37');
+   if(live){
+     live.chain='温哥华女子冰球比赛 → 加拿大对美国 → 和好友看比赛 → 第一次现场看女子冰球 → 球很小速度快 → 美国队最后领先 → 加拿大输了但现场很精彩';
+     if(Array.isArray(live.reviewed)){
+       live.reviewed.forEach(p=>{
+         if(p.text?.includes('an ice hockey match'))p.text=p.text.replace('an ice hockey match',"a women's ice hockey match");
+         if(p.text?.includes('watching ice hockey in person'))p.text=p.text.replace('watching ice hockey in person',"watching women's ice hockey in person");
+       });
+     }
+   }
+ }
+
 })();
