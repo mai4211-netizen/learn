@@ -75,3 +75,13 @@ html.sidebar-is-resizing,html.sidebar-is-resizing *{cursor:col-resize!important;
   .sidebar-collapse{top:16px}
   .app.sidebar-collapsed .main{padding-top:70px}
 }
+
+/* Bottom navigation changes the selected sidebar story group, not Q cards inside it. */
+.group-pager{max-width:900px;margin:16px auto 0;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.pager-btn{border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);padding:11px 18px;min-height:42px;font-size:13px;font-weight:700;cursor:pointer}
+.pager-btn:hover:not(:disabled){background:var(--soft);border-color:#c5bcb0}
+.pager-btn:focus-visible{outline:2px solid #777;outline-offset:2px}
+.pager-btn:disabled{opacity:.38;cursor:default}
+.pager-progress{font-size:12px;color:var(--sub);font-variant-numeric:tabular-nums}
+.app.foreign-mode #groupPager{display:none}
+@media(max-width:850px){.group-pager{margin-top:12px}.pager-btn{padding:10px 14px;min-width:92px}}
