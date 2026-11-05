@@ -1,6 +1,7 @@
 /* IELTS Part 2: November template consistency pass.
    Current approved text is backed up separately on
    backup/ielts-part2-before-templates-20261105.
+   Only within-answer logic and topic fit matter: no cross-topic persona consistency is required.
    No A/B/C/D template labels are shown in the answer UI.
    Keep paragraph counts and ordering unchanged to retain personal highlight
    storage keys; personal character offsets inside changed paragraphs may shift.
@@ -18,7 +19,7 @@
   "Q09": "I'd like to talk about a time when my smartwatch suddenly stopped working.",
   "Q10": "I'd like to talk about a short local-news video about a pottery market in my city.",
   "Q11": "I'd like to talk about my long-term goal of building a small online art platform.",
-  "Q12": "The person I'd like to talk about is a former classmate who wants to become a doctor.",
+  "Q12": "The person I'd like to talk about is my friend Claire, who wants to become a doctor.",
   "Q13": "I'd like to talk about K11 in Guangzhou, a place I found quite boring on one visit.",
   "Q14": "I'd like to talk about a recent change in my exercise and sleep habits.",
   "Q15": "I'd like to talk about a family gathering during the Mid-Autumn Festival that I remember well.",
@@ -215,7 +216,7 @@
   const chainUpdates={
   "Q02": "周末常去广州大夫山 → 午饭后骑行特别热 → 沿湖骑车、很累又出汗 → 为了陪朋友仍会去",
   "Q11": "我的长期目标：小型线上艺术平台 → 看到 Claire 的艺术业务获得灵感 → AR 预览能帮助买家 → 问艺术家需求 → 小规模试做 → 学管理与品牌",
-  "Q12": "以前的一位同学 → 看韩国医疗剧对医生感兴趣 → 社区健康志愿活动 → 开始查课程 → 有耐心、有条理",
+  "Q12": "朋友 Claire → 看韩国医疗剧对医生感兴趣 → 社区健康志愿活动 → 开始查课程 → 有耐心、有条理",
   "Q14": "约一年前买智能手表 → 最近开始规律使用 → 下班看步数与活动圆环 → 睡前查看睡眠 → 小习惯变稳定",
   "Q15": "中秋家庭小聚 → 母亲教做冰皮月饼 → 几位家人一起制作 → 压模太用力 → 大家笑、晚饭后配茶吃",
   "Q23": "三人准备演唱会行程 → 我联系二手票卖家 → 卖家突然不回复 → 等一小时、着急 → 改找另一卖家买到票",
@@ -229,7 +230,7 @@
 };
   const zhUpdates={
   "Q11": "我的长期目标是做一个小型线上艺术平台。我已经想做类似的艺术项目一段时间了，看到朋友 Claire 的线上艺术业务后，这个想法更清晰。她的平台与艺术家合作，买家可以在购买前预览画挂在自己墙上的样子，让我看到设计和技术能解决实际问题。对于自己的平台，我会先问一些艺术家需要什么，找少量人试做，再学习管理、品牌和沟通。我希望先做简单、可行的版本，慢慢发展，因为这结合了我喜欢的艺术、设计和技术。",
-  "Q12": "我想介绍以前的一位同学，她想成为医生。我们在学校认识。她看韩国医疗剧后开始对医学感兴趣，因为医生需要在困难的情况下保持冷静、作出决定并帮助别人。后来她参加社区志愿活动，协助简单的健康项目，照顾需要帮助的人，还与志愿者安排工作。她已经开始查询课程和资格要求，知道成为医生要长期学习。我觉得她很适合医疗行业，因为她有耐心、有条理，也愿意继续学习。",
+  "Q12": "我想介绍我的朋友 Claire，她想成为医生。我们在学校认识。她看韩国医疗剧后开始对医学感兴趣，因为医生需要在困难的情况下保持冷静、作出决定并帮助别人。后来她参加社区志愿活动，协助简单的健康项目，照顾需要帮助的人，还与志愿者安排工作。她已经开始查询课程和资格要求，知道成为医生要长期学习。我觉得她很适合医疗行业，因为她有耐心、有条理，也愿意继续学习。",
   "Q14": "我最近的改变是开始更规律地运动和睡觉。手表是大约一年前买的，当时想记录运动和睡眠；最近我才开始更认真、经常地使用它。下班后我会查看步数和活动圆环，如果一天没怎么动，就出去走一走。晚上我也会看睡眠记录，注意自己有没有睡太晚。以前忙起来常常忘记活动，现在更容易看见自己的习惯。虽然只是小改变，我还是觉得比以前更会照顾自己。",
   "Q15": "我记得一次中秋节的家庭小聚，几位家人在家里一起过节。当时我还小，妈妈教我做冰皮月饼。我们准备甜馅、包上软饼皮，再用模具压花纹。我第一次太用力，月饼形状不太整齐，妈妈提醒我要轻一点。后来大家比较月饼，笑那些形状奇怪的，晚饭后一起配茶吃。我最喜欢的不是月饼多完美，而是大家一起动手的过程。",
   "Q31": "我不太喜欢的电影是《疯狂动物城 2》。因为很喜欢第一部，所以看续集前期待很高。故事继续讲 Judy 和 Nick 破案，也加入新角色。我看完第一部后才看了第二部，但续集有些地方花了很多时间解释城市的历史。第一部让我觉得动物城市很新鲜；第二部有更多名字和背景信息，反而更难跟上。我不会说它很差，只是比预期复杂，惊喜也没有第一部多。",
