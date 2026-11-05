@@ -6,7 +6,6 @@
   const scope = pick('speechScope');
   const rate = pick('speechRate');
   const voiceSelect = pick('speechVoice');
-  const voicePreview = pick('speechVoicePreview');
   const voiceHint = pick('speechVoiceHint');
   const progressBar = pick('speechProgress');
   const progressText = pick('speechProgressText');
@@ -24,6 +23,9 @@
   let generation = 0;
   let playing = false;
   let paused = false;
+  let pendingResumeAfterSeek = false;
+  let pendingSeekPercent = 0;
+  let charOffset = 0; // Current position inside the paragraph, in characters.
   const VOICE_KEY = 'p2-2026q4-speech-voice';
   let preferredVoice = (() => { try { return localStorage.getItem(VOICE_KEY) || ''; } catch (_) { return ''; } })();
   // One-time reset of the old generic voice preference when switching to the
@@ -109,15 +111,75 @@
     if (!voices.length) populateVoices();
     return selectedVoice();
   };
+  // The progress measures answer text, not audio seconds: Web Speech provides
+  // character boundaries but does not offer a real audio seeking interface.
   function updateProgress(done, total) {
     const percent = Math.round(100 * Math.max(0,Math.min(1,done / Math.max(total,1))));
-    progressBar.value = percent;
+    progressBar.value = String(percent);
+    progressBar.style.setProperty('--speech-played',percent+'%');
     progressText.textContent = percent + '%';
-    progressBar.setAttribute('aria-valuetext','当前英文答案已读约 ' + percent + '%');
+    progressBar.setAttribute('aria-valuetext','当前英文答案约 ' + percent + '% 的文本位置');
   }
   function progressCounts(paragraphs) {
     const lengths = paragraphs.map(x => x.length);
     return {base:lengths.slice(0,paragraph).reduce((sum,n)=>sum+n,0),total:lengths.reduce((sum,n)=>sum+n,0)};
+  }
+  function nearestWordStart(text,at) {
+    if (at<=0) return 0;
+    if (at>=text.length) return text.length;
+    const left = text.lastIndexOf(' ',at-1)+1;
+    const nextSpace = text.indexOf(' ',at);
+    const right = nextSpace<0?text.length:nextSpace+1;
+    return at-left<=right-at?left:right;
+  }
+  function locatePercent(percent) {
+    const item = queue[cursor];
+    if (!item) return;
+    const ps=answerParagraphs(item);
+    const total=ps.reduce((n,t)=>n+t.length,0);
+    let target=Math.floor(total * Math.max(0,Math.min(100,percent)) / 100);
+    paragraph=0;
+    charOffset=0;
+    for(let i=0;i<ps.length;i++){
+      if(target>=ps[i].length&&i<ps.length-1){
+        target-=ps[i].length;
+        continue;
+      }
+      paragraph=i;
+      charOffset=nearestWordStart(ps[i],target);
+      break;
+    }
+    const {base}=progressCounts(ps);
+    updateProgress(base+charOffset,total);
+  }
+  function seekTo(percent) {
+    if (!canSpeak) return;
+    const value = Math.max(0,Math.min(100,Number(percent)||0));
+    if (!playing) {
+      pendingSeekPercent=value;
+      updateProgress(value,100);
+      setStatus('定位到本篇约 '+value+'% · 点击播放从这里开始');
+      return;
+    }
+    const wasPaused=paused;
+    ++generation;
+    engine.cancel();
+    pendingResumeAfterSeek=false;
+    if (value>=100) {
+      paused=false;
+      return advance(generation);
+    }
+    locatePercent(value);
+    if (wasPaused) {
+      paused=true;
+      pendingResumeAfterSeek=true;
+      updateUI();
+      setStatus('已定位到约 '+progressBar.value+'% · 点击继续播放');
+    } else {
+      paused=false;
+      announce();
+      speakPart(generation);
+    }
   }
   const setStatus = message => { status.textContent = message; };
   function updateUI() {
@@ -128,12 +190,14 @@
     stopBtn.disabled = !playing;
     scope.disabled = !canSpeak;
     voiceSelect.disabled = !canSpeak;
-    voicePreview.disabled = !canSpeak;
   }
   function stop(message='已停止', retainProgress=false) {
     ++generation; // Ignore late onend/onerror events from a cancelled utterance.
     playing = false;
     paused = false;
+    pendingResumeAfterSeek = false;
+    pendingSeekPercent = 0;
+    charOffset = 0;
     queue = [];
     cursor = 0;
     paragraph = 0;
@@ -180,9 +244,11 @@
     if (!item) return stop('播放完成');
     const paragraphs = answerParagraphs(item);
     if (paragraph >= paragraphs.length) return advance(token);
-    const text = paragraphs[paragraph];
+    const fullParagraph = paragraphs[paragraph];
+    const startOffset = charOffset;
+    const text = fullParagraph.slice(startOffset);
     const {base,total} = progressCounts(paragraphs);
-    updateProgress(base,total);
+    updateProgress(base+startOffset,total);
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-GB';
     utterance.rate = Number(rate.value) || 1;
@@ -193,11 +259,15 @@
     // the bar still advances at each paragraph boundary.
     utterance.onboundary = ev => {
       if (!playing || token !== generation || paused) return;
-      if (Number.isFinite(ev.charIndex)) updateProgress(base + Math.min(text.length,Math.max(0,ev.charIndex)),total);
+      if (Number.isFinite(ev.charIndex)) {
+        charOffset = Math.min(fullParagraph.length, startOffset + Math.max(0,ev.charIndex));
+        updateProgress(base + charOffset,total);
+      }
     };
     utterance.onend = () => {
       if (!playing || token !== generation) return;
-      updateProgress(base + text.length,total);
+      updateProgress(base + fullParagraph.length,total);
+      charOffset = 0;
       paragraph++;
       speakPart(token);
     };
@@ -218,6 +288,8 @@
     }
     cursor++;
     paragraph = 0;
+    charOffset = 0;
+    pendingSeekPercent = 0;
     showEntry(queue[cursor], true);
     announce();
     speakPart(token);
@@ -231,19 +303,28 @@
     if (!canSpeak) return;
     if (playing && paused) {
       paused = false;
-      engine.resume();
-      announce();
+      if (pendingResumeAfterSeek) {
+        pendingResumeAfterSeek = false;
+        announce();
+        speakPart(generation);
+      } else {
+        engine.resume();
+        announce();
+      }
       return;
     }
     if (playing) return;
+    const initialPosition = pendingSeekPercent >= 100 ? 0 : pendingSeekPercent;
     stop('');
     queue = startQueue();
     if (!queue.length) return setStatus('当前范围没有可朗读的题目');
     playing = true;
     cursor = 0;
     paragraph = 0;
+    charOffset = 0;
     const token = generation;
     showEntry(queue[0], false);
+    if (initialPosition) locatePercent(initialPosition);
     announce();
     speakPart(token);
   }
@@ -261,9 +342,11 @@
     ++generation;
     engine.cancel();
     paused = false;
+    pendingResumeAfterSeek = false;
     const token = generation;
     cursor++;
     paragraph = 0;
+    charOffset = 0;
     showEntry(queue[cursor], true);
     announce();
     speakPart(token);
@@ -279,6 +362,7 @@
     ++generation;
     engine.cancel();
     paused = false;
+    pendingResumeAfterSeek = false;
     announce();
     speakPart(generation);
   }
@@ -288,29 +372,14 @@
     try { localStorage.setItem(VOICE_KEY, preferredVoice); } catch (_) {}
     refreshVoiceHint();
     if (playing) restartParagraph();
-    else setStatus('已切换音色，可先试听，再播放当前答案');
+    else setStatus('已切换音色，点击播放当前答案');
   });
-  voicePreview.addEventListener('click', () => {
-    if (!canSpeak) return;
-    // Preview never changes the current Q or the playback range.
-    stop('');
-    const v = chosenVoice();
-    if (!v) {
-      setStatus('没有找到明确的英文女声，请先添加英文女声后重新打开网页');
-      return;
-    }
-    const utterance = new SpeechSynthesisUtterance(
-      "I'd like to talk about a memorable trip. It was a wonderful experience, and I still remember it clearly."
-    );
-    utterance.voice = v;
-    utterance.lang = v.lang;
-    utterance.rate = Number(rate.value) || 1;
-    utterance.pitch = 1;
-    setStatus('试听中 · ' + v.name);
-    utterance.onend = () => setStatus('试听完成 · ' + v.name);
-    utterance.onerror = () => setStatus('试听失败，请尝试其他系统音色');
-    engine.speak(utterance);
+  progressBar.addEventListener('input', () => {
+    const percent=Number(progressBar.value);
+    progressBar.style.setProperty('--speech-played',percent+'%');
+    progressText.textContent=percent+'%';
   });
+  progressBar.addEventListener('change', () => seekTo(progressBar.value));
   // Direct manual navigation takes priority over an ongoing playlist.
   document.addEventListener('click', ev => {
     if (!playing) return;
@@ -325,7 +394,7 @@
   } else {
     updateProgress(0,1);
     refreshVoiceHint();
-    setStatus('默认优先清晰女声；可点击试听比较音色');
+    setStatus('可拖动进度条，从指定的文本位置继续朗读');
     updateUI();
   }
 })();
