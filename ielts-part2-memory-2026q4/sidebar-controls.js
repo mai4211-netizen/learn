@@ -1,11 +1,50 @@
-/* Collapsible, draggable topic sidebar. Keeps existing answer and bold state untouched. */
+/* One shared collapsible and resizable sidebar for Part 1, Part 2, Part 3 and Overview. */
 (() => {
-  const app = document.querySelector('.app');
-  const sidebar = document.getElementById('topicSidebar');
-  const collapse = document.getElementById('sidebarCollapse');
-  const expand = document.getElementById('sidebarExpand');
-  const resizer = document.getElementById('sidebarResizer');
-  if (!app || !sidebar || !collapse || !expand || !resizer) return;
+  const app = document.querySelector('.p2-page .app, .practice-page .layout, .overview-page .overview-app');
+  const sidebar = app?.querySelector('aside.sidebar, aside.shared-sidebar');
+  if (!app || !sidebar) return;
+
+  // Part 2 already has these controls in its HTML. Reuse them there and
+  // create identical controls for the other pages without altering their content.
+  if (!sidebar.id) sidebar.id = 'speakingSidebar';
+  let collapse = document.getElementById('sidebarCollapse');
+  let expand = document.getElementById('sidebarExpand');
+  let resizer = document.getElementById('sidebarResizer');
+  if (!collapse) {
+    collapse = document.createElement('button');
+    collapse.id = 'sidebarCollapse';
+    collapse.className = 'sidebar-collapse';
+    collapse.type = 'button';
+    collapse.textContent = '‹';
+    collapse.title = '收起左侧题目栏';
+    collapse.setAttribute('aria-label', '收起题目列表');
+    collapse.setAttribute('aria-controls', sidebar.id);
+    sidebar.prepend(collapse);
+  }
+  if (!resizer) {
+    resizer = document.createElement('div');
+    resizer.id = 'sidebarResizer';
+    resizer.className = 'sidebar-resizer';
+    resizer.title = '拖动调整侧栏宽度；也可按左右方向键';
+    resizer.tabIndex = 0;
+    resizer.setAttribute('role', 'separator');
+    resizer.setAttribute('aria-label', '拖动调整题目列表宽度');
+    resizer.setAttribute('aria-orientation', 'vertical');
+    resizer.setAttribute('aria-controls', sidebar.id);
+    resizer.setAttribute('aria-valuemin', '250');
+    app.insertBefore(resizer, sidebar.nextSibling);
+  }
+  if (!expand) {
+    expand = document.createElement('button');
+    expand.id = 'sidebarExpand';
+    expand.className = 'sidebar-expand';
+    expand.type = 'button';
+    expand.innerHTML = '☰ <span>题目</span>';
+    expand.setAttribute('aria-label', '展开题目列表');
+    expand.setAttribute('aria-controls', sidebar.id);
+    expand.hidden = true;
+    app.insertBefore(expand, app.querySelector('main'));
+  }
 
   const WIDTH_KEY = 'p2-2026q4-sidebar-width';
   const COLLAPSED_KEY = 'p2-2026q4-sidebar-collapsed';
@@ -16,6 +55,8 @@
   const clamp = width => Math.round(Math.max(minWidth, Math.min(maxWidth(), width)));
   let width = clamp(Number(safeGet(WIDTH_KEY)) || 290);
   let dragging = false;
+  let dragStartX = 0;
+  let dragStartWidth = width;
 
   function applyWidth(next, persist = false) {
     width = clamp(next);
@@ -41,13 +82,14 @@
   resizer.addEventListener('pointerdown', event => {
     if (event.button !== 0 || window.matchMedia('(max-width: 850px)').matches || app.classList.contains('sidebar-collapsed')) return;
     dragging = true;
+    dragStartX = event.clientX;
+    dragStartWidth = width;
     resizer.setPointerCapture(event.pointerId);
     document.documentElement.classList.add('sidebar-is-resizing');
     event.preventDefault();
   });
   resizer.addEventListener('pointermove', event => {
-    if (!dragging) return;
-    applyWidth(event.clientX);
+    if (dragging) applyWidth(dragStartWidth + event.clientX - dragStartX);
   });
   const endDrag = () => {
     if (!dragging) return;
