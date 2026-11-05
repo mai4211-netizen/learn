@@ -132,6 +132,8 @@
   // Q02 and Q46 intentionally reuse the same ride paragraph; Q19 focuses on photography.
   edit('Q02',2,"We followed a quiet road beside the coast and could stop whenever we wanted. My friend loves taking photos, so we stopped several times to photograph the sea and the little streets.");
   keywords('Q02',['short island trip','Japanese island','missed the bus','public transport','rented bikes','extremely hot','coast','taking photos','tired','sweaty','sunburnt']);
+  // Preserve the established Q02/Q46 shared island-riding paragraph.
+  edit('Q46',2,byQ.Q02.reviewed[2].text);
 
   edit('Q19',1,"I noticed this most clearly when we travelled to a quiet Japanese island. We rented bikes and explored the island together.");
   edit('Q19',2,"My friend kept stopping to take pictures of the sea, signs and little streets. She likes natural light and sometimes takes several versions before choosing one.");
