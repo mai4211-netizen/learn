@@ -129,3 +129,8 @@ html.sidebar-is-resizing,html.sidebar-is-resizing *{cursor:col-resize!important;
 /* Source note for recall-based IELTS speaking cue prompts. */
 .cue-source{margin-top:8px;font-size:10px;line-height:1.55;color:var(--sub)}
 .cue-source a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+
+/* Global overview entry, consistent with the existing study sidebar. */
+.overview-entry{display:flex;flex-direction:column;gap:1px;padding:10px 12px;margin:10px 0 12px;background:#eef6ef;border:1px solid #dce9de;border-radius:10px;text-decoration:none!important;color:#2b6749}
+.overview-entry>span{font-size:13px;font-weight:800}.overview-entry>small{font-size:10px;color:#647967}
+.overview-entry:hover{background:#e7f2e8}

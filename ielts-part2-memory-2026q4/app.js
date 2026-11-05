@@ -5,6 +5,11 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const BOLD_KEY='p2-2026q4-bold-ranges';
 let selectedGroup=storage.get('p2-2026q4-group')||GROUPS[0]?.id;
 let selectedQ=storage.get('p2-2026q4-q')||GROUPS[0]?.topics?.[0]?.q;
+const linkedQuestion=new URLSearchParams(window.location.search).get('q');
+if(linkedQuestion){
+  const matched=GROUPS.find(g=>g.topics.some(t=>t.q===linkedQuestion));
+  if(matched){selectedGroup=matched.id;selectedQ=linkedQuestion}
+}
 let boldOnly=false,boldSource=storage.get('p2-2026q4-bold-source')||'mine',selectionInfo=null,boldState={},selectionTimer=null;
 try{boldState=JSON.parse(storage.get(BOLD_KEY)||'{}')||{}}catch(e){boldState={}}
 
@@ -310,7 +315,7 @@ try{
   };
   main.addEventListener('click',()=>select('mainland'));
   foreign.addEventListener('click',()=>select('foreign'));
-  select(storage.get('p2-2026q4-region')==='foreign'?'foreign':'mainland');
+  select(linkedQuestion?'mainland':(storage.get('p2-2026q4-region')==='foreign'?'foreign':'mainland'));
 })();
 
 if ("serviceWorker" in navigator) {
