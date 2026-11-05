@@ -9,8 +9,8 @@
     "zh": "有时我会拍下展览的照片，因为那些颜色能给我的设计工作带来灵感。"
   },
   "人物": {
-    "text": "She still makes time for friends, even when she is busy with her own projects.",
-    "zh": "即使忙着自己的事情，她仍然会抽时间陪朋友。"
+    "text": "Even when we only have time for coffee, she always makes the conversation feel relaxed.",
+    "zh": "即使我们只能简单喝杯咖啡，她也总能让聊天的气氛很轻松。"
   },
   "经历": {
     "text": "I still remember how proud I felt when I finally made one that looked almost right.",
@@ -33,8 +33,8 @@
     "zh": "店员花时间讲清楚不同手表的区别，让我更容易做出选择。"
   },
   "目标": {
-    "text": "I would first try the idea with a small group of artists before spending too much time or money.",
-    "zh": "我会先找少量艺术家试一试这个想法，再决定是否投入更多时间和金钱。"
+    "text": "I would ask a few artists what they need most, so the first version could solve a real problem.",
+    "zh": "我会先问几位艺术家最需要什么，让第一版产品能够解决一个实际问题。"
   },
   "演唱会": {
     "text": "I remember how excited we looked when the first familiar song began.",
@@ -179,11 +179,18 @@
   {
     "name": "claire-plants",
     "questions": [
-      "Q35",
       "Q39"
     ],
     "text": "She gets excited whenever she notices a new leaf, even if it is a very small change.",
     "zh": "即使只是多长出一片新叶子，她都会很开心。"
+  },
+  {
+    "name": "claire-house",
+    "questions": [
+      "Q35"
+    ],
+    "text": "I enjoy the cosy feeling when I visit, but I would miss having more room for my own things.",
+    "zh": "我去做客时很喜欢那种温馨感，但如果自己住，我会希望有更多地方放自己的东西。"
   },
   {
     "name": "medical-career",
@@ -225,8 +232,8 @@
     "questions": [
       "Q50"
     ],
-    "text": "At the beginning, she had to convince artists to join even though the platform was still very small.",
-    "zh": "起初平台规模还很小，她必须努力说服艺术家加入。"
+    "text": "The AR preview made her platform different from ordinary art shops, and I think it helped attract customers.",
+    "zh": "AR 预览让她的平台与普通艺术商店有所不同，我觉得这也帮助她吸引了顾客。"
   },
   {
     "name": "sister-travel",
