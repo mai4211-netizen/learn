@@ -6,6 +6,8 @@
   const scope = pick('speechScope');
   const rate = pick('speechRate');
   const voiceSelect = pick('speechVoice');
+  const voicePreview = pick('speechVoicePreview');
+  const voiceHint = pick('speechVoiceHint');
   const progressBar = pick('speechProgress');
   const progressText = pick('speechProgressText');
   const playBtn = pick('speechPlay');
@@ -26,46 +28,76 @@
   let preferredVoice = (() => { try { return localStorage.getItem(VOICE_KEY) || ''; } catch (_) { return ''; } })();
   let voices = [];
   const voiceKey = v => [v.voiceURI,v.lang,v.name].join('|');
+  // Web Speech exposes voice names, not gender. Match only recognisable English
+  // female names; do not mark an unknown or generic voice as definitely female.
+  const FEMALE_NAMES = /\\b(?:ava|serena|samantha|jenny|aria|sonia|libby|kate|allison|karen|moira|fiona|joelle|noelle|zoe|matilda|susan|victoria|salli|joanna|kendra|ruth|michelle|olivia|emily|emma|amy|clara|stephanie|hazel|tessa|sangeeta|isha|natasha|catherine|kimberly|lisa|jane|mary|nancy|sara|sarah)\\b/i;
+  const MALE_NAMES = /\\b(?:daniel|george|tom|fred|oliver|evan|nathan|rishi|arthur|christopher|david|james|michael|mark|eric|aaron|brian|richard|paul|alex)\\b/i;
+  const isFemale = v => /\\b(female|woman|women)\\b/i.test(v.name) || FEMALE_NAMES.test(v.name);
+  const isMale = v => /\\bmale\\b/i.test(v.name) && !/\\bfemale\\b/i.test(v.name) || MALE_NAMES.test(v.name);
   const voiceScore = v => {
-    const n = v.name || '';
-    return (/natural|neural|premium|enhanced|siri/i.test(n)?100:0)
-      + (/Google.*English|Microsoft.*Online/i.test(n)?55:0)
-      + (/Samantha|Daniel|Serena|Karen|Moira|Ava|Allison/i.test(n)?25:0)
-      + (/en-GB/i.test(v.lang)?12:0)
-      - (/compact|espeak/i.test(n)?100:0);
+    const name = v.name || '';
+    const quality = /premium|neural|natural|enhanced|siri/i.test(name) ? 110 : 0;
+    return (isFemale(v) ? 1000 : 0)
+      + quality
+      + (/Microsoft.*Online|Google.*English/i.test(name) ? 35 : 0)
+      + (/en-GB/i.test(v.lang) ? 12 : 0)
+      - (/compact|espeak/i.test(name) ? 150 : 0)
+      - (isMale(v) ? 600 : 0);
   };
+  const selectedVoice = () => {
+    const key = voiceSelect.value;
+    return voices.find(v => voiceKey(v) === key)
+      || voices.find(isFemale)
+      || voices.find(v => !isMale(v))
+      || null;
+  };
+  const selectedVoiceLabel = () => {
+    const v = selectedVoice();
+    if (!voices.length) return '设备尚未提供英文音色列表，可以尝试刷新或重新打开页面。';
+    if (!v) return '未找到可用的英文女声。建议在系统设置中添加高质量英文女声。';
+    if (!isFemale(v)) return '设备未识别到明确的英文女声。当前音色可能仍偏机械；可安装 Ava（Premium）或 Serena（Premium）等语音。';
+    return '当前优先：' + v.name + (/premium|neural|natural|enhanced/i.test(v.name) ? ' · 高质量音色' : ' · 如仍机械，可添加 Premium 女声');
+  };
+  function refreshVoiceHint() {
+    if (voiceHint) voiceHint.textContent = selectedVoiceLabel();
+  }
   function populateVoices() {
     if (!canSpeak) return;
     const found = engine.getVoices().filter(v => /^en(?:-|$)/i.test(v.lang));
-    if (!found.length) return;
+    if (!found.length) {
+      refreshVoiceHint();
+      return;
+    }
     const previous = preferredVoice || voiceSelect.value;
-    voices = found.sort((a,b)=>voiceScore(b)-voiceScore(a)||a.name.localeCompare(b.name));
+    voices = found.sort((a,b) => voiceScore(b)-voiceScore(a) || a.name.localeCompare(b.name));
     voiceSelect.replaceChildren();
     const auto = document.createElement('option');
-    auto.value = ''; auto.textContent = '自动（优先自然音色）'; voiceSelect.appendChild(auto);
+    auto.value = '';
+    auto.textContent = '清晰女声（自动优先）';
+    voiceSelect.appendChild(auto);
     voices.forEach(v => {
       const op = document.createElement('option');
       op.value = voiceKey(v);
-      op.textContent = v.name + ' · ' + v.lang;
+      op.textContent = (isFemale(v) ? '♀ ' : '') + v.name + ' · ' + v.lang;
       voiceSelect.appendChild(op);
     });
     voiceSelect.value = voices.some(v=>voiceKey(v)===previous) ? previous : '';
+    refreshVoiceHint();
   }
   if (canSpeak) {
     populateVoices();
-    engine.addEventListener?.('voiceschanged',populateVoices);
-    voiceSelect.addEventListener('focus',populateVoices);
+    engine.addEventListener?.('voiceschanged', populateVoices);
+    voiceSelect.addEventListener('focus', populateVoices);
   }
 
   const categoryOf = g => (g.category || '').split('/')[0].trim();
   const selected = () => GROUPS.find(g => g.id === selectedGroup) || GROUPS[0];
   const flat = gs => gs.flatMap(g => g.topics.map(t => ({ group:g, topic:t })));
   const answerParagraphs = item => parts(item.group, item.topic)
-    .map(p => p.text.replace(/\s+/g,' ').trim()).filter(Boolean);
+    .map(p => p.text.replace(/\\s+/g,' ').trim()).filter(Boolean);
   const chosenVoice = () => {
     if (!voices.length) populateVoices();
-    const key = voiceSelect.value;
-    return voices.find(v => voiceKey(v) === key) || voices[0] || null;
+    return selectedVoice();
   };
   function updateProgress(done, total) {
     const percent = Math.round(100 * Math.max(0,Math.min(1,done / Math.max(total,1))));
@@ -86,6 +118,7 @@
     stopBtn.disabled = !playing;
     scope.disabled = !canSpeak;
     voiceSelect.disabled = !canSpeak;
+    voicePreview.disabled = !canSpeak;
   }
   function stop(message='已停止', retainProgress=false) {
     ++generation; // Ignore late onend/onerror events from a cancelled utterance.
@@ -243,8 +276,30 @@
   voiceSelect.addEventListener('change', () => {
     preferredVoice = voiceSelect.value;
     try { localStorage.setItem(VOICE_KEY, preferredVoice); } catch (_) {}
+    refreshVoiceHint();
     if (playing) restartParagraph();
-    else setStatus('已切换音色，点击播放试听');
+    else setStatus('已切换音色，可先试听，再播放当前答案');
+  });
+  voicePreview.addEventListener('click', () => {
+    if (!canSpeak) return;
+    // Preview never changes the current Q or the playback range.
+    stop('');
+    const v = chosenVoice();
+    if (!v) {
+      setStatus('没有找到明确的英文女声，请先添加英文女声后重新打开网页');
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(
+      "I'd like to talk about a memorable trip. It was a wonderful experience, and I still remember it clearly."
+    );
+    utterance.voice = v;
+    utterance.lang = v.lang;
+    utterance.rate = Number(rate.value) || 1;
+    utterance.pitch = 1;
+    setStatus('试听中 · ' + v.name);
+    utterance.onend = () => setStatus('试听完成 · ' + v.name);
+    utterance.onerror = () => setStatus('试听失败，请尝试其他系统音色');
+    engine.speak(utterance);
   });
   // Direct manual navigation takes priority over an ongoing playlist.
   document.addEventListener('click', ev => {
@@ -259,7 +314,8 @@
     playBtn.disabled = true;
   } else {
     updateProgress(0,1);
-    setStatus('可选择英文音色；部分设备需要安装更自然的系统语音');
+    refreshVoiceHint();
+    setStatus('默认优先清晰女声；可点击试听比较音色');
     updateUI();
   }
 })();
