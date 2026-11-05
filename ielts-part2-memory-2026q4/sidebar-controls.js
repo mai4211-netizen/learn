@@ -10,11 +10,11 @@
   const WIDTH_KEY = 'p2-2026q4-sidebar-width';
   const COLLAPSED_KEY = 'p2-2026q4-sidebar-collapsed';
   const minWidth = 250;
-  const maxWidth = () => Math.max(minWidth, Math.min(560, window.innerWidth - 320));
+  const maxWidth = () => Math.max(minWidth, Math.min(560, window.innerWidth - 382));
   const safeGet = key => { try { return localStorage.getItem(key); } catch (_) { return null; } };
   const safeSet = (key, value) => { try { localStorage.setItem(key, String(value)); } catch (_) {} };
   const clamp = width => Math.round(Math.max(minWidth, Math.min(maxWidth(), width)));
-  let width = clamp(Number(safeGet(WIDTH_KEY)) || 340);
+  let width = clamp(Number(safeGet(WIDTH_KEY)) || 290);
   let dragging = false;
 
   function applyWidth(next, persist = false) {

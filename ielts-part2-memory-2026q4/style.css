@@ -1,7 +1,7 @@
 :root{
-  --bg:#f7f5f1;--card:#fff;--ink:#1f1d1a;--sub:#726b62;--line:#e5dfd7;
-  --accent:#25221f;--soft:#f3eee7;--shared:#fffaf0;--own:#f3f7ff;--green:#2f7d57;
-  --adjust:#f7f1ff;--adjust-line:#bca4da;--recommend:#dff1df;
+  --bg:#f6f7f5;--card:#fff;--ink:#17241f;--sub:#66746d;--line:#e4e9e5;
+  --accent:#147d58;--soft:#e5f4ed;--shared:#f2f8f4;--own:#f3f7ff;--green:#147d58;
+  --adjust:#f5f0fb;--adjust-line:#bca4da;--recommend:#dff1df;
 }
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
 body{min-height:100vh}.app{display:grid;grid-template-columns:340px minmax(0,1fr);min-height:100vh}

@@ -10,29 +10,33 @@
 <meta name="apple-mobile-web-app-title" content="IELTS P2">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=templates-v25">
-<link rel="stylesheet" href="site-tabs.css?v=modules-v27">
+<link rel="stylesheet" href="style.css?v=templates-v26">
+<link rel="stylesheet" href="site-tabs.css?v=modules-v28">
 </head>
-<body>
+<body class="p2-page">
 <div class="app">
   <aside class="sidebar" id="topicSidebar">
     <button id="sidebarCollapse" class="sidebar-collapse" type="button" aria-label="收起题目列表" title="收起左侧题目栏" aria-controls="topicSidebar" aria-expanded="true">‹</button>
     <div class="brand">
-      <div class="eyebrow">2026 SEP–DEC · 爱听写题库</div>
-      <h1>IELTS Part 2<br>故事母版重修版</h1>
-<nav class="site-tabs" aria-label="口语模块导航">
-<a href="./practice.html?part=1">Part 1</a>
-<a href="./" class="active" aria-current="page">Part 2</a>
-<a href="./practice.html?part=3">Part 3</a>
-<a href="./overview.html">概述</a>
-</nav><div class="stats"><div class="stat"><b id="statTopics">58</b><span>题目</span></div><span id="statStories" hidden></span><span id="statGroups" hidden></span></div>
-      <div class="backup-tools">
-        <button id="exportBold" type="button">导出加粗</button>
-        <button id="importBold" type="button">导入加粗</button>
-        <input id="importBoldFile" type="file" accept="application/json,.json" hidden>
+      <div class="eyebrow">2026 SEP–DEC · 大陆题库</div>
+      <h1>IELTS Speaking<br>题库</h1>
+      <div class="stats" hidden>
+        <div class="stat"><b id="statTopics">58</b><span>题目</span></div>
+        <span id="statStories" hidden></span><span id="statGroups" hidden></span>
       </div>
-      <div id="backupStatus" class="backup-status" aria-live="polite"></div>
     </div>
+    <nav class="site-tabs" aria-label="口语模块导航">
+      <a href="./practice.html?part=1">Part 1</a>
+      <a href="./" class="active" aria-current="page">Part 2</a>
+      <a href="./practice.html?part=3">Part 3</a>
+      <a href="./overview.html">概述</a>
+    </nav>
+    <div class="backup-tools">
+      <button id="exportBold" type="button">导出加粗</button>
+      <button id="importBold" type="button">导入加粗</button>
+      <input id="importBoldFile" type="file" accept="application/json,.json" hidden>
+    </div>
+    <div id="backupStatus" class="backup-status" aria-live="polite"></div>
     <div class="region-tabs" role="tablist" aria-label="题库地区">
       <button type="button" id="regionMain" class="region-tab on" role="tab" aria-selected="true">大陆题库 <small>58 题</small></button>
       <button type="button" id="regionForeign" class="region-tab" role="tab" aria-selected="false">非大陆题库 <small>14 题</small></button>
@@ -44,6 +48,13 @@
   <button id="sidebarExpand" class="sidebar-expand" type="button" aria-label="展开题目列表" aria-controls="topicSidebar" aria-expanded="false" hidden>☰ <span>题目</span></button>
 
   <main class="main">
+    <header class="p2-module-header">
+      <div class="eyebrow">IELTS SPEAKING · 2026 SEP–DEC · 中国大陆</div>
+      <div class="headingline">
+        <div><h1>Part 2 <span>题库</span></h1><p class="subtitle">58 道 Cue Card，按可复用故事整理答案。Part 3 的 54 组是延伸话题组，不与 P2 逐题一一对应。</p></div>
+        <div class="topmeta"><span class="pill green">58 道 Cue Card</span></div>
+      </div>
+    </header>
     <article class="card" id="card">
       <header class="head">
         <div class="kicker"><span id="index"></span><span class="category" id="category"></span></div>
