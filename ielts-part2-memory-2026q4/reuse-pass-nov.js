@@ -211,7 +211,7 @@
   setMeta("concert-interview","看完演唱会再了解 Soyeon 的采访","香港演唱会 → 想深入了解组合 → 看 2022 回归采访 → 队长谈压力、重新出发 → 更佩服她");
 
   // Topic-fit check across all 58 Cue Cards: omit irrelevant optional padding.
-  for(const q of ["Q04","Q16","Q20","Q21","Q24","Q46","Q47","Q51","Q52"])byQ.get(q).flex=null;
+  for(const q of ["Q04","Q16","Q20","Q21","Q24","Q46","Q47","Q51","Q52"])delete byQ.get(q).flex;
   byQ.get("Q17").flex={
     text:"I often tell myself I'll stop after one more video, but then another one appears.",
     zh:"我常告诉自己再看一个视频就停，但总是又刷到下一个。",
