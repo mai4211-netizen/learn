@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install MP3 generator
-        run: python -m pip install --disable-pip-version-check edge-tts
+        run: python -m pip install --disable-pip-version-check edge-tts mutagen
       - name: Generate missing or changed IELTS audio
         run: python ielts-part2-memory-2026q4/tools/build-jenny-audio.py
       - name: Commit updated MP3s and source hashes
@@ -53,6 +53,9 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Sync Jenny recordings with IELTS Part 2 English answers"
           git pull --rebase origin main
+          # A newer answer edit may have landed during audio synthesis. Never
+          # publish a recording set for the previous source snapshot.
+          node ielts-part2-memory-2026q4/tools/verify-jenny-sync.js
           git push origin main
           echo 'changed=true' >> "$GITHUB_OUTPUT"
 
