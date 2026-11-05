@@ -1,6 +1,7 @@
 /* Offline shell and MP3 caching for the IELTS Part 2 Jenny player. */
-const CACHE_NAME = "ielts-part2-q4-offline-v20";
-const AUDIO_CACHE = "ielts-part2-q4-mp3-v1";
+const CACHE_NAME = "ielts-part2-q4-offline-v21";
+const AUDIO_CACHE = "ielts-part2-q4-mp3-v2";
+const LEGACY_AUDIO_CACHE = "ielts-part2-q4-mp3-v1";
 const APP_SHELL = [
   "./", "./index.html", "./style.css?v=topic-fit-v19",
   "./manifest.webmanifest", "./icon.svg",
@@ -16,8 +17,8 @@ const APP_SHELL = [
   "./reviewed-q24collab.js",
   "./supplement-q4.js", "./supplement-q4-extra.js",
   "./reviewed-user-feedback-nov.js?v=island-v18", "./category-flex.js?v=topic-fit-v20", "./translations-zh.js?v=island-v18",
-  "./audio/audio-manifest.js?v=topic-fit-v20", "./app.js?v=category-flex-v17",
-  "./sidebar-controls.js", "./speech-player.js?v=mp3-v15"
+  "./audio/audio-manifest.js?v=audio-sync-v21", "./app.js?v=category-flex-v17",
+  "./sidebar-controls.js", "./speech-player.js?v=audio-sync-v21"
 ];
 
 self.addEventListener("install",event => {
@@ -25,7 +26,7 @@ self.addEventListener("install",event => {
 });
 self.addEventListener("activate",event => {
   event.waitUntil(caches.keys()
-    .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME && k !== AUDIO_CACHE).map(k => caches.delete(k))))
+    .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME && k !== AUDIO_CACHE && k !== LEGACY_AUDIO_CACHE).map(k => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 
@@ -37,7 +38,7 @@ async function audioResponse(req,url) {
   let full = await cache.match(key);
   if (!full) {
     try {
-      full = await fetch(key);
+      full = await fetch(key,{cache:"no-store"});
       if (full.status === 200) await cache.put(key,full.clone());
       else return fetch(req);
     } catch (err) {
@@ -75,7 +76,7 @@ self.addEventListener("fetch",event => {
     event.respondWith(audioResponse(req,url));
     return;
   }
-  event.respondWith(fetch(req).then(response => {
+  event.respondWith(fetch(req,{cache:"no-store"}).then(response => {
     if (response && response.ok && response.status===200) {
       const copy = response.clone();
       caches.open(CACHE_NAME).then(cache => cache.put(req,copy)).catch(() => {});
