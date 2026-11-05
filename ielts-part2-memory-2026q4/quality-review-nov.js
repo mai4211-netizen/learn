@@ -6,7 +6,7 @@
  const zh=window.P2_2026Q4_ZH_TRANSLATIONS||{};
  const set=(q,i,text)=>{const t=byQ.get(q);if(!t||!t.reviewed?.[i])throw Error("QA target missing "+q+"/"+i);t.reviewed[i].text=text;};
  const hide=["Q01","Q02","Q03","Q04","Q05","Q08","Q11","Q16","Q20","Q21","Q06","Q07","Q09","Q12","Q13","Q14","Q15","Q17","Q19","Q23","Q25","Q28","Q29","Q30","Q31","Q32","Q33","Q34","Q35","Q36","Q40","Q41","Q43","Q44","Q45","Q48","Q49","Q50","Q53","Q54","Q46","Q47","Q51","Q55","Q56","Q57","Q58","Q38"];
- hide.forEach(q=>{if(byQ.has(q))byQ.get(q).flex="";});
+ hide.forEach(q=>{if(byQ.has(q))byQ.get(q).flex={};});
  set("Q02",0,"I'd like to talk about a short trip I often make to a large forest park with a lake in Guangzhou, although I don't really enjoy it.");
  set("Q01",2,"The displays change quite often, so there is usually something new to look at. It is also easy to reach by public transport, and I can stay indoors when Guangzhou is very hot. I don't always buy anything there; sometimes I just look around and take photos of details that give me ideas for my own design work.");
  set("Q05",3,"But I pressed mine too hard, and it came out in a strange shape. My mother laughed and showed me how to press more gently. The dough was a little sticky, so controlling the pressure was the hardest part. After a few tries, I finally made one that looked right.");
