@@ -1,9 +1,9 @@
 /* Offline shell and MP3 caching for the IELTS Part 2 Jenny player. */
-const CACHE_NAME = "ielts-part2-q4-offline-v31";
+const CACHE_NAME = "ielts-part2-q4-offline-v32";
 const AUDIO_CACHE = "ielts-part2-q4-mp3-v2";
 const LEGACY_AUDIO_CACHE = "ielts-part2-q4-mp3-v1";
 const APP_SHELL = [
-  "./", "./index.html", "./overview.html", "./practice.html", "./site-tabs.css?v=modules-v31", "./style.css?v=templates-v26",
+  "./", "./index.html", "./overview.html", "./practice.html", "./site-tabs.css?v=modules-v32", "./style.css?v=templates-v26",
   "./manifest.webmanifest", "./icon.svg",
   "./data.js", "./patch-ui-v2.js", "./patch-ui-v3.js",
   "./patch-ui-v4.js", "./patch-ui-v5.js",
@@ -19,8 +19,8 @@ const APP_SHELL = [
   "./reviewed-user-feedback-nov.js?v=island-v18", "./cue-card-verified.js?v=cues-v22", "./category-flex.js?v=topic-fit-v20", "./translations-zh.js?v=island-v18",
   "./approved-topic-edits-nov.js?v=approved-v23",
   "./consistent-templates-nov.js?v=templates-v26",
-  "./audio/audio-manifest.js?v=templates-v26", "./app.js?v=templates-v25",
-  "./sidebar-controls.js?v=shared-v30", "./speech-player.js?v=audio-sync-v21"
+  "./reuse-pass-nov.js?v=reuse-v32", "./audio/audio-manifest.js?v=follow-v32", "./app.js?v=templates-v25",
+  "./sidebar-controls.js?v=shared-v30", "./speech-player.js?v=follow-v32"
 ];
 
 self.addEventListener("install",event => {
@@ -73,7 +73,7 @@ async function audioResponse(req,url) {
 // shell assets immediately instead of forcing a network request on every tab
 // revisit. HTML navigations remain network-first so content updates stay fresh.
 const PRECACHED_ASSET_URLS = new Set(APP_SHELL
-  .filter(path => path !== "./" && !/\.html(?:\?|$)/.test(path))
+  .filter(path => path !== "./" && !/\.html(?:\?|$)/.test(path) && !path.includes("audio-manifest.js"))
   .map(path => new URL(path, self.registration.scope).href));
 
 self.addEventListener("fetch",event => {

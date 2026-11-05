@@ -49,7 +49,84 @@
     progress.style.setProperty('--speech-played',(value / 10)+'%');
     const time = seconds === null ? value / 1000 * duration() : seconds;
     progressText.textContent = duration() ? fmt(time) + ' / ' + fmt(duration()) : Math.round(value/10)+'%';
+    syncReading();
   }
+  // Audio is a plain MP3 without word timestamps. Estimate the current
+  // sentence from its share of spoken words; the audio timeline itself stays exact.
+  // The CSS Highlight API marks the sentence without modifying user bold spans.
+  let readingBlock=null;
+  const readingKey='p2-read-current';
+  function clearReading(){
+    window.CSS?.highlights?.delete(readingKey);
+    if(readingBlock && readingBlock.isConnected){
+      readingBlock.classList.remove('speech-reading');
+      readingBlock.style.removeProperty('--speech-line');
+    }
+    readingBlock=null;
+  }
+  function nodePoint(block,offset){
+    const walker=document.createTreeWalker(block,NodeFilter.SHOW_TEXT);
+    let node=walker.nextNode(),remaining=offset,last=null;
+    while(node){
+      last=node;
+      if(remaining<=node.textContent.length)return [node,remaining];
+      remaining-=node.textContent.length;
+      node=walker.nextNode();
+    }
+    return last?[last,last.textContent.length]:null;
+  }
+  function syncReading(){
+    if(!started || !duration() || !queue[cursor]){clearReading();return;}
+    const item=queue[cursor];
+    const blocks=[...document.querySelectorAll('#answer > p.answer-paragraph')];
+    // In "bold only" mode the original sentence text is incomplete.
+    // Do not pretend the fragment can be aligned to the full recording.
+    if(blocks.length!==parts(item.g,item.t).length){clearReading();return;}
+    const sentences=[];
+    blocks.forEach((block,p)=>{
+      const text=block.textContent;
+      const re=/[^.!?]+[.!?]?/g;
+      let m;
+      while((m=re.exec(text))){
+        const lead=m[0].search(/\S/);
+        if(lead<0)continue;
+        const start=m.index+lead,end=m.index+m[0].length;
+        const words=(m[0].match(/[A-Za-z]+(?:['-][A-Za-z]+)*/g)||[]).length;
+        sentences.push({p,start,end,weight:Math.max(1,words)+.35});
+      }
+    });
+    if(!sentences.length){clearReading();return;}
+    const total=sentences.reduce((n,x)=>n+x.weight,0);
+    const where=Math.max(0,Math.min(.999999,audio.currentTime/duration()))*total;
+    let passed=0,current=sentences[sentences.length-1];
+    for(const x of sentences){
+      if(where<passed+x.weight){current=x;break;}
+      passed+=x.weight;
+    }
+    const block=blocks[current.p];
+    if(readingBlock!==block){
+      clearReading();
+      readingBlock=block;
+      block.classList.add('speech-reading');
+    }
+    const partial=(where-passed)/current.weight;
+    const paragraphStart=sentences.filter(x=>x.p===current.p);
+    const used=paragraphStart.filter(x=>x.end<=current.start).reduce((n,x)=>n+x.weight,0);
+    const totalParagraph=paragraphStart.reduce((n,x)=>n+x.weight,0);
+    block.style.setProperty('--speech-line',Math.max(0,Math.min(100,(used+partial*current.weight)/totalParagraph*100))+'%');
+    if(!window.CSS?.highlights || !window.Highlight)return;
+    const a=nodePoint(block,current.start),b=nodePoint(block,current.end);
+    if(!a||!b)return;
+    const range=document.createRange();
+    range.setStart(a[0],a[1]);
+    range.setEnd(b[0],b[1]);
+    window.CSS.highlights.set(readingKey,new window.Highlight(range));
+  }
+  const syncHint=document.createElement('p');
+  syncHint.className='speech-sync-hint';
+  syncHint.textContent='正文按播放进度估算当前句；MP3 没有逐词时间戳。';
+  status.insertAdjacentElement('afterend',syncHint);
+
   function ui() {
     playBtn.disabled = !isReady || (started && !audio.paused) || (!started && invalidAudio.has(topic().q));
     playBtn.textContent = started && audio.paused ? '▶ 继续' : '▶ 播放';
@@ -66,6 +143,7 @@
     audio.removeAttribute('src');
     audio.load();
     pendingSeek = null;
+    clearReading();
     if (reset) displayProgress(0,0);
     ui();
     status.textContent = message;
@@ -113,6 +191,7 @@
     if (!item) return stop('播放完成');
     const hash = versions[item.t.q];
     if (!hash) return stop('尚未生成 '+item.t.q+' 的音频');
+    clearReading();
     showTopic(item,scroll);
     audio.pause();
     if (invalidAudio.has(item.t.q)) return stop(item.t.q+' 的音频与英文原稿版本不一致，已停止播放；请联网刷新');

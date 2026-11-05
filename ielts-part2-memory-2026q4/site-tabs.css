@@ -228,3 +228,30 @@
   border-color:#e4e9e5;border-radius:18px;
   box-shadow:0 10px 38px rgba(25,55,39,.055);
 }
+
+/* November 5 feedback: refresh obsolete warm/brown nav states on ALL pages. */
+.site-tabs{background:#f2f5f2}
+.site-tabs a{color:#61746a}
+.site-tabs a:hover{background:#e5f4ed;color:#106443}
+.site-tabs a.active,.site-tabs a[aria-current="page"]{background:#147d58;color:#fff;box-shadow:0 2px 5px #147d5826}
+/* Neutral paragraph groups: green is reserved for navigation, not text highlighting. */
+.p2-page .answer-paragraph.shared{background:#f7f5f1;border-left-color:#d5ccbd}
+.p2-page .answer-paragraph.flex{background:#f5f1f8;border-left-color:#bdacd0}
+.p2-page .answer-paragraph.flex::before{color:#725f84}
+.p2-page .answer strong.rec-mark,.p2-page .bold-only-paragraph strong.rec-mark{background:#efe2ff}
+.p2-page #answer .answer-paragraph.speech-reading{
+  background:#fffaf0;box-shadow:inset 0 0 0 1px #f1d69e;
+}
+.p2-page #answer .answer-paragraph.speech-reading::after{
+  content:"";position:absolute;left:0;bottom:0;width:var(--speech-line,0%);
+  height:3px;border-radius:0 0 0 9px;background:#e9a044;
+  transition:width .17s linear;pointer-events:none;
+}
+::highlight(p2-read-current){background:rgba(255,198,98,.64);color:inherit}
+.speech-sync-hint{margin:5px 0 0;font-size:11px;color:#7c7365}
+
+/* Align remaining overview controls with the speaking palette. */
+.overview-page .filter button[aria-pressed="true"]{background:#147d58;border-color:#147d58;color:white}
+.overview-page .story summary{color:#147d58}
+.overview-page .story .topic b{color:#147d58}
+.overview-page .searchrow input{border:1px solid #e4e9e5;border-radius:12px}
