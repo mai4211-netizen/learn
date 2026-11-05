@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const folder=path.resolve(__dirname,'..');
 const html=fs.readFileSync(path.join(folder,'index.html'),'utf8');
-const scripts=[...html.matchAll(/<script\\s+src="([^"]+)"\\s*>\\s*<\\/script>/g)].map(m=>m[1].split('?')[0]);
+const scripts=[...html.matchAll(/<script\s+src="([^"]+)"\s*>\s*<\/script>/g)].map(m=>m[1].split('?')[0]);
 const ctx=vm.createContext({window:{},console});
 for(const name of scripts){
   if(name==='app.js')break;
