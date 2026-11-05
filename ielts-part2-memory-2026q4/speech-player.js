@@ -14,7 +14,10 @@
   const progressText = el('speechProgressText');
   const status = el('speechStatus');
   const versions = window.P2_2026Q4_AUDIO?.versions || {};
-  const isReady = Object.keys(versions).length === 58;
+  let isReady = false;
+  const invalidAudio = new Set();
+  const setting = window.P2_2026Q4_AUDIO || {};
+  let verificationNote = '正在核对录音与答案版本…';
 
   let queue = [];
   let cursor = 0;
@@ -48,7 +51,7 @@
     progressText.textContent = duration() ? fmt(time) + ' / ' + fmt(duration()) : Math.round(value/10)+'%';
   }
   function ui() {
-    playBtn.disabled = !isReady || (started && !audio.paused);
+    playBtn.disabled = !isReady || (started && !audio.paused) || (!started && invalidAudio.has(topic().q));
     playBtn.textContent = started && audio.paused ? '▶ 继续' : '▶ 播放';
     pauseBtn.disabled = !started || audio.paused;
     nextBtn.disabled = !started || cursor + 1 >= queue.length;
@@ -112,7 +115,9 @@
     if (!hash) return stop('尚未生成 '+item.t.q+' 的音频');
     showTopic(item,scroll);
     audio.pause();
-    audio.src = './audio/'+item.t.q+'.mp3?v='+encodeURIComponent(hash);
+    if (invalidAudio.has(item.t.q)) return stop(item.t.q+' 的音频与英文原稿版本不一致，已停止播放；请联网刷新');
+    // The file name is immutable for this exact answer text and voice settings.
+    audio.src = './audio/'+item.t.q+'-'+encodeURIComponent(hash)+'.mp3';
     audio.playbackRate = Number(rate.value) || 1;
     audio.load();
     displayProgress(0,0);
@@ -120,7 +125,7 @@
     playAudio();
   }
   function begin() {
-    if (!isReady) { status.textContent = 'Jenny 音频正在准备，刷新后再试'; return; }
+    if (!isReady) { status.textContent = verificationNote; return; }
     const seek = pendingSeek;
     stop('',true);
     queue = playlist();
@@ -206,9 +211,48 @@
   },true);
   window.addEventListener('pagehide', () => { if (started) stop(); });
 
+  // Compare the SHA-256 of the ACTUAL answer on this page with the version
+  // that was used to synthesize the MP3. If scripts/manifest were cached from
+  // different deployments, don't play an unrelated recording.
+  async function verifyVersions() {
+    if (!window.crypto?.subtle || !window.TextEncoder) {
+      verificationNote='当前环境不能安全校验录音版本，请使用 HTTPS 网页重新打开';
+      status.textContent=verificationNote;
+      ui();
+      return;
+    }
+    if (Object.keys(versions).length !== 58) {
+      verificationNote='录音索引尚未同步，联网刷新后再试';
+      status.textContent=verificationNote;
+      ui();
+      return;
+    }
+    const encoder = new window.TextEncoder();
+    const voice=setting.voice || 'en-US-JennyNeural';
+    const voiceRate=setting.rate || '-5%';
+    const topicList=GROUPS.flatMap(g=>g.topics.map(t=>({g,t})));
+    await Promise.all(topicList.map(async ({g,t}) => {
+      const plain=fullText(g,t).replace(/\\s+/g,' ').trim();
+      const bytes=encoder.encode(voice+'\\0'+voiceRate+'\\0'+plain);
+      const digest=await window.crypto.subtle.digest('SHA-256',bytes);
+      const signature=Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,16);
+      if (versions[t.q]!==signature) invalidAudio.add(t.q);
+    }));
+    isReady=true;
+    verificationNote=invalidAudio.size
+      ? invalidAudio.size+' 篇录音版本与当前答案不同，已阻止播放这些篇章；请联网刷新页面'
+      : 'Jenny Neural 女声 · MP3 · 可按实际音频时间拖动';
+    status.textContent=verificationNote;
+    ui();
+  }
+
   displayProgress(0,0);
-  status.textContent = isReady
-    ? 'Jenny Neural 女声 · MP3 · 可按实际音频时间拖动'
-    : 'Jenny 女声音频正在生成，完成后刷新页面';
+  status.textContent=verificationNote;
   ui();
+  verifyVersions().catch(() => {
+    isReady=false;
+    verificationNote='核对录音版本失败，请联网刷新页面';
+    status.textContent=verificationNote;
+    ui();
+  });
 })();
