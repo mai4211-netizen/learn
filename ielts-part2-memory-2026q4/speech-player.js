@@ -171,8 +171,11 @@
       selectedQ = item.t.q;
       const search = el('search');
       if (search && search.value) search.value = '';
+      // Audio auto-advance changes the text but preserves the reader's page position.
+      // Keep normal, user-initiated topic navigation in app.js unchanged.
+      const pageX = window.scrollX, pageY = window.scrollY;
       save(); render();
-      if (scroll) el('card').scrollIntoView({block:'start',behavior:'auto'});
+      window.scrollTo(pageX, pageY);
       const sidebar = el('topicSidebar');
       const active = document.querySelector('#nav .nav-btn.on');
       if (sidebar && active) {
