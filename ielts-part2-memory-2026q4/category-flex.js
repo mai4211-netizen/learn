@@ -173,8 +173,8 @@
       "Q36",
       "Q54"
     ],
-    "text": "When something does not go as planned, she just moves it to another day instead of giving up.",
-    "zh": "如果事情没有按计划进行，她会改天继续，而不是直接放弃。"
+    "text": "She prefers a few small daily goals because they are easier to keep up with when life gets busy.",
+    "zh": "她更喜欢每天定几个小目标，因为忙起来也比较容易坚持。"
   },
   {
     "name": "claire-plants",
@@ -189,8 +189,8 @@
     "questions": [
       "Q35"
     ],
-    "text": "I enjoy the cosy feeling when I visit, but I would miss having more room for my own things.",
-    "zh": "我去做客时很喜欢那种温馨感，但如果自己住，我会希望有更多地方放自己的东西。"
+    "text": "Her plants and art supplies make the place feel warm, but they also take up quite a lot of room.",
+    "zh": "她的植物和美术用品让屋子很温馨，但也占了不少空间。"
   },
   {
     "name": "medical-career",
