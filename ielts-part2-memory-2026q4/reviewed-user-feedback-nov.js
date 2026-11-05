@@ -127,4 +127,17 @@
     para("I admire her because she kept leading her teammates under pressure. Her determination impressed me more than the final score.",'own')
   ],"温哥华和好友看加拿大对美国的女子冰球 → 球太快很难跟上 → 发现一位加拿大球员特别活跃 → 美国逐渐领先，她仍指挥进攻 → 赛后朋友说她是队长 Marie-Philip Poulin → 我佩服她顶住压力的领导力",
   ['Marie-Philip Poulin','Canadian','women\'s ice hockey','Vancouver','puck','active','directions','teammates','US','organise attacks','captain','2024','pressure','determination']);
+
+  // 2026-11-05: Remove redundant coast/photo/bus descriptions within the island group.
+  // Q02 and Q46 intentionally reuse the same ride paragraph; Q19 focuses on photography.
+  edit('Q02',2,"We followed a quiet road beside the coast and could stop whenever we wanted. My friend loves taking photos, so we stopped several times to photograph the sea and the little streets.");
+  keywords('Q02',['short island trip','Japanese island','missed the bus','public transport','rented bikes','extremely hot','coast','taking photos','tired','sweaty','sunburnt']);
+
+  edit('Q19',1,"I noticed this most clearly when we travelled to a quiet Japanese island. We rented bikes and explored the island together.");
+  edit('Q19',2,"My friend kept stopping to take pictures of the sea, signs and little streets. She likes natural light and sometimes takes several versions before choosing one.");
+  byQ.Q19.chain = '爱拍照的朋友 → 日本小岛一起骑车 → 她拍海景、小路和路牌 → 为了光线多拍几张 → 我慢慢学会欣赏细节 → 收到她发来的相册';
+  keywords('Q19',['close friend','taking photos','Japanese island','rented bikes','sea','signs','little streets','natural light','appreciate the details','small album','through her eyes']);
+
+  edit('Q46',3,"I was still tired at the end, but I understood why people enjoy cycling on trips. We could explore at our own pace, and the journey felt more flexible than I expected. Her photos also helped me appreciate the small details of the journey.");
+  byQ.Q46.chain = '原本觉得骑车旅行累又慢 → 日本小岛错过公交、改租自行车 → 沿海骑行、朋友拍照 → 自己掌握节奏 → 虽然累但发现旅行更自由 → 也开始欣赏旅途细节';
 })();
