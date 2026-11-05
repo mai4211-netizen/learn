@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Verify IELTS English answers and their Jenny recordings
+        run: node ielts-part2-memory-2026q4/tools/verify-jenny-sync.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
