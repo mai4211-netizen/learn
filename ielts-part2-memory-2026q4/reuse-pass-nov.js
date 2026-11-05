@@ -5,6 +5,10 @@
   const groups=window.P2_2026Q4_GROUPS||[];
   const zh=window.P2_2026Q4_ZH_TRANSLATIONS||{};
   const byQ=new Map(groups.flatMap(g=>(g.topics||[]).map(t=>[t.q,t])));
+  // Older modules reused the same paragraph objects for different topics.
+  // Isolate their final text before this reuse pass to avoid cross-topic edits.
+  for(const t of byQ.values())if(Array.isArray(t.reviewed))
+    t.reviewed=t.reviewed.map(p=>({...p}));
   const ride="One weekend morning, we rented bikes near the entrance and rode along the paths beside the lake. We could stop whenever we wanted to take photos and enjoy the view.";
   const school="Claire and I met at school more than ten years ago. We used to draw together after class, and she often helped classmates with difficult homework.";
   const schoolHelp="If someone did not understand a question, she explained it in a simple way instead of making them feel bad.";
