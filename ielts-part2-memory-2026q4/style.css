@@ -101,3 +101,12 @@ html.sidebar-is-resizing,html.sidebar-is-resizing *{cursor:col-resize!important;
 .speech-status{font-size:11px;line-height:1.6;color:var(--sub);min-height:16px}
 .app.foreign-mode #speechPlayer{display:none}
 @media(max-width:850px){.speech-player{padding:11px 12px}.speech-player-options{gap:8px}.speech-player-actions button{flex:1 1 auto;padding:9px 8px}}
+
+/* Single-answer progress and selectable English voices. */
+.speech-voice-label select{max-width:min(260px,55vw);min-width:140px}
+.speech-progress-row{display:flex;justify-content:space-between;gap:8px;color:var(--sub);font-size:11px;font-variant-numeric:tabular-nums}
+#speechProgress{display:block;width:100%;height:8px;appearance:none;-webkit-appearance:none;border:0;border-radius:999px;background:#e6e1d9;overflow:hidden}
+#speechProgress::-webkit-progress-bar{background:#e6e1d9;border-radius:999px}
+#speechProgress::-webkit-progress-value{background:#6b806f;border-radius:999px;transition:width .16s ease}
+#speechProgress::-moz-progress-bar{background:#6b806f;border-radius:999px}
+@media(max-width:850px){.speech-voice-label{flex:1 1 180px}.speech-voice-label select{flex:1;min-width:0;max-width:100%}}
