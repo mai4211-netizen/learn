@@ -168,11 +168,43 @@ function buildNav(filter=''){
   $('#empty').style.display=shown?'none':'block';$('#card').style.display=shown?'block':'none';
 }
 
+function moveGroup(step){
+  const current=GROUPS.findIndex(g=>g.id===selectedGroup);
+  const next=current+step;
+  if(next<0||next>=GROUPS.length)return;
+  const g=GROUPS[next];
+  selectedGroup=g.id;
+  selectedQ=g.topics[0].q;
+  // Group navigation uses the full ordered sidebar, even after a search.
+  $('#search').value='';
+  save();
+  render();
+  // Keep the newly highlighted group visible in the independently scrolling sidebar.
+  const active=$('#nav').querySelector('.nav-btn.on');
+  const sidebar=$('#topicSidebar');
+  if(active){
+    const nav=$('#nav');
+    const container=(nav.scrollHeight>nav.clientHeight+3)?nav:sidebar;
+    if(container.scrollHeight>container.clientHeight+3){
+      const a=active.getBoundingClientRect(),c=container.getBoundingClientRect();
+      if(a.top<c.top+12)container.scrollTop+=a.top-c.top-12;
+      else if(a.bottom>c.bottom-12)container.scrollTop+=a.bottom-c.bottom+12;
+    }
+  }
+  $('#card').scrollIntoView({block:'start',behavior:'auto'});
+}
+
 function render(){
   hideTools();const g=group();if(!g)return;const t=topic();selectedQ=t.q;
   buildNav($('#search').value.trim());
   $('#index').textContent='语料组 '+String(GROUPS.indexOf(g)+1).padStart(2,'0')+' / '+GROUPS.length;
   $('#category').textContent=g.topics.length+' 题';
+  const groupIndex=GROUPS.indexOf(g);
+  $('#prevGroup').disabled=groupIndex<=0;
+  $('#nextGroup').disabled=groupIndex>=GROUPS.length-1;
+  $('#prevGroup').title=groupIndex>0?'上一组：'+GROUPS[groupIndex-1].title:'已是第一组';
+  $('#nextGroup').title=groupIndex<GROUPS.length-1?'下一组：'+GROUPS[groupIndex+1].title:'已是最后一组';
+  $('#groupProgress').textContent=(groupIndex+1)+' / '+GROUPS.length+' 组';
   $('#title').textContent=g.title;$('#story').textContent='故事母版：'+g.story;
   $('#memory').innerHTML='<span class="memory-title">母版中文链</span>'+esc(g.memory).replaceAll('→',' → ');
   const topics=$('#topics');topics.innerHTML='';
@@ -227,6 +259,8 @@ try{
   validate();$('#statTopics').textContent='58';$('#statStories').textContent=String(uniqueStories());$('#statGroups').textContent=String(GROUPS.length);
   if(!GROUPS.some(g=>g.id===selectedGroup)){selectedGroup=GROUPS[0].id;selectedQ=GROUPS[0].topics[0].q}
   $('#search').addEventListener('input',e=>buildNav(e.target.value.trim()));
+  $('#prevGroup').addEventListener('click',()=>moveGroup(-1));
+  $('#nextGroup').addEventListener('click',()=>moveGroup(1));
   $('#mineBoldSource').addEventListener('click',()=>setBoldSource('mine'));
   $('#recommendedBoldSource').addEventListener('click',()=>setBoldSource('recommended'));
   $('#boldOnlyToggle').addEventListener('click',()=>{boldOnly=!boldOnly;render()});
