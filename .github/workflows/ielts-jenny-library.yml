@@ -37,6 +37,8 @@ jobs:
           python-version: '3.11'
       - name: Install MP3 generator
         run: python -m pip install --disable-pip-version-check edge-tts mutagen
+      - name: Audit 58 final IELTS answers against Cue Cards
+        run: node ielts-part2-memory-2026q4/tools/audit-final-answers.js
       - name: Generate missing or changed IELTS audio
         run: python ielts-part2-memory-2026q4/tools/build-jenny-audio.py
       - name: Commit updated MP3s and source hashes
