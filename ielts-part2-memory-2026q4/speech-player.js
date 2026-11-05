@@ -232,8 +232,8 @@
     const voiceRate=setting.rate || '-5%';
     const topicList=GROUPS.flatMap(g=>g.topics.map(t=>({g,t})));
     await Promise.all(topicList.map(async ({g,t}) => {
-      const plain=fullText(g,t).replace(/\\s+/g,' ').trim();
-      const bytes=encoder.encode(voice+'\\0'+voiceRate+'\\0'+plain);
+      const plain=fullText(g,t).replace(/\s+/g,' ').trim();
+      const bytes=encoder.encode(voice+'\0'+voiceRate+'\0'+plain);
       const digest=await window.crypto.subtle.digest('SHA-256',bytes);
       const signature=Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,16);
       if (versions[t.q]!==signature) invalidAudio.add(t.q);
