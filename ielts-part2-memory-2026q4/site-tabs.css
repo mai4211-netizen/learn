@@ -119,3 +119,95 @@
  .p2-page .pager-btn{padding:9px 11px}
  .p2-page .selection-tools{left:50%!important;transform:translateX(-50%);bottom:16px;top:auto!important}
 }
+
+/* Shared sidebar: Part 2 is the visual and dimensional source of truth.
+   Page-specific filters and study tools keep their own behavior. */
+@media (min-width:851px){
+  .practice-page .layout,.overview-page .overview-app{
+    display:grid;
+    grid-template-columns:var(--sidebar-width,290px) minmax(0,1fr);
+    gap:18px;align-items:start;min-height:100vh;
+    padding:16px 28px 68px 16px;
+  }
+  .practice-page .sidebar,.overview-page .shared-sidebar{
+    position:sticky;top:16px;
+    height:calc(100dvh - 32px);max-height:calc(100dvh - 32px);
+    min-width:0;margin:0;padding:15px;
+    background:#fff;border:1px solid #e4e9e5;border-radius:18px;
+    box-shadow:0 10px 38px rgba(25,55,39,.055);overflow:auto;
+  }
+  .practice-page .content{min-width:0;padding:12px 0 0;max-width:1360px;margin:0 auto}
+  .overview-page .overview-main{min-width:0;padding:0}
+  .overview-page .shell{max-width:1360px;padding:12px 0 64px}
+}
+.practice-page .sidebar{display:flex;flex-direction:column}
+.practice-page .topicnav{flex:1;min-height:120px;max-height:none;overflow:auto}
+.practice-page .site-brand,.overview-page .site-brand{
+  padding:0 5px 12px;border-bottom:1px solid #e4e9e5;
+}
+.practice-page .site-brand .eyebrow,.overview-page .site-brand .eyebrow{
+  font-size:11px;letter-spacing:.14em;color:#147d58;font-weight:800;
+}
+.practice-page .site-brand h2,.overview-page .site-brand h2{
+  font-size:23px;line-height:1.23;letter-spacing:-.02em;font-weight:850;
+  margin:9px 0 0;padding-right:30px;color:#17241f;
+}
+.practice-page .site-tabs,.overview-page .site-tabs{margin:15px 0 12px}
+.overview-page .overview-nav-group{
+  padding:12px 4px 6px;letter-spacing:.05em;color:#66746d;font-size:11px;font-weight:800;
+}
+.overview-page .overview-quicklink{border-radius:10px;padding:10px 11px;color:#17241f;font-size:13px}
+.overview-page .overview-quicklink:hover{background:#f5f8f5}
+
+/* The same collapse, expand and resize behavior on all four tabs. */
+.practice-page .sidebar,.overview-page .shared-sidebar{min-width:0}
+.practice-page .sidebar-collapse,.overview-page .sidebar-collapse{
+  position:absolute;top:15px;right:14px;z-index:4;
+  width:30px;height:32px;display:grid;place-items:center;padding:0;
+  border:1px solid #e4e9e5;border-radius:8px;background:#fff;color:#66746d;
+  font-size:23px;line-height:1;cursor:pointer;
+}
+.practice-page .sidebar-collapse:hover,.overview-page .sidebar-collapse:hover,
+.practice-page .sidebar-expand:hover,.overview-page .sidebar-expand:hover{background:#f5f8f5}
+.practice-page .sidebar-resizer,.overview-page .sidebar-resizer{
+  position:fixed;left:calc(var(--sidebar-width,290px) + 11px);top:0;
+  height:100vh;width:10px;z-index:15;cursor:col-resize;touch-action:none;background:transparent;
+}
+.practice-page .sidebar-resizer::after,.overview-page .sidebar-resizer::after{
+  content:"";position:absolute;width:3px;height:40px;top:calc(50% - 20px);left:3px;
+  border-radius:3px;background:#b6aea5;opacity:.65;transition:opacity .15s,background .15s;
+}
+.practice-page .sidebar-resizer:hover::after,.overview-page .sidebar-resizer:hover::after{opacity:1;background:#77706a}
+.practice-page .sidebar-expand,.overview-page .sidebar-expand{
+  display:none;position:fixed;top:12px;left:14px;z-index:17;
+  align-items:center;gap:7px;border:1px solid #e4e9e5;border-radius:9px;
+  padding:9px 12px;background:#fff;color:#17241f;font-size:13px;line-height:1.2;
+  box-shadow:0 3px 12px rgba(0,0,0,.06);cursor:pointer;
+}
+.practice-page .layout.sidebar-collapsed,.overview-page .overview-app.sidebar-collapsed{
+  grid-template-columns:minmax(0,1fr);
+}
+.practice-page .sidebar-collapsed .sidebar,.overview-page .sidebar-collapsed .shared-sidebar,
+.practice-page .sidebar-collapsed .sidebar-resizer,.overview-page .sidebar-collapsed .sidebar-resizer{display:none}
+.practice-page .sidebar-collapsed .sidebar-expand:not([hidden]),
+.overview-page .sidebar-collapsed .sidebar-expand:not([hidden]){display:flex}
+.practice-page .sidebar-collapsed .content,.overview-page .sidebar-collapsed .overview-main{padding-top:54px}
+.practice-page .sidebar-collapse:focus-visible,.overview-page .sidebar-collapse:focus-visible,
+.practice-page .sidebar-expand:focus-visible,.overview-page .sidebar-expand:focus-visible,
+.practice-page .sidebar-resizer:focus-visible,.overview-page .sidebar-resizer:focus-visible{
+  outline:2px solid #147d58;outline-offset:2px;
+}
+@media (max-width:850px){
+  .practice-page .layout,.overview-page .overview-app{display:block;min-height:0;padding:14px 13px 52px}
+  .practice-page .sidebar,.overview-page .shared-sidebar{
+    position:relative;top:auto;height:auto;max-height:none;width:100%;
+    margin:0 0 16px;padding:14px;background:#fff;
+    border:1px solid #e4e9e5;border-radius:18px;
+    box-shadow:0 10px 38px rgba(25,55,39,.055);
+  }
+  .practice-page .sidebar-resizer,.overview-page .sidebar-resizer{display:none}
+  .practice-page .content{width:100%;padding:0}
+  .overview-page .overview-main,.overview-page .shell{padding:0}
+  .practice-page .topicnav{max-height:260px;flex:auto}
+  .practice-page .sidebar-collapsed .content,.overview-page .sidebar-collapsed .overview-main{padding-top:54px}
+}
