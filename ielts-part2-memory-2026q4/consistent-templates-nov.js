@@ -166,8 +166,7 @@
   },
   "Q53": {
     "1": "The book version follows Judy, a small rabbit who dreams of becoming a police officer. Other animals do not take her seriously because of her size. She meets a fox who is also judged by a stereotype.",
-    "2": "In the story, they work together on a difficult case. At first they do not fully trust each other, but they slowly learn to cooperate. I like the way their different strengths help them solve the problem.",
-    "3": "I liked imagining the animal city and the different places where animals of all sizes could live together."
+    "2": "In the story, they work together on a difficult case. At first they do not fully trust each other, but they slowly learn to cooperate. I like the way their different strengths help them solve the problem."
   },
   "Q54": {
     "1": "She usually exercises in the morning after getting up. But when work gets busy, she moves her workout to the afternoon. She does not give up just because she has a lot to do."
