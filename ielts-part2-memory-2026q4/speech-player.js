@@ -51,18 +51,20 @@
     progressText.textContent = duration() ? fmt(time) + ' / ' + fmt(duration()) : Math.round(value/10)+'%';
     syncReading();
   }
-  // Audio is a plain MP3 without word timestamps. Estimate the current
-  // sentence from its share of spoken words; the audio timeline itself stays exact.
-  // The CSS Highlight API marks the sentence without modifying user bold spans.
-  let readingBlock=null;
+  // Existing immutable Jenny MP3 files contain no word-boundary timestamps.
+  // Follow one word at a time using estimated duration/word weights; no answer
+  // markup is modified, so custom bold ranges and selection remain intact.
   const readingKey='p2-read-current';
-  function clearReading(){
+  let readingCache=null,shownWord=-1,readingFrameId=0,lastFrameAt=0;
+  const clearMarker=()=>{
     window.CSS?.highlights?.delete(readingKey);
-    if(readingBlock && readingBlock.isConnected){
-      readingBlock.classList.remove('speech-reading');
-      readingBlock.style.removeProperty('--speech-line');
-    }
-    readingBlock=null;
+    shownWord=-1;
+  };
+  function clearReading(){
+    clearMarker();
+    readingCache=null;
+    if(readingFrameId)cancelAnimationFrame(readingFrameId);
+    readingFrameId=0;
   }
   function nodePoint(block,offset){
     const walker=document.createTreeWalker(block,NodeFilter.SHOW_TEXT);
@@ -75,56 +77,71 @@
     }
     return last?[last,last.textContent.length]:null;
   }
-  function syncReading(){
-    if(!started || !duration() || !queue[cursor]){clearReading();return;}
-    const item=queue[cursor];
-    const blocks=[...document.querySelectorAll('#answer > p.answer-paragraph')];
-    // In "bold only" mode the original sentence text is incomplete.
-    // Do not pretend the fragment can be aligned to the full recording.
-    if(blocks.length!==parts(item.g,item.t).length){clearReading();return;}
-    const sentences=[];
+  function followTimeline(item,blocks){
+    if(readingCache?.q===item.t.q &&
+       readingCache.blocks.length===blocks.length &&
+       blocks.every((block,i)=>block===readingCache.blocks[i]))return readingCache;
+    clearMarker();
+    const words=[];
+    let total=0;
     blocks.forEach((block,p)=>{
       const text=block.textContent;
-      const re=/[^.!?]+[.!?]?/g;
+      const re=/[A-Za-z]+(?:['’-][A-Za-z]+)*/g;
       let m;
       while((m=re.exec(text))){
-        const lead=m[0].search(/\S/);
-        if(lead<0)continue;
-        const start=m.index+lead,end=m.index+m[0].length;
-        const words=(m[0].match(/[A-Za-z]+(?:['-][A-Za-z]+)*/g)||[]).length;
-        sentences.push({p,start,end,weight:Math.max(1,words)+.35});
+        const end=m.index+m[0].length;
+        const after=text.slice(end).match(/^\s*([,;:.!?])/)?.[1]||'';
+        const pause=/[.!?]/.test(after)?1.1:/[,;:]/.test(after)?.42:0;
+        const weight=Math.max(.8,Math.min(1.5,.9+m[0].length*.08))+pause;
+        words.push({p,start:m.index,end,at:total});
+        total+=weight;
       }
     });
-    if(!sentences.length){clearReading();return;}
-    const total=sentences.reduce((n,x)=>n+x.weight,0);
-    const where=Math.max(0,Math.min(.999999,audio.currentTime/duration()))*total;
-    let passed=0,current=sentences[sentences.length-1];
-    for(const x of sentences){
-      if(where<passed+x.weight){current=x;break;}
-      passed+=x.weight;
+    readingCache={q:item.t.q,blocks,words,total};
+    return readingCache;
+  }
+  function syncReading(){
+    if(!started || !queue[cursor] || !duration()){clearMarker();return;}
+    const item=queue[cursor];
+    const blocks=[...document.querySelectorAll('#answer > p.answer-paragraph')];
+    // "只看加粗" does not display the complete recording transcript.
+    if(blocks.length!==parts(item.g,item.t).length){clearMarker();return;}
+    const timeline=followTimeline(item,blocks);
+    if(!timeline.words.length){clearMarker();return;}
+    const position=Math.min(.999999,Math.max(0,audio.currentTime/duration()))*timeline.total;
+    let lo=0,hi=timeline.words.length-1;
+    while(lo<hi){
+      const mid=(lo+hi+1)>>1;
+      if(timeline.words[mid].at<=position)lo=mid;else hi=mid-1;
     }
-    const block=blocks[current.p];
-    if(readingBlock!==block){
-      clearReading();
-      readingBlock=block;
-      block.classList.add('speech-reading');
-    }
-    const partial=(where-passed)/current.weight;
-    const paragraphStart=sentences.filter(x=>x.p===current.p);
-    const used=paragraphStart.filter(x=>x.end<=current.start).reduce((n,x)=>n+x.weight,0);
-    const totalParagraph=paragraphStart.reduce((n,x)=>n+x.weight,0);
-    block.style.setProperty('--speech-line',Math.max(0,Math.min(100,(used+partial*current.weight)/totalParagraph*100))+'%');
-    if(!window.CSS?.highlights || !window.Highlight)return;
-    const a=nodePoint(block,current.start),b=nodePoint(block,current.end);
-    if(!a||!b)return;
+    if(lo===shownWord)return;
+    const word=timeline.words[lo],block=blocks[word.p];
+    const first=nodePoint(block,word.start),last=nodePoint(block,word.end);
+    if(!first||!last){clearMarker();return;}
     const range=document.createRange();
-    range.setStart(a[0],a[1]);
-    range.setEnd(b[0],b[1]);
-    window.CSS.highlights.set(readingKey,new window.Highlight(range));
+    range.setStart(first[0],first[1]);
+    range.setEnd(last[0],last[1]);
+    if(window.CSS?.highlights&&window.Highlight){
+      window.CSS.highlights.set(readingKey,new window.Highlight(range));
+      shownWord=lo;
+    }
+  }
+  function readingFrame(now){
+    readingFrameId=0;
+    if(!started||audio.paused)return;
+    if(now-lastFrameAt>=85){lastFrameAt=now;syncReading();}
+    readingFrameId=requestAnimationFrame(readingFrame);
+  }
+  function startFollowing(){
+    if(!readingFrameId)readingFrameId=requestAnimationFrame(readingFrame);
+  }
+  function pauseFollowing(){
+    if(readingFrameId)cancelAnimationFrame(readingFrameId);
+    readingFrameId=0;
   }
   const syncHint=document.createElement('p');
   syncHint.className='speech-sync-hint';
-  syncHint.textContent='正文按播放进度估算当前句；MP3 没有逐词时间戳。';
+  syncHint.textContent='正文逐词浅灰高亮（按播放进度估算；MP3 没有逐词时间戳）。';
   status.insertAdjacentElement('afterend',syncHint);
 
   function ui() {
@@ -256,8 +273,8 @@
     const d=duration();
     if (d) displayProgress(audio.currentTime/d,audio.currentTime);
   });
-  audio.addEventListener('play',()=> { if (started) announce(); });
-  audio.addEventListener('pause',ui);
+  audio.addEventListener('play',()=> { if (started){announce();startFollowing();} });
+  audio.addEventListener('pause',()=>{pauseFollowing();ui();});
   audio.addEventListener('ended',advance);
   audio.addEventListener('error',() => {
     if (!started) return;

@@ -255,3 +255,32 @@
 .overview-page .story summary{color:#147d58}
 .overview-page .story .topic b{color:#147d58}
 .overview-page .searchrow input{border:1px solid #e4e9e5;border-radius:12px}
+
+/* Final speaking answer colours and compact word follow (Nov 5).
+   Shared and question-specific are both blue; recall bold is pale yellow. */
+.p2-page #answer .answer-paragraph.shared{background:#eef4ff;border-left-color:#b6c9e8}
+.p2-page #answer .answer-paragraph.own{background:#f3f7ff;border-left-color:#aebfdf}
+.p2-page #answer .answer-paragraph.adjusted{background:#eef3fd;border-left-color:#a9bbdc}
+.p2-page #answer .answer-paragraph.flex{background:#f1f5ff;border-left-color:#a9bbdc}
+.p2-page #answer .answer-paragraph.flex::before{color:#54678d}
+.p2-page .answer strong.rec-mark,
+.p2-page .bold-only-paragraph strong.rec-mark{background:#fff0bc}
+.p2-page .answer strong.mine-mark,
+.p2-page .bold-only-paragraph strong.mine-mark{background:#fff0ac}
+/* Word tracking uses only a faint neutral grey patch, never a whole paragraph. */
+.p2-page #answer .answer-paragraph.speech-reading{
+  background:inherit;box-shadow:none;
+}
+.p2-page #answer .answer-paragraph.speech-reading::after{content:none}
+::highlight(p2-read-current){background:rgba(125,134,144,.30);color:inherit}
+/* Specificity: the collapsed P2 grid must override .p2-page .app.
+   Otherwise an invisible 290px sidebar grid column remains reserved. */
+@media (min-width:851px){
+  .p2-page .app.sidebar-collapsed{grid-template-columns:minmax(0,1fr)}
+  .p2-page .app.sidebar-collapsed .main{
+    min-width:0;max-width:none;width:100%;padding-top:54px;
+  }
+}
+@media (max-width:850px){
+  .p2-page .app.sidebar-collapsed .main{width:100%;padding-top:70px}
+}
