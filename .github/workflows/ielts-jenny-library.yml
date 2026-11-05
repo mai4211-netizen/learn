@@ -1,0 +1,78 @@
+name: Sync IELTS Part 2 Jenny voice recordings
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'ielts-part2-memory-2026q4/*.js'
+      - 'ielts-part2-memory-2026q4/index.html'
+      - 'ielts-part2-memory-2026q4/tools/**'
+      - '.github/workflows/ielts-jenny-library.yml'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ielts-jenny-generation
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install MP3 generator
+        run: python -m pip install --disable-pip-version-check edge-tts
+      - name: Generate missing or changed IELTS audio
+        run: python ielts-part2-memory-2026q4/tools/build-jenny-audio.py
+      - name: Commit updated MP3s and source hashes
+        id: commit
+        shell: bash
+        run: |
+          git add -A ielts-part2-memory-2026q4/audio
+          if git diff --cached --quiet; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'All 58 audio recordings already match the source answers'
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Sync Jenny recordings with IELTS Part 2 English answers"
+          git pull --rebase origin main
+          git push origin main
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
