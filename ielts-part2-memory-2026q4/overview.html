@@ -60,4 +60,9 @@ filter.innerHTML=categories.map(c=>'<button type="button" data-category="'+esc(c
 filter.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;active=b.dataset.category;render()});
 search.addEventListener("input",render);
 render();
-</script></body></html>
+</script><script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js', {scope:'./'}).catch(() => {}));
+}
+</script>
+</body></html>
