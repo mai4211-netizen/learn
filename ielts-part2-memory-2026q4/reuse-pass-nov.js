@@ -144,8 +144,21 @@
     const t=byQ.get(q);
     if(!t||!Array.isArray(t.reviewed))throw Error("Missing approved P2 paragraphs: "+q);
     if(change.p){
-      if(change.p.length!==t.reviewed.length)throw Error("Unexpected paragraph count for "+q+": "+t.reviewed.length);
-      change.p.forEach((text,i)=>{t.reviewed[i].text=text;});
+      const paragraphs=[...change.p];
+      // Several previously approved answers use four paragraphs, not five.
+      // Merge story setup into the next paragraph rather than changing the
+      // paragraph count or the student's saved bold-selection keys.
+      while(paragraphs.length>t.reviewed.length && paragraphs.length>2){
+        paragraphs[1]+=" "+paragraphs[2];
+        paragraphs.splice(2,1);
+      }
+      while(paragraphs.length<t.reviewed.length){
+        const i=paragraphs.findIndex((text,k)=>k>0&&k<paragraphs.length-1&&text.includes(". "));
+        if(i<0)throw Error("Cannot preserve paragraph count for "+q);
+        const at=paragraphs[i].indexOf(". ")+1;
+        paragraphs.splice(i,1,paragraphs[i].slice(0,at),paragraphs[i].slice(at).trim());
+      }
+      paragraphs.forEach((text,i)=>{t.reviewed[i].text=text;});
     }
     if(change.zh)zh[q]=change.zh;
     if(change.chain)t.chain=change.chain;
