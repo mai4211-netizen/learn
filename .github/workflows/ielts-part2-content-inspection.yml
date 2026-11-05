@@ -1,0 +1,38 @@
+name: Inspect final IELTS Part 2 texts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/ielts-part2-content-inspection.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Print final 58 answer texts for review
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),vm=require('vm'),path=require('path');
+          const base='ielts-part2-memory-2026q4';
+          const index=fs.readFileSync(path.join(base,'index.html'),'utf8');
+          const scripts=[...index.matchAll(/<script\s+src="([^"]+)"\s*>\s*<\/script>/g)].map(x=>x[1].split('?')[0]);
+          const sandbox={window:{},console};vm.createContext(sandbox);
+          for(const filename of scripts){
+            if(filename==='app.js')break;
+            if(filename.startsWith('audio/'))continue;
+            vm.runInContext(fs.readFileSync(path.join(base,filename),'utf8'),sandbox,{filename,timeout:15000});
+          }
+          const groups=sandbox.window.P2_2026Q4_GROUPS||[];
+          for(const g of groups)for(const t of (g.topics||[])){
+            let p=t.reviewed?.length?t.reviewed.filter(x=>x.text).map(x=>x.text):[t.intro,...g.shared,t.middle,...(t.extra||[]),t.ending].filter(Boolean);
+            if(t.flex?.text)p.splice(Math.max(0,p.length-1),0,"[OPTIONAL] "+t.flex.text);
+            console.log("TOPIC_JSON "+JSON.stringify({q:t.q,zh:t.zh,en:t.en,g:g.id,story:g.story,p,chain:t.chain||g.memory}));
+          }
+          NODE
