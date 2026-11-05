@@ -1,80 +1,91 @@
-const CACHE_NAME = "ielts-part2-q4-offline-v14";
+/* Offline shell and MP3 caching for the IELTS Part 2 Jenny player. */
+const CACHE_NAME = "ielts-part2-q4-offline-v15";
+const AUDIO_CACHE = "ielts-part2-q4-mp3-v1";
 const APP_SHELL = [
-  "./",
-  "./index.html",
-  "./style.css?v=speech-v14",
-  "./manifest.webmanifest",
-  "./icon.svg",
-  "./data.js",
-  "./patch-ui-v2.js",
-  "./patch-ui-v3.js",
-  "./patch-ui-v4.js",
-  "./patch-ui-v5.js",
-  "./reviewed-a.js",
-  "./reviewed-b1.js",
-  "./reviewed-b2.js",
-  "./reviewed-length.js",
-  "./reviewed-smooth.js",
-  "./reviewed-smooth2.js",
-  "./reviewed-keywords2.js",
-  "./reviewed-q22.js",
-  "./reviewed-merge1.js",
-  "./reviewed-merge2.js",
-  "./reviewed-merge3.js",
-  "./reviewed-simplelevel.js",
-  "./reviewed-finalpolish.js",
-  "./reviewed-merge4.js",
-  "./reviewed-final2.js",
-  "./reviewed-comments2.js",
-  "./reviewed-merge5.js",
+  "./", "./index.html", "./style.css?v=mp3-v15",
+  "./manifest.webmanifest", "./icon.svg",
+  "./data.js", "./patch-ui-v2.js", "./patch-ui-v3.js",
+  "./patch-ui-v4.js", "./patch-ui-v5.js",
+  "./reviewed-a.js", "./reviewed-b1.js", "./reviewed-b2.js",
+  "./reviewed-length.js", "./reviewed-smooth.js", "./reviewed-smooth2.js",
+  "./reviewed-keywords2.js", "./reviewed-q22.js",
+  "./reviewed-merge1.js", "./reviewed-merge2.js", "./reviewed-merge3.js",
+  "./reviewed-simplelevel.js", "./reviewed-finalpolish.js",
+  "./reviewed-merge4.js", "./reviewed-final2.js",
+  "./reviewed-comments2.js", "./reviewed-merge5.js",
   "./reviewed-q24collab.js",
-  "./supplement-q4.js",
-  "./supplement-q4-extra.js",
-  "./reviewed-user-feedback-nov.js",
-  "./translations-zh.js",
-  "./app.js?v=pager-v9",
-  "./sidebar-controls.js",
-  "./speech-player.js?v=speech-v14"
+  "./supplement-q4.js", "./supplement-q4-extra.js",
+  "./reviewed-user-feedback-nov.js", "./translations-zh.js",
+  "./audio/audio-manifest.js", "./app.js?v=pager-v9",
+  "./sidebar-controls.js", "./speech-player.js?v=mp3-v15"
 ];
 
-self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
-  );
+self.addEventListener("install",event => {
+  event.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(APP_SHELL)).then(() => self.skipWaiting()));
+});
+self.addEventListener("activate",event => {
+  event.waitUntil(caches.keys()
+    .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME && k !== AUDIO_CACHE).map(k => caches.delete(k))))
+    .then(() => self.clients.claim()));
 });
 
-self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
-  );
-});
+// Audio elements can request "Range: bytes=..." for native seeking. Cache API
+// rejects 206 Partial Content; cache the full 200 MP3 and build 206 responses.
+async function audioResponse(req,url) {
+  const cache = await caches.open(AUDIO_CACHE);
+  const key = new Request(url.href);
+  let full = await cache.match(key);
+  if (!full) {
+    try {
+      full = await fetch(key);
+      if (full.status === 200) await cache.put(key,full.clone());
+      else return fetch(req);
+    } catch (err) {
+      const saved = await cache.match(key);
+      if (!saved) throw err;
+      full = saved;
+    }
+  }
+  const range = req.headers.get("range");
+  if (!range) return full;
+  const bytes = await full.arrayBuffer();
+  const size = bytes.byteLength;
+  const match = /^bytes=(\d*)-(\d*)$/.exec(range.trim());
+  if (!match || (!match[1] && !match[2])) return full;
+  let first = match[1] ? Number(match[1]) : Math.max(0,size-Number(match[2]));
+  let last = match[2] && match[1] ? Math.min(size-1,Number(match[2])) : size-1;
+  if (!Number.isSafeInteger(first) || !Number.isSafeInteger(last) || first < 0 || last >= size || first > last) {
+    return new Response(null,{status:416,headers:{"Content-Range":"bytes */"+size}});
+  }
+  const headers = new Headers(full.headers);
+  headers.set("Content-Type","audio/mpeg");
+  headers.set("Accept-Ranges","bytes");
+  headers.set("Content-Range","bytes "+first+"-"+last+"/"+size);
+  headers.set("Content-Length",String(last-first+1));
+  headers.delete("Content-Encoding");
+  return new Response(bytes.slice(first,last+1),{status:206,headers});
+}
 
-self.addEventListener("fetch", event => {
+self.addEventListener("fetch",event => {
   const req = event.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
-
-  event.respondWith(
-    fetch(req)
-      .then(response => {
-        if (response && response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
-        }
-        return response;
-      })
-      .catch(async () => {
-        const cached = await caches.match(req);
-        if (cached) return cached;
-        if (req.mode === "navigate") {
-          return (await caches.match("./index.html")) || (await caches.match("./"));
-        }
-        throw new Error("Offline and not cached");
-      })
-  );
+  if (/\.mp3$/i.test(url.pathname)) {
+    event.respondWith(audioResponse(req,url));
+    return;
+  }
+  event.respondWith(fetch(req).then(response => {
+    if (response && response.ok && response.status===200) {
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then(cache => cache.put(req,copy)).catch(() => {});
+    }
+    return response;
+  }).catch(async () => {
+    const cached = await caches.match(req);
+    if (cached) return cached;
+    if (req.mode === "navigate")
+      return (await caches.match("./index.html")) || (await caches.match("./"));
+    throw new Error("Offline and not cached");
+  }));
 });
