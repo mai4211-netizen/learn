@@ -26,6 +26,16 @@
   let paused = false;
   const VOICE_KEY = 'p2-2026q4-speech-voice';
   let preferredVoice = (() => { try { return localStorage.getItem(VOICE_KEY) || ''; } catch (_) { return ''; } })();
+  // One-time reset of the old generic voice preference when switching to the
+  // female-first experience. Later user choices continue to persist normally.
+  try {
+    const presetKey = 'p2-2026q4-female-preset-v13';
+    if (!localStorage.getItem(presetKey)) {
+      preferredVoice = '';
+      localStorage.setItem(VOICE_KEY, '');
+      localStorage.setItem(presetKey, '1');
+    }
+  } catch (_) {}
   let voices = [];
   const voiceKey = v => [v.voiceURI,v.lang,v.name].join('|');
   // Web Speech exposes voice names, not gender. Match only recognisable English
