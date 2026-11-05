@@ -11,6 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css?v=templates-v25">
+<link rel="stylesheet" href="site-tabs.css?v=modules-v27">
 </head>
 <body>
 <div class="app">
@@ -19,12 +20,12 @@
     <div class="brand">
       <div class="eyebrow">2026 SEP–DEC · 爱听写题库</div>
       <h1>IELTS Part 2<br>故事母版重修版</h1>
-      <div class="stats">
-        <div class="stat"><b id="statTopics">58</b><span>题目</span></div>
-        <div class="stat"><b id="statStories">11</b><span>故事母版</span></div>
-        <div class="stat"><b id="statGroups">22</b><span>语料组</span></div>
-      </div>
-      <a class="overview-entry" href="./overview.html"><span>全局概述</span><small>通用句型 · 故事与58题对照</small></a>
+<nav class="site-tabs" aria-label="口语模块导航">
+<a href="./practice.html?part=1">Part 1</a>
+<a href="./" class="active" aria-current="page">Part 2</a>
+<a href="./practice.html?part=3">Part 3</a>
+<a href="./overview.html">概述</a>
+</nav><div class="stats"><div class="stat"><b id="statTopics">58</b><span>题目</span></div><span id="statStories" hidden></span><span id="statGroups" hidden></span></div>
       <div class="backup-tools">
         <button id="exportBold" type="button">导出加粗</button>
         <button id="importBold" type="button">导入加粗</button>

@@ -1,0 +1,43 @@
+/* Consistent site tabs across the three IELTS speaking parts and overview. */
+.site-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;background:#efeae4;border-radius:11px;margin:16px 0 11px}
+.site-tabs a{display:flex;align-items:center;justify-content:center;min-height:35px;padding:5px 1px;border-radius:8px;color:#605a53;text-decoration:none!important;font-size:12px;font-weight:750;white-space:nowrap}
+.site-tabs a:hover{background:#e5ddd4;color:#302b25}
+.site-tabs a.active,.site-tabs a[aria-current="page"]{background:#292522;color:#fff;box-shadow:0 2px 4px #00000014}
+.site-tabs a:focus-visible{outline:2px solid #2f7d57;outline-offset:2px}
+[hidden]{display:none!important}
+#topicSidebar .stats{grid-template-columns:minmax(0,1fr)}
+#card .story-line,#card .memory{display:none!important}
+#card .head{padding-bottom:16px}
+/* Original P1/P3 practice controls kept, global sidebar styling applied. */
+.practice-page .shell{max-width:none;margin:0;padding:0}
+.practice-page .layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:0;align-items:stretch;min-height:100vh}
+.practice-page .sidebar{position:sticky;top:0;height:100vh;max-height:100vh;padding:27px 20px 25px;background:#fbfaf8;border:0;border-right:1px solid #e5dfd7;border-radius:0;box-shadow:none;overflow:auto}
+.practice-page .content{max-width:none;width:100%;padding:30px clamp(22px,4vw,65px) 68px}
+.practice-page .topicnav{min-height:120px;flex:1;max-height:none;overflow:auto}
+.practice-page .parttabs{display:none!important}
+.practice-page .header{margin:0 0 23px}
+.practice-page .site-tabs{margin:15px 0}
+.practice-page .searchwrap input{background:#fff}
+.practice-page .header h1{font-size:clamp(24px,3vw,38px)}
+.practice-page .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+.site-brand{padding:0 5px 10px;border-bottom:1px solid #e5dfd7}
+.site-brand .eyebrow{font-size:11px;letter-spacing:.14em;font-weight:800;color:#817a72}
+.site-brand h2{font-size:23px;margin:9px 0 0;line-height:1.23;color:#27221e}
+/* Overview: same sidebar always visible, content uses entire remaining column. */
+.overview-page .overview-app{display:grid;grid-template-columns:340px minmax(0,1fr);min-height:100vh}
+.overview-page .shared-sidebar{position:sticky;top:0;height:100vh;overflow:auto;padding:28px 20px;background:#fbfaf8;border-right:1px solid #e5dfd7}
+.overview-page .overview-main{min-width:0;padding:0 clamp(13px,3vw,48px)}
+.overview-page .shell{max-width:1200px;width:100%;margin:0 auto;padding:30px 0 64px}
+.overview-page .site-tabs{margin:15px 0 18px}
+.overview-page .overview-nav-group{padding:13px 6px 5px;color:#77716a;font-size:11px;font-weight:750}
+.overview-page .overview-quicklink{display:block;padding:10px 12px;border-radius:9px;color:#5c5851;font-size:13px;text-decoration:none}
+.overview-page .overview-quicklink:hover{background:#eeeae3;text-decoration:none}
+@media(max-width:850px){
+.practice-page .layout,.overview-page .overview-app{display:block;min-height:0}
+.practice-page .sidebar,.overview-page .shared-sidebar{position:relative;top:auto;height:auto;max-height:none;width:100%;border-right:0;border-bottom:1px solid #e5dfd7;padding:16px 14px;border-radius:0}
+.practice-page .content{padding:17px 13px 55px}
+.practice-page .topicnav{max-height:260px}
+.practice-page .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+.overview-page .overview-main{padding:0 15px}
+.overview-page .shell{padding:22px 0 52px}
+}
