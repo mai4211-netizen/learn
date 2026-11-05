@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="IELTS P2">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=speech-v10">
+<link rel="stylesheet" href="style.css?v=speech-v11">
 </head>
 <body>
 <div class="app">
@@ -95,6 +95,11 @@
                 <option value="1.25">1.25×</option>
               </select>
             </label>
+            <label class="speech-control-label speech-voice-label" for="speechVoice">音色
+              <select id="speechVoice" aria-label="英文朗读音色">
+                <option value="">自动（优先自然音色）</option>
+              </select>
+            </label>
           </div>
           <div class="speech-player-actions">
             <button class="speech-primary" type="button" id="speechPlay">▶ 播放</button>
@@ -102,6 +107,10 @@
             <button type="button" id="speechNext" disabled>下一篇</button>
             <button type="button" id="speechStop" disabled>停止</button>
           </div>
+          <div class="speech-progress-row">
+            <span>当前篇进度</span><span id="speechProgressText">0%</span>
+          </div>
+          <progress id="speechProgress" max="100" value="0" aria-label="当前英文答案朗读进度">0%</progress>
           <div class="speech-status" id="speechStatus" role="status" aria-live="polite">英文朗读准备就绪</div>
         </section>
         <div class="zh-translation" id="zhTranslation" lang="zh-CN" aria-label="中文翻译"></div>
@@ -170,6 +179,6 @@
 <script src="translations-zh.js"></script>
 <script src="app.js?v=pager-v9"></script>
 <script src="sidebar-controls.js"></script>
-<script src="speech-player.js?v=speech-v10"></script>
+<script src="speech-player.js?v=speech-v11"></script>
 </body>
 </html>
