@@ -30,10 +30,10 @@
   const voiceKey = v => [v.voiceURI,v.lang,v.name].join('|');
   // Web Speech exposes voice names, not gender. Match only recognisable English
   // female names; do not mark an unknown or generic voice as definitely female.
-  const FEMALE_NAMES = /\\b(?:ava|serena|samantha|jenny|aria|sonia|libby|kate|allison|karen|moira|fiona|joelle|noelle|zoe|matilda|susan|victoria|salli|joanna|kendra|ruth|michelle|olivia|emily|emma|amy|clara|stephanie|hazel|tessa|sangeeta|isha|natasha|catherine|kimberly|lisa|jane|mary|nancy|sara|sarah)\\b/i;
-  const MALE_NAMES = /\\b(?:daniel|george|tom|fred|oliver|evan|nathan|rishi|arthur|christopher|david|james|michael|mark|eric|aaron|brian|richard|paul|alex)\\b/i;
-  const isFemale = v => /\\b(female|woman|women)\\b/i.test(v.name) || FEMALE_NAMES.test(v.name);
-  const isMale = v => /\\bmale\\b/i.test(v.name) && !/\\bfemale\\b/i.test(v.name) || MALE_NAMES.test(v.name);
+  const FEMALE_NAMES = /\b(?:ava|serena|samantha|jenny|aria|sonia|libby|kate|allison|karen|moira|fiona|joelle|noelle|zoe|matilda|susan|victoria|salli|joanna|kendra|ruth|michelle|olivia|emily|emma|amy|clara|stephanie|hazel|tessa|sangeeta|isha|natasha|catherine|kimberly|lisa|jane|mary|nancy|sara|sarah)\b/i;
+  const MALE_NAMES = /\b(?:daniel|george|tom|fred|oliver|evan|nathan|rishi|arthur|christopher|david|james|michael|mark|eric|aaron|brian|richard|paul|alex)\b/i;
+  const isFemale = v => /\b(female|woman|women)\b/i.test(v.name) || FEMALE_NAMES.test(v.name);
+  const isMale = v => /\bmale\b/i.test(v.name) && !/\bfemale\b/i.test(v.name) || MALE_NAMES.test(v.name);
   const voiceScore = v => {
     const name = v.name || '';
     const quality = /premium|neural|natural|enhanced|siri/i.test(name) ? 110 : 0;
@@ -94,7 +94,7 @@
   const selected = () => GROUPS.find(g => g.id === selectedGroup) || GROUPS[0];
   const flat = gs => gs.flatMap(g => g.topics.map(t => ({ group:g, topic:t })));
   const answerParagraphs = item => parts(item.group, item.topic)
-    .map(p => p.text.replace(/\\s+/g,' ').trim()).filter(Boolean);
+    .map(p => p.text.replace(/\s+/g,' ').trim()).filter(Boolean);
   const chosenVoice = () => {
     if (!voices.length) populateVoices();
     return selectedVoice();
