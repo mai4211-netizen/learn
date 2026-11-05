@@ -147,6 +147,14 @@
       }
       paragraph=i;
       charOffset=nearestWordStart(ps[i],target);
+      // Rounding to the end of a paragraph must not produce an empty
+      // utterance: some engines never fire "end" for empty text.
+      if (charOffset >= ps[i].length && i < ps.length - 1) {
+        paragraph=i+1;
+        charOffset=0;
+      } else if (charOffset >= ps[i].length && ps[i].length) {
+        charOffset=Math.max(0,ps[i].lastIndexOf(' ',ps[i].length-2)+1);
+      }
       break;
     }
     const {base}=progressCounts(ps);
