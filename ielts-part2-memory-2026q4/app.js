@@ -12,25 +12,33 @@ function group(){return GROUPS.find(g=>g.id===selectedGroup)||GROUPS[0]}
 function topic(){const g=group();return g.topics.find(t=>t.q===selectedQ)||g.topics[0]}
 function save(){storage.set('p2-2026q4-group',selectedGroup);storage.set('p2-2026q4-q',selectedQ);storage.set('p2-2026q4-bold-source',boldSource)}
 function parts(g,t){
+  let out;
   if(Array.isArray(t.reviewed)&&t.reviewed.length){
-    return t.reviewed.filter(p=>p?.text).map((p,i)=>({
+    out=t.reviewed.filter(p=>p?.text).map((p,i)=>({
       text:p.text,
       type:p.type||'own',
       adjusted:!!p.adjusted,
       source:'reviewed-'+i
     }));
+  }else{
+    const omit=new Set(t.omit||[]);
+    out=[{text:t.intro,type:'own',source:'intro'}];
+    g.shared.forEach((baseText,i)=>{
+      if(omit.has(i))return;
+      const changed=t.overrides&&Object.prototype.hasOwnProperty.call(t.overrides,i);
+      out.push({text:changed?t.overrides[i]:baseText,type:'shared',adjusted:changed,source:'shared-'+i});
+      if(i===0&&t.middle)out.push({text:t.middle,type:'own',source:'middle'});
+    });
+    (t.extra||[]).forEach((text,i)=>out.push({text,type:'own',source:'extra-'+i}));
+    if(t.ending)out.push({text:t.ending,type:'own',source:'ending'});
+    out=out.filter(p=>p.text);
   }
-  const omit=new Set(t.omit||[]);
-  const out=[{text:t.intro,type:'own',source:'intro'}];
-  g.shared.forEach((baseText,i)=>{
-    if(omit.has(i))return;
-    const changed=t.overrides&&Object.prototype.hasOwnProperty.call(t.overrides,i);
-    out.push({text:changed?t.overrides[i]:baseText,type:'shared',adjusted:changed,source:'shared-'+i});
-    if(i===0&&t.middle)out.push({text:t.middle,type:'own',source:'middle'});
-  });
-  (t.extra||[]).forEach((text,i)=>out.push({text,type:'own',source:'extra-'+i}));
-  if(t.ending)out.push({text:t.ending,type:'own',source:'ending'});
-  return out.filter(p=>p.text);
+  // Add an optional paragraph BEFORE the closing paragraph. Existing source
+  // keys stay unchanged, so previous user bold selections remain valid.
+  if(t.flex?.text){
+    out.splice(Math.max(0,out.length-1),0,{text:t.flex.text,type:'flex',source:'category-flex'});
+  }
+  return out;
 }
 function fullText(g,t){return parts(g,t).map(x=>x.text).join(' ')}
 function wordCount(g,t){return (fullText(g,t).match(/[A-Za-z]+(?:'[A-Za-z]+)?/g)||[]).length}
@@ -214,8 +222,9 @@ function render(){
   $('#chain').textContent=t.chain||g.memory;
   $('#answerTitle').textContent=(boldOnly?'加粗内容 · 原答案 ':'完整答案 · ')+wordCount(g,t)+' words';
   const zh=window.P2_2026Q4_ZH_TRANSLATIONS?.[t.q]||'';
-  $('#zhTranslation').textContent=zh;
-  $('#zhTranslation').hidden=!zh;
+  const flexZh=t.flex?.zh?'\n（可选延展）'+t.flex.zh:'';
+  $('#zhTranslation').textContent=zh+flexZh;
+  $('#zhTranslation').hidden=!zh&&!flexZh;
 
   $('#mineBoldSource').classList.toggle('on',boldSource==='mine');
   $('#recommendedBoldSource').classList.toggle('on',boldSource==='recommended');
@@ -226,7 +235,7 @@ function render(){
     const key=t.q+':'+p.source;
     if(boldOnly){
       const html=boldOnlyHtml(p.text,key,t);
-      return html?'<p class="bold-only-paragraph">'+html+'</p>':'';
+      return html?'<p class="bold-only-paragraph'+(p.type==='flex'?' flex':'')+'">'+html+'</p>':'';
     }
     const klass='answer-paragraph '+p.type+(p.adjusted?' adjusted':'');
     return '<p class="'+klass+'" data-key="'+key+'">'+marked(p.text,key,t)+'</p>';
