@@ -125,3 +125,7 @@ html.sidebar-is-resizing,html.sidebar-is-resizing *{cursor:col-resize!important;
 .answer-paragraph.flex::before{content:"可选延展 · 贴题补充";position:absolute;top:7px;left:12px;font-size:10px;font-weight:800;color:#397653;letter-spacing:.02em}
 .bold-only-paragraph.flex{background:#edf7ee;border-left:3px solid #65a57b;border-radius:7px;padding:7px 10px}
 .zh-translation{white-space:pre-line}
+
+/* Source note for recall-based IELTS speaking cue prompts. */
+.cue-source{margin-top:8px;font-size:10px;line-height:1.55;color:var(--sub)}
+.cue-source a{color:inherit;text-decoration:underline;text-underline-offset:2px}
