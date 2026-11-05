@@ -220,7 +220,9 @@ function render(){
   const cueHtml=(t.cue||[]).length?'<div class="cue-title">You should say:</div><ul class="cue-list">'+t.cue.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'';
   // Explicit provenance: cue bullets are meaning-aligned study wording,
   // not claimed to be an exact transcription of 爱听写 screenshot cards.
-  const cueSource=t.cueSource&&t.cueVerified
+  const cueSource=t.cueSourceKind==='user-screenshot'
+    ? '<div class="cue-source">题卡来源：你提供的截图 · 按原图提示点核对</div>'
+    : t.cueSource&&t.cueVerified
     ? '<div class="cue-source">根据公开回忆题卡核对 · 提示点为同义整理 · <a href="'+esc(t.cueSource)+'" target="_blank" rel="noopener noreferrer">查看题卡来源</a></div>'
     : '<div class="cue-source">补充题卡：尚未找到可核验的原始提示点，现为练习版</div>';
   $('#prompt').innerHTML='<b>'+t.q+' · '+esc(t.zh)+'</b>'+esc(t.en)+cueHtml+cueSource;
