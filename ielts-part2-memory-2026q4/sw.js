@@ -1,9 +1,9 @@
 /* Offline shell and MP3 caching for the IELTS Part 2 Jenny player. */
-const CACHE_NAME = "ielts-part2-q4-offline-v29";
+const CACHE_NAME = "ielts-part2-q4-offline-v30";
 const AUDIO_CACHE = "ielts-part2-q4-mp3-v2";
 const LEGACY_AUDIO_CACHE = "ielts-part2-q4-mp3-v1";
 const APP_SHELL = [
-  "./", "./index.html", "./overview.html", "./practice.html", "./site-tabs.css?v=modules-v28", "./style.css?v=templates-v26",
+  "./", "./index.html", "./overview.html", "./practice.html", "./site-tabs.css?v=modules-v30", "./style.css?v=templates-v26",
   "./manifest.webmanifest", "./icon.svg",
   "./data.js", "./patch-ui-v2.js", "./patch-ui-v3.js",
   "./patch-ui-v4.js", "./patch-ui-v5.js",
@@ -20,7 +20,7 @@ const APP_SHELL = [
   "./approved-topic-edits-nov.js?v=approved-v23",
   "./consistent-templates-nov.js?v=templates-v26",
   "./audio/audio-manifest.js?v=templates-v26", "./app.js?v=templates-v25",
-  "./sidebar-controls.js", "./speech-player.js?v=audio-sync-v21"
+  "./sidebar-controls.js?v=shared-v30", "./speech-player.js?v=audio-sync-v21"
 ];
 
 self.addEventListener("install",event => {
@@ -69,6 +69,13 @@ async function audioResponse(req,url) {
   return new Response(bytes.slice(first,last+1),{status:206,headers});
 }
 
+// The Part 2 page loads many small scripts. Serve the versioned, precached
+// shell assets immediately instead of forcing a network request on every tab
+// revisit. HTML navigations remain network-first so content updates stay fresh.
+const PRECACHED_ASSET_URLS = new Set(APP_SHELL
+  .filter(path => path !== "./" && !/\\.html(?:\\?|$)/.test(path))
+  .map(path => new URL(path, self.registration.scope).href));
+
 self.addEventListener("fetch",event => {
   const req = event.request;
   if (req.method !== "GET") return;
@@ -76,6 +83,17 @@ self.addEventListener("fetch",event => {
   if (url.origin !== self.location.origin) return;
   if (/\.mp3$/i.test(url.pathname)) {
     event.respondWith(audioResponse(req,url));
+    return;
+  }
+  if (PRECACHED_ASSET_URLS.has(url.href)) {
+    event.respondWith(caches.open(CACHE_NAME).then(async cache => {
+      const cached = await cache.match(req);
+      if (cached) return cached;
+      const response = await fetch(req);
+      if (response.ok && response.status === 200)
+        cache.put(req, response.clone()).catch(() => {});
+      return response;
+    }));
     return;
   }
   event.respondWith(fetch(req,{cache:"no-store"}).then(response => {
