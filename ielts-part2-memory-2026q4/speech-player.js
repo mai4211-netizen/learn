@@ -5,6 +5,9 @@
   const pick = id => document.getElementById(id);
   const scope = pick('speechScope');
   const rate = pick('speechRate');
+  const voiceSelect = pick('speechVoice');
+  const progressBar = pick('speechProgress');
+  const progressText = pick('speechProgressText');
   const playBtn = pick('speechPlay');
   const pauseBtn = pick('speechPause');
   const nextBtn = pick('speechNext');
@@ -19,6 +22,40 @@
   let generation = 0;
   let playing = false;
   let paused = false;
+  const VOICE_KEY = 'p2-2026q4-speech-voice';
+  let preferredVoice = (() => { try { return localStorage.getItem(VOICE_KEY) || ''; } catch (_) { return ''; } })();
+  let voices = [];
+  const voiceKey = v => [v.voiceURI,v.lang,v.name].join('|');
+  const voiceScore = v => {
+    const n = v.name || '';
+    return (/natural|neural|premium|enhanced|siri/i.test(n)?100:0)
+      + (/Google.*English|Microsoft.*Online/i.test(n)?55:0)
+      + (/Samantha|Daniel|Serena|Karen|Moira|Ava|Allison/i.test(n)?25:0)
+      + (/en-GB/i.test(v.lang)?12:0)
+      - (/compact|espeak/i.test(n)?100:0);
+  };
+  function populateVoices() {
+    if (!canSpeak) return;
+    const found = engine.getVoices().filter(v => /^en(?:-|$)/i.test(v.lang));
+    if (!found.length) return;
+    const previous = preferredVoice || voiceSelect.value;
+    voices = found.sort((a,b)=>voiceScore(b)-voiceScore(a)||a.name.localeCompare(b.name));
+    voiceSelect.replaceChildren();
+    const auto = document.createElement('option');
+    auto.value = ''; auto.textContent = '自动（优先自然音色）'; voiceSelect.appendChild(auto);
+    voices.forEach(v => {
+      const op = document.createElement('option');
+      op.value = voiceKey(v);
+      op.textContent = v.name + ' · ' + v.lang;
+      voiceSelect.appendChild(op);
+    });
+    voiceSelect.value = voices.some(v=>voiceKey(v)===previous) ? previous : '';
+  }
+  if (canSpeak) {
+    populateVoices();
+    engine.addEventListener?.('voiceschanged',populateVoices);
+    voiceSelect.addEventListener('focus',populateVoices);
+  }
 
   const categoryOf = g => (g.category || '').split('/')[0].trim();
   const selected = () => GROUPS.find(g => g.id === selectedGroup) || GROUPS[0];
@@ -26,13 +63,20 @@
   const answerParagraphs = item => parts(item.group, item.topic)
     .map(p => p.text.replace(/\s+/g,' ').trim()).filter(Boolean);
   const chosenVoice = () => {
-    const voices = engine.getVoices();
-    return voices.find(v => /^en-GB$/i.test(v.lang) && v.localService)
-      || voices.find(v => /^en-GB$/i.test(v.lang))
-      || voices.find(v => /^en/i.test(v.lang) && v.localService)
-      || voices.find(v => /^en/i.test(v.lang))
-      || null;
+    if (!voices.length) populateVoices();
+    const key = voiceSelect.value;
+    return voices.find(v => voiceKey(v) === key) || voices[0] || null;
   };
+  function updateProgress(done, total) {
+    const percent = Math.round(100 * Math.max(0,Math.min(1,done / Math.max(total,1))));
+    progressBar.value = percent;
+    progressText.textContent = percent + '%';
+    progressBar.setAttribute('aria-valuetext','当前英文答案已读约 ' + percent + '%');
+  }
+  function progressCounts(paragraphs) {
+    const lengths = paragraphs.map(x => x.length);
+    return {base:lengths.slice(0,paragraph).reduce((sum,n)=>sum+n,0),total:lengths.reduce((sum,n)=>sum+n,0)};
+  }
   const setStatus = message => { status.textContent = message; };
   function updateUI() {
     playBtn.disabled = !canSpeak || (playing && !paused);
@@ -40,9 +84,10 @@
     pauseBtn.disabled = !playing || paused;
     nextBtn.disabled = !playing || cursor >= queue.length - 1;
     stopBtn.disabled = !playing;
-    scope.disabled = playing;
+    scope.disabled = !canSpeak;
+    voiceSelect.disabled = !canSpeak;
   }
-  function stop(message='已停止') {
+  function stop(message='已停止', retainProgress=false) {
     ++generation; // Ignore late onend/onerror events from a cancelled utterance.
     playing = false;
     paused = false;
@@ -50,6 +95,7 @@
     cursor = 0;
     paragraph = 0;
     if (engine) engine.cancel();
+    if (!retainProgress) updateProgress(0,1);
     updateUI();
     setStatus(message);
   }
@@ -91,13 +137,24 @@
     if (!item) return stop('播放完成');
     const paragraphs = answerParagraphs(item);
     if (paragraph >= paragraphs.length) return advance(token);
-    const utterance = new SpeechSynthesisUtterance(paragraphs[paragraph]);
+    const text = paragraphs[paragraph];
+    const {base,total} = progressCounts(paragraphs);
+    updateProgress(base,total);
+    const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-GB';
-    utterance.rate = Number(rate.value) || 0.9;
+    utterance.rate = Number(rate.value) || 1;
+    utterance.pitch = 1;
     const voice = chosenVoice();
-    if (voice) utterance.voice = voice;
+    if (voice) { utterance.voice = voice; utterance.lang = voice.lang; }
+    // Web Speech exposes character position where supported. On other browsers,
+    // the bar still advances at each paragraph boundary.
+    utterance.onboundary = ev => {
+      if (!playing || token !== generation || paused) return;
+      if (Number.isFinite(ev.charIndex)) updateProgress(base + Math.min(text.length,Math.max(0,ev.charIndex)),total);
+    };
     utterance.onend = () => {
       if (!playing || token !== generation) return;
+      updateProgress(base + text.length,total);
       paragraph++;
       speakPart(token);
     };
@@ -113,7 +170,8 @@
     if (!playing || token !== generation) return;
     if (cursor + 1 >= queue.length) {
       const total = queue.length;
-      return stop('已播放完毕 · ' + total + ' / ' + total + ' 题');
+      updateProgress(100,100);
+      return stop('已播放完毕 · ' + total + ' / ' + total + ' 题', true);
     }
     cursor++;
     paragraph = 0;
@@ -169,11 +227,24 @@
   });
   stopBtn.addEventListener('click', () => stop());
   scope.addEventListener('change', () => {
-    if (playing) stop();
-    setStatus('点击播放后朗读' + scope.options[scope.selectedIndex].text);
+    // The scope selector stays usable during playback: restart at the currently displayed Q.
+    if (playing) { stop(''); play(); }
+    else setStatus('点击播放后朗读' + scope.options[scope.selectedIndex].text);
   });
-  rate.addEventListener('change', () => {
-    if (playing) setStatus('语速调整将在下一段生效');
+  function restartParagraph() {
+    if (!playing) return;
+    ++generation;
+    engine.cancel();
+    paused = false;
+    announce();
+    speakPart(generation);
+  }
+  rate.addEventListener('change', restartParagraph);
+  voiceSelect.addEventListener('change', () => {
+    preferredVoice = voiceSelect.value;
+    try { localStorage.setItem(VOICE_KEY, preferredVoice); } catch (_) {}
+    if (playing) restartParagraph();
+    else setStatus('已切换音色，点击播放试听');
   });
   // Direct manual navigation takes priority over an ongoing playlist.
   document.addEventListener('click', ev => {
@@ -187,7 +258,8 @@
     setStatus('当前浏览器不支持语音朗读');
     playBtn.disabled = true;
   } else {
-    setStatus('使用设备英文语音；选择范围后点击播放');
+    updateProgress(0,1);
+    setStatus('可选择英文音色；部分设备需要安装更自然的系统语音');
     updateUI();
   }
 })();
