@@ -73,7 +73,7 @@ async function audioResponse(req,url) {
 // shell assets immediately instead of forcing a network request on every tab
 // revisit. HTML navigations remain network-first so content updates stay fresh.
 const PRECACHED_ASSET_URLS = new Set(APP_SHELL
-  .filter(path => path !== "./" && !/\\.html(?:\\?|$)/.test(path))
+  .filter(path => path !== "./" && !/\.html(?:\?|$)/.test(path))
   .map(path => new URL(path, self.registration.scope).href));
 
 self.addEventListener("fetch",event => {
