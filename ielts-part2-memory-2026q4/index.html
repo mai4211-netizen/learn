@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="IELTS P2">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=pager-v9">
+<link rel="stylesheet" href="style.css?v=speech-v10">
 </head>
 <body>
 <div class="app">
@@ -75,6 +75,35 @@
             <button class="filter-btn" id="boldOnlyToggle" type="button">只看加粗</button>
           </div>
         </div>
+        <section class="speech-player" id="speechPlayer" aria-label="英文答案朗读">
+          <div class="speech-player-options">
+            <strong class="speech-label">英文朗读</strong>
+            <label class="speech-control-label" for="speechScope">播放范围
+              <select id="speechScope" aria-label="朗读范围">
+                <option value="single">当前题</option>
+                <option value="group">当前故事组</option>
+                <option value="category">当前分类</option>
+                <option value="all">全部 58 题</option>
+              </select>
+            </label>
+            <label class="speech-control-label" for="speechRate">语速
+              <select id="speechRate" aria-label="朗读语速">
+                <option value="0.75">0.75×</option>
+                <option value="0.9" selected>0.9×</option>
+                <option value="1">1.0×</option>
+                <option value="1.15">1.15×</option>
+                <option value="1.25">1.25×</option>
+              </select>
+            </label>
+          </div>
+          <div class="speech-player-actions">
+            <button class="speech-primary" type="button" id="speechPlay">▶ 播放</button>
+            <button type="button" id="speechPause" disabled>暂停</button>
+            <button type="button" id="speechNext" disabled>下一篇</button>
+            <button type="button" id="speechStop" disabled>停止</button>
+          </div>
+          <div class="speech-status" id="speechStatus" role="status" aria-live="polite">英文朗读准备就绪</div>
+        </section>
         <div class="zh-translation" id="zhTranslation" lang="zh-CN" aria-label="中文翻译"></div>
         <div class="answer" id="answer"></div>
       </div>
@@ -141,5 +170,6 @@
 <script src="translations-zh.js"></script>
 <script src="app.js?v=pager-v9"></script>
 <script src="sidebar-controls.js"></script>
+<script src="speech-player.js?v=speech-v10"></script>
 </body>
 </html>
