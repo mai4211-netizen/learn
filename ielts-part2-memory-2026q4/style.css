@@ -119,3 +119,9 @@ html.sidebar-is-resizing,html.sidebar-is-resizing *{cursor:col-resize!important;
 
 /* Jenny MP3 player - same understated styling, now using a real audio timeline. */
 .speech-audio-voice{display:inline-flex;align-items:center;font-size:12px;font-weight:700;color:#356648;border:1px solid #d7e2d5;background:#f2f7f1;border-radius:8px;padding:7px 10px;min-height:34px}
+
+/* Optional shared-by-category IELTS extension: distinct from personal or recommended bolding. */
+.answer-paragraph.flex{background:#edf7ee;border-left:3px solid #65a57b;padding-top:29px}
+.answer-paragraph.flex::before{content:"可选延展 · 同类共用";position:absolute;top:7px;left:12px;font-size:10px;font-weight:800;color:#397653;letter-spacing:.02em}
+.bold-only-paragraph.flex{background:#edf7ee;border-left:3px solid #65a57b;border-radius:7px;padding:7px 10px}
+.zh-translation{white-space:pre-line}
