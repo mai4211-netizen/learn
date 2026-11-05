@@ -1,0 +1,71 @@
+name: One-time IELTS Jenny voice preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/ielts-jenny-preview.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Extract the latest Q56 answer from the website scripts
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),vm=require('vm'),path=require('path');
+          const folder='ielts-part2-memory-2026q4';
+          const html=fs.readFileSync(path.join(folder,'index.html'),'utf8');
+          const scripts=[...html.matchAll(/<script\s+src="([^"]+)"\s*>\s*<\/script>/g)]
+            .map(m=>m[1].split('?')[0]);
+          const ctx=vm.createContext({window:{},console});
+          for(const src of scripts){
+            if(src==='app.js')break;
+            vm.runInContext(fs.readFileSync(path.join(folder,src),'utf8'),ctx,{filename:src,timeout:10000});
+          }
+          const topics=(ctx.window.P2_2026Q4_GROUPS||[]).flatMap(g=>g.topics||[]);
+          const q=topics.find(t=>t.q==='Q56');
+          if(!q||!Array.isArray(q.reviewed))throw Error('Final Q56 English answer not found');
+          const answer=q.reviewed.map(p=>p.text||'').filter(Boolean).join(' ');
+          const words=answer.trim().split(/\s+/).length;
+          if(words<110||words>210)throw Error('Unexpected Q56 answer length: '+words);
+          fs.writeFileSync('/tmp/ielts-jenny-preview.txt',answer,'utf8');
+          console.log('Extracted Q56,',words,'words from published website sources');
+          NODE
+      - name: Generate one Jenny Neural MP3 without API credentials
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check edge-tts
+          python <<'PY'
+          import asyncio
+          from pathlib import Path
+          import edge_tts
+
+          output = Path('ielts-part2-memory-2026q4/audio/jenny-q56-preview.mp3')
+          output.parent.mkdir(parents=True, exist_ok=True)
+          text = Path('/tmp/ielts-jenny-preview.txt').read_text(encoding='utf-8')
+          async def generate():
+              await edge_tts.Communicate(text, voice='en-US-JennyNeural', rate='-5%').save(str(output))
+          asyncio.run(generate())
+          if output.stat().st_size < 8_000:
+              raise RuntimeError('Generated audio unexpectedly short')
+          print('Created',output,'size',output.stat().st_size,'bytes')
+          PY
+      - name: Save preview in the existing website repository
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ielts-part2-memory-2026q4/audio/jenny-q56-preview.mp3
+          git commit -m "Add one Jenny English voice preview for IELTS Q56"
+          git push
