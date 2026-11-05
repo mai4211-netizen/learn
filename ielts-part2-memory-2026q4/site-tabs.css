@@ -211,3 +211,20 @@
   .practice-page .topicnav{max-height:260px;flex:auto}
   .practice-page .sidebar-collapsed .content,.overview-page .sidebar-collapsed .overview-main{padding-top:54px}
 }
+
+/* Overview main content stays intact, but its page chrome matches Part 2. */
+.overview-page{
+  --bg:#f6f7f5;--text:#17241f;--muted:#66746d;--line:#e4e9e5;
+  --green:#147d58;--soft:#e5f4ed;
+  background:#f6f7f5;color:#17241f;
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft Yahei",Inter,Arial,sans-serif;
+}
+.overview-page .shell>header h1{
+  font-size:clamp(25px,3.1vw,41px);line-height:1.15;
+  letter-spacing:-.04em;font-weight:850;margin:8px 0;
+}
+.overview-page .shell>header .lead{font-size:14px;line-height:1.8}
+.overview-page .panel,.overview-page .story{
+  border-color:#e4e9e5;border-radius:18px;
+  box-shadow:0 10px 38px rgba(25,55,39,.055);
+}
