@@ -220,6 +220,7 @@
   // Sharing a school acquaintance does not make homework relevant to photography,
   // language learning, or a healthy daily routine.
   const basicSchool="Claire and I met at school more than ten years ago. We used to draw together after class.";
+  const metOnly="Claire and I met at school more than ten years ago, and we have stayed friends ever since.";
   const photoTopic=byQ.get("Q19");
   photoTopic.reviewed[1].text=photoTopic.reviewed[1].text.replace(
     "Claire and I met at school more than ten years ago. We used to draw together after class, and she often helped classmates with difficult homework.",
@@ -228,13 +229,13 @@
   photoTopic.chain="学校认识 Claire、课后画画 → 喜欢摄影 → 广州湖边森林公园骑行拍照 → K11 拍艺术陈列 → 发照片相册";
   zh.Q19="我想介绍很喜欢拍照的朋友 Claire。我们十多年前在学校认识，常在课后一起画画。一个周末早晨，我们去广州一座有湖的森林公园，在入口租自行车沿湖骑行，可以随时停下拍照。她会拍湖水、青山和小路，喜欢自然光，能把普通场景拍得很美。我们去 K11 时，她也会拍艺术陈列。回来后她给我发了一本小相册，让我注意到许多当时没留意的细节。我觉得她很会发现生活里的美。";
   const languageTopic=byQ.get("Q36");
-  languageTopic.reviewed[1].text=basicSchool+" She learns English and Japanese and enjoys practising with other people.";
-  languageTopic.chain="学校认识 Claire、课后画画 → 现在学英语日语 → 看 Friends、在线聊天、日语 App → 列清单、开口练习";
-  zh.Q36="我想介绍擅长学语言的朋友 Claire。我们十多年前在学校认识，课后经常一起画画。她现在学英语和日语，喜欢通过真实交流练习。比如，看《老友记》和在线聊天来练英语，日语则定期使用 App。她还会在电脑上列简短清单，知道下一步学什么。我欣赏她敢开口、不怕犯错的态度。";
+  languageTopic.reviewed[1].text=metOnly+" She learns English and Japanese and enjoys practising with other people.";
+  languageTopic.chain="学校认识 Claire → 现在学英语日语 → 看 Friends、在线聊天、日语 App → 列清单、开口练习";
+  zh.Q36="我想介绍擅长学语言的朋友 Claire。我们十多年前在学校认识，至今仍是朋友。她现在学英语和日语，喜欢通过真实交流练习。比如，看《老友记》和在线聊天来练英语，日语则定期使用 App。她还会在电脑上列简短清单，知道下一步学什么。我欣赏她敢开口、不怕犯错的态度。";
   const routineTopic=byQ.get("Q54");
-  routineTopic.reviewed[1].text=basicSchool+" These days she also tries to keep a healthy daily routine.";
+  routineTopic.reviewed[1].text=metOnly+" These days she also tries to keep a healthy daily routine.";
   routineTopic.chain="学校认识 Claire → 现在早上运动、工作忙改下午 → 睡前阅读、列明天待办 → 作息容易坚持";
-  zh.Q54="我想介绍有健康作息的好友 Claire。我们十多年前在学校认识，以前常在课后一起画画。现在她通常早晨运动，工作忙时改到下午，不会完全放弃。睡前会读一会儿书，再列第二天的简单任务清单，这让她早上更有条理。我觉得这些习惯不复杂，所以她可以长期坚持。";
+  zh.Q54="我想介绍有健康作息的好友 Claire。我们十多年前在学校认识，至今仍是朋友。现在她通常早晨运动，工作忙时改到下午，不会完全放弃。睡前会读一会儿书，再列第二天的简单任务清单，这让她早上更有条理。我觉得这些习惯不复杂，所以她可以长期坚持。";
   // Tall-building answer: focus on the building rather than only its shops.
   const tallTopic=byQ.get("Q52");
   tallTopic.reviewed[0].text="I'd like to talk about K11, a tall building in downtown Guangzhou. It has several floors of shops, offices above them and art exhibitions from time to time.";
