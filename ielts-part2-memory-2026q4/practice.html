@@ -17,7 +17,7 @@
 @media(max-width:720px){.shell{padding:18px 13px 52px}.header{margin-bottom:15px}.subtitle{font-size:12px}.kpis{gap:7px;grid-template-columns:repeat(4,minmax(0,1fr));margin:13px 0 15px}.kpi{padding:9px 9px;border-radius:10px}.kpi .value{font-size:18px}.kpi .label{font-size:10px}.layout{display:flex;flex-direction:column;gap:12px}.sidebar{position:relative;top:0;width:100%;max-height:none;padding:11px;border-radius:13px}.topicnav{max-height:260px}.topicnav.collapsed{display:none}.mobilemenu{display:inline-flex}.mainbar{margin:0 0 10px;gap:9px}.btn{padding:8px 10px;min-height:34px}.modes{gap:3px}.modes .btn{font-size:11px;padding:7px 8px}.contenthead{padding:18px}.contenthead h2{font-size:22px}.qcard{padding:16px 17px}.qen{font-size:16px}.qcard .top{gap:4px}.tinybtn{padding:5px 8px}.focuscard{padding:19px;min-height:250px}.focusnav button{min-width:0;flex:1}.topmeta{gap:5px}.pill{font-size:10px;padding:4px 8px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
-<link rel="stylesheet" href="site-tabs.css?v=modules-v28">
+<link rel="stylesheet" href="site-tabs.css?v=modules-v30">
 </head>
 <body class="practice-page">
 <div class="shell">
@@ -96,7 +96,7 @@
  if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');
  });
  }
- function switchPart(part){state.part=part;state.filter='全部';state.topicId=null;state.focusIndex=0;state.query='';$('search').value='';render();history.replaceState(null,'','./practice.html?part='+(part==='P3'?'3':'1'))}
+ function switchPart(part,updateHistory=true){if(part===state.part)return;state.part=part;state.filter='全部';state.topicId=null;state.focusIndex=0;state.query='';$('search').value='';render();if(updateHistory)history.pushState(null,'','./practice.html?part='+(part==='P3'?'3':'1'))}
  function chooseTopic(id){state.topicId=id;state.focusIndex=0;state.collapsed=window.innerWidth<=720;render();$('main').scrollIntoView({behavior:'smooth',block:'start'})}
  function stepTopic(delta){const i=visible.findIndex(t=>t.id===state.topicId);if(i<0)return;const n=(i+delta+visible.length)%visible.length;chooseTopic(visible[n].id)}
  function stepQuestion(delta){const t=visible.find(t=>t.id===state.topicId);if(!t)return;const n=t.matches.length;let next=state.focusIndex+delta;if(next>=n){let i=visible.findIndex(x=>x.id===state.topicId);if(i+1<visible.length){state.topicId=visible[i+1].id;state.focusIndex=0}else{state.focusIndex=0;notify('已经完成当前筛选范围的最后一道题')}}else if(next<0){let i=visible.findIndex(x=>x.id===state.topicId);if(i>0){state.topicId=visible[i-1].id;state.focusIndex=visible[i-1].matches.length-1}else{state.focusIndex=0;notify('已经是第一道题')}}else state.focusIndex=next;render();$('main').scrollIntoView({behavior:'smooth',block:'start'})}
@@ -104,6 +104,17 @@
  function speak(k){const [t,i]=findQ(k);if(!t)return;if(!('speechSynthesis' in window)){notify('当前浏览器不支持语音朗读');return}try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.questions[i].q);u.lang='en-US';u.rate=.87;speechSynthesis.speak(u)}catch(e){notify('语音朗读不可用')}}
  function findQ(k){for(const t of DATA){if(k.startsWith(t.id+'-')){const n=Number(k.slice(t.id.length+1));if(Number.isInteger(n)&&n>=0&&n<t.questions.length)return [t,n]}}return [null,-1]}
  $('tabP1').addEventListener('click',()=>switchPart('P1'));$('tabP3').addEventListener('click',()=>switchPart('P3'));
+ // Part 1 and Part 3 share this document. Change data without a full reload.
+ document.querySelector('#globalPartNav .site-tabs').addEventListener('click',event=>{
+   const a=event.target.closest('a[href*="practice.html?part="]');
+   if(!a)return;
+   event.preventDefault();
+   switchPart(new URL(a.href).searchParams.get('part')==='3'?'P3':'P1');
+ });
+ window.addEventListener('popstate',()=>{
+   const part=new URL(location.href).searchParams.get('part')==='3'?'P3':'P1';
+   switchPart(part,false);
+ });
  $('search').addEventListener('input',e=>{state.query=e.target.value.trim();state.focusIndex=0;render()});
  $('filters').addEventListener('click',e=>{let b=e.target.closest('[data-filter]');if(!b)return;state.filter=b.dataset.filter;state.topicId=null;state.focusIndex=0;render()});
  $('topicnav').addEventListener('click',e=>{let b=e.target.closest('[data-id]');if(b)chooseTopic(b.dataset.id)});
@@ -131,4 +142,5 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js', {scope:'./'}).catch(() => {}));
 }
 </script>
+<script src="sidebar-controls.js?v=shared-v30"></script>
 </body></html>
