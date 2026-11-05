@@ -1,8 +1,8 @@
-const CACHE_NAME = "ielts-part2-q4-offline-v12";
+const CACHE_NAME = "ielts-part2-q4-offline-v13";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css?v=speech-v11",
+  "./style.css?v=speech-v13",
   "./manifest.webmanifest",
   "./icon.svg",
   "./data.js",
@@ -34,7 +34,7 @@ const APP_SHELL = [
   "./translations-zh.js",
   "./app.js?v=pager-v9",
   "./sidebar-controls.js",
-  "./speech-player.js?v=speech-v11"
+  "./speech-player.js?v=speech-v13"
 ];
 
 self.addEventListener("install", event => {
