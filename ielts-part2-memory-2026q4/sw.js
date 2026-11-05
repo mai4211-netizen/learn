@@ -1,8 +1,8 @@
-const CACHE_NAME = "ielts-part2-q4-offline-v8";
+const CACHE_NAME = "ielts-part2-q4-offline-v9";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css",
+  "./style.css?v=pager-v9",
   "./manifest.webmanifest",
   "./icon.svg",
   "./data.js",
@@ -32,7 +32,7 @@ const APP_SHELL = [
   "./supplement-q4-extra.js",
   "./reviewed-user-feedback-nov.js",
   "./translations-zh.js",
-  "./app.js",
+  "./app.js?v=pager-v9",
   "./sidebar-controls.js"
 ];
 
