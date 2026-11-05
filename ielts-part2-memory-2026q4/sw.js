@@ -1,5 +1,5 @@
 /* Offline shell and MP3 caching for the IELTS Part 2 Jenny player. */
-const CACHE_NAME = "ielts-part2-q4-offline-v15";
+const CACHE_NAME = "ielts-part2-q4-offline-v16";
 const AUDIO_CACHE = "ielts-part2-q4-mp3-v1";
 const APP_SHELL = [
   "./", "./index.html", "./style.css?v=mp3-v15",
