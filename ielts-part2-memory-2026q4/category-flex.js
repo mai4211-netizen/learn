@@ -58,5 +58,9 @@
       t.flex = {text:line.text,zh:line.zh,category:primary};
     });
   });
+  // Q19 describes a photographer even though its reused story is filed under
+  // "地点 / 旅行". Reuse the 人物 sentence instead of an unrelated place-atmosphere line.
+  const photoFriend = groups.flatMap(g => g.topics || []).find(t => t.q === 'Q19');
+  if (photoFriend) photoFriend.flex = {...templates["人物"],category:"人物"};
   window.P2_2026Q4_CATEGORY_FLEX = templates;
 })();
