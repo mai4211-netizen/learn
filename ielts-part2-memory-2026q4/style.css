@@ -116,3 +116,6 @@ html.sidebar-is-resizing,html.sidebar-is-resizing *{cursor:col-resize!important;
 
 /* Device voice hint; preview control intentionally removed. */
 .speech-voice-hint{font-size:11px;line-height:1.55;color:var(--sub)}
+
+/* Jenny MP3 player - same understated styling, now using a real audio timeline. */
+.speech-audio-voice{display:inline-flex;align-items:center;font-size:12px;font-weight:700;color:#356648;border:1px solid #d7e2d5;background:#f2f7f1;border-radius:8px;padding:7px 10px;min-height:34px}
