@@ -142,13 +142,13 @@
     "1": "I bought my smartwatch about a year ago to track exercise and sleep. More recently, I started checking it regularly instead of forgetting about it after work."
   },
   "Q15": {
-    "1": "One Mid-Autumn Festival, a small group of family members got together at home. I was still young, and my mother taught me how to make snow-skin mooncakes."
+    "1": "A few close relatives came over when I was young, and my mother showed us how to make snow-skin mooncakes."
   },
   "Q16": {
     "1": "One weekend morning, I went there with a friend. We rented bikes near the entrance and rode along the paths beside the lake. It was a nice way to explore the park without rushing."
   },
   "Q23": {
-    "4": "The seller never replied during that hour, and the tickets were selling quickly. That made me worried, so I started looking for another seller."
+    "4": "At that point, tickets were selling quickly and I was worried we would miss the show, so I started looking for another seller."
   },
   "Q31": {
     "1": "The story still follows Judy and Nick on a new case, and there are several new characters. I watched it after enjoying the first film, so I had high expectations. However, some parts spent a long time explaining the city's history."
@@ -177,6 +177,21 @@
   },
   "Q57": {
     "3": "I have watched her work in the studio, and she can make small changes very quickly. I used to think pottery was old-fashioned, but a market video and her work helped me see it differently."
+  },
+  "Q03": {
+    "1": "I went there with a friend on a weekend afternoon. It was very crowded near the escalators and the food area. We had to walk slowly, and it was hard to find a seat."
+  },
+  "Q13": {
+    "1": "I went there with a friend on a weekend afternoon. It was very crowded near the escalators and the food area. We had to walk slowly, and it was hard to find a seat."
+  },
+  "Q07": {
+    "1": "We had been fans of the same K-pop group for years, so the three of us were excited long before the show started."
+  },
+  "Q30": {
+    "1": "We had been fans of the same K-pop group for years, so the three of us were excited long before the show started."
+  },
+  "Q47": {
+    "1": "I went there after shopping for most of the day. I was already tired and still carrying a few bags when we started going up."
   }
 };
   const tweaks={
