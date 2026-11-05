@@ -19,18 +19,24 @@ for (const script of scripts) {
 const groups = ctx.window.P2_2026Q4_GROUPS || [];
 const voice = 'en-US-JennyNeural', rate = '-5%';
 function parts(g,t) {
-  if (Array.isArray(t.reviewed) && t.reviewed.length)
-    return t.reviewed.filter(p => p && p.text).map(p => p.text);
-  const omit = new Set(t.omit || []);
-  const result = [t.intro];
-  (g.shared || []).forEach((part,i) => {
-    if (omit.has(i)) return;
-    result.push(t.overrides && Object.prototype.hasOwnProperty.call(t.overrides,i) ? t.overrides[i] : part);
-    if (i===0 && t.middle) result.push(t.middle);
-  });
-  (t.extra || []).forEach(x => result.push(x));
-  if (t.ending) result.push(t.ending);
-  return result.filter(Boolean);
+  let result;
+  if (Array.isArray(t.reviewed) && t.reviewed.length) {
+    result = t.reviewed.filter(p => p && p.text).map(p => p.text);
+  } else {
+    const omit = new Set(t.omit || []);
+    result = [t.intro];
+    (g.shared || []).forEach((part,i) => {
+      if (omit.has(i)) return;
+      result.push(t.overrides && Object.prototype.hasOwnProperty.call(t.overrides,i) ? t.overrides[i] : part);
+      if (i===0 && t.middle) result.push(t.middle);
+    });
+    (t.extra || []).forEach(x => result.push(x));
+    if (t.ending) result.push(t.ending);
+    result = result.filter(Boolean);
+  }
+  // Keep exactly the same placement as the website's parts(g,t).
+  if (t.flex?.text) result.splice(Math.max(0,result.length-1),0,t.flex.text);
+  return result;
 }
 const items = {};
 for (const g of groups) for (const t of g.topics) {
