@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="IELTS P2">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=speech-v13">
+<link rel="stylesheet" href="style.css?v=speech-v14">
 </head>
 <body>
 <div class="app">
@@ -100,7 +100,6 @@
                 <option value="">清晰女声（自动优先）</option>
               </select>
             </label>
-            <button class="speech-voice-preview" type="button" id="speechVoicePreview" aria-label="试听选中的英文女声">▶ 试听女声</button>
           </div>
           <div class="speech-voice-hint" id="speechVoiceHint" aria-live="polite">正在检查设备可用的英文女声…</div>
           <div class="speech-player-actions">
@@ -110,9 +109,9 @@
             <button type="button" id="speechStop" disabled>停止</button>
           </div>
           <div class="speech-progress-row">
-            <span>当前篇进度</span><span id="speechProgressText">0%</span>
+            <label for="speechProgress">当前篇进度 · 拖动跳转</label><span id="speechProgressText">0%</span>
           </div>
-          <progress id="speechProgress" max="100" value="0" aria-label="当前英文答案朗读进度">0%</progress>
+          <input type="range" id="speechProgress" min="0" max="100" step="1" value="0" aria-label="当前英文答案朗读文本位置，可拖动跳转">
           <div class="speech-status" id="speechStatus" role="status" aria-live="polite">英文朗读准备就绪</div>
         </section>
         <div class="zh-translation" id="zhTranslation" lang="zh-CN" aria-label="中文翻译"></div>
@@ -181,6 +180,6 @@
 <script src="translations-zh.js"></script>
 <script src="app.js?v=pager-v9"></script>
 <script src="sidebar-controls.js"></script>
-<script src="speech-player.js?v=speech-v13"></script>
+<script src="speech-player.js?v=speech-v14"></script>
 </body>
 </html>
