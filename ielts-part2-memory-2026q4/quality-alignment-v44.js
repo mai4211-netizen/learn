@@ -7,9 +7,9 @@
   const q56 = byQ.get("Q56");
   if (q56?.reviewed?.[0]) {
     q56.reviewed[0].text = q56.reviewed[0].text.replace(
-      /Marie-Philip Poulin/g,
+      /Marie-Philip Poulin, the captain of Canada's women's ice hockey team/g,
       "the captain of Canada's women's ice hockey team"
-    );
+    ).replace(/Marie-Philip Poulin/g, "the team captain");
   }
   if (q56?.reviewed?.[3]) {
     q56.reviewed[3].text =
