@@ -10,7 +10,7 @@ for(const name of scripts){
   vm.runInContext(fs.readFileSync(path.join(folder,name),'utf8'),ctx,{filename:name,timeout:10000});
 }
 // Include the final content-only patch that the live page loads after app.js.
-const lateContentPatches=['quality-alignment-v44.js'];
+const lateContentPatches=['quality-alignment-v44.js','final-answers-v2.js'];
 for(const name of lateContentPatches){
   vm.runInContext(fs.readFileSync(path.join(folder,name),'utf8'),ctx,{filename:name,timeout:10000});
 }
