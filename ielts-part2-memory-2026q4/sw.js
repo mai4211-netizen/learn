@@ -1,5 +1,5 @@
 /* Offline shell and MP3 caching for the IELTS Part 2 Jenny player. */
-const CACHE_NAME = "ielts-part2-q4-offline-v41";
+const CACHE_NAME = "ielts-part2-q4-offline-v42";
 const AUDIO_CACHE = "ielts-part2-q4-mp3-v2";
 const LEGACY_AUDIO_CACHE = "ielts-part2-q4-mp3-v1";
 const APP_SHELL = [
@@ -19,7 +19,7 @@ const APP_SHELL = [
   "./reviewed-user-feedback-nov.js?v=island-v18", "./cue-card-verified.js?v=cues-v22", "./category-flex.js?v=topic-fit-v20", "./translations-zh.js?v=island-v18",
   "./approved-topic-edits-nov.js?v=approved-v23",
   "./consistent-templates-nov.js?v=templates-v26",
-  "./reuse-pass-nov.js?v=reuse-v36", "./topic-fit-review-nov.js?v=fit-v36", "./content-length-review-nov.js?v=length-v38", "./quality-review-nov.js?v=qa-v40", "./final-content-polish.js?v=41", "./audio/audio-manifest.js?v=follow-v36", "./app.js?v=41", "./recall-ui-v41.js?v=41",
+  "./reuse-pass-nov.js?v=reuse-v36", "./topic-fit-review-nov.js?v=fit-v36", "./content-length-review-nov.js?v=length-v38", "./quality-review-nov.js?v=qa-v40", "./final-content-polish.js?v=42", "./audio/audio-manifest.js?v=follow-v36", "./app.js?v=42", "./recall-ui-v41.js?v=41",
   "./sidebar-controls.js?v=shared-v30", "./speech-player.js?v=41"
 ];
 

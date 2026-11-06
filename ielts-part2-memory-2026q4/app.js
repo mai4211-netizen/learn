@@ -5,6 +5,12 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const BOLD_KEY='p2-2026q4-bold-ranges';
 let selectedGroup=storage.get('p2-2026q4-group')||GROUPS[0]?.id;
 let selectedQ=storage.get('p2-2026q4-q')||GROUPS[0]?.topics?.[0]?.q;
+// If a topic has moved between story groups, preserve the saved topic instead
+// of silently falling back to the former group's first Cue Card.
+if(!GROUPS.find(g=>g.id===selectedGroup)?.topics.some(t=>t.q===selectedQ)){
+  const actualGroup=GROUPS.find(g=>g.topics.some(t=>t.q===selectedQ));
+  if(actualGroup)selectedGroup=actualGroup.id;
+}
 const linkedQuestion=new URLSearchParams(window.location.search).get('q');
 if(linkedQuestion){
   const matched=GROUPS.find(g=>g.topics.some(t=>t.q===linkedQuestion));

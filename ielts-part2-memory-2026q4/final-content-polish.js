@@ -132,5 +132,86 @@
  for(const q of items.keys())if(!window.P2_2026Q4_ZH_PARAGRAPHS[q])window.P2_2026Q4_ZH_PARAGRAPHS[q]=summaryParagraphs(q);
  // Remove any obsolete optional extension from topic data so all consumers agree.
  for(const item of items.values())item.flex={};
- window.P2_2026Q4_EDITORIAL_VERSION='2026-11-06-v41';
+
+ // 2026-11-06 targeted corrections: story ownership, overlap and memorable identity.
+ const allGroups=window.P2_2026Q4_GROUPS||[];
+ const keep=(q,lines)=>{
+   const item=items.get(q);
+   if(!item||item.reviewed?.length!==lines.length)throw Error("Paragraph structure changed for "+q);
+   item.reviewed=item.reviewed.map((part,i)=>({...part,text:lines[i]}));
+ };
+ const lakeRide="One weekend morning, my friend and I rented bikes near the entrance and rode along the paths beside the lake. We could stop whenever we wanted to take photos and enjoy the view.";
+ const lakeView="There are green hills, tall trees and quiet paths around the water. We could hear birds and feel the cool air under the trees. The lake is my favourite part because the water reflects the trees when the weather is calm.";
+ const lakeFeeling="I enjoy this place because I can exercise and enjoy nature without leaving the city. It feels much more relaxing than a busy shopping centre.";
+ keep("Q16",[
+   "I'd like to talk about a large forest park with a lake in Guangzhou. It is one of my favourite natural places in the city.",
+   lakeRide,
+   lakeView,
+   "I usually go there with a close friend on free weekend mornings, when it is not too hot. She likes taking photos of the lake and little paths. We normally spend an hour or two there, so it doesn't need a whole day.",
+   lakeFeeling+" There are also places to sit, so we can enjoy the view when we're tired."
+ ]);
+ keep("Q47",[
+   "I'd like to recommend a large forest park with a lake on the outskirts of Guangzhou. I went there with a friend for a weekend day trip.",
+   lakeRide,
+   lakeView,
+   "There are also places to sit, so people who don't want to cycle can enjoy the view. It's peaceful and different from the busy shopping areas in Guangzhou.",
+   lakeFeeling,
+   "I would recommend going in the morning when the weather is cooler. Friends and families can take photos, walk around and see a quieter side of Guangzhou."
+ ]);
+ keep("Q56",[
+   "I'd like to talk about the captain of Canada's women's ice hockey team. I first noticed her at a match in Vancouver.",
+   "It was Canada against the United States, and it was my first time watching women's ice hockey live. The puck moved so fast that I could hardly follow the game. My friend explained a few basic rules to me during the match.",
+   "She was very active and kept giving directions to her teammates. Even as the US scored more goals, she stayed focused and tried to organise attacks.",
+   "Later, I learned that she has won three Olympic gold medals. Outside matches, she supports programmes that help children try sport. I admire that she cares about young players as well as her own career. In interviews, she seems calm and often talks about the team rather than only herself. I think she is a good example of a team leader.",
+   "I admire her because she stays calm under pressure and encourages her teammates, even when they are losing. I'd like to be that positive when things get difficult."
+ ]);
+ const parkGroup=allGroups.find(g=>g.topics.some(t=>t.q==="Q16"));
+ const concertGroup=allGroups.find(g=>g.topics.some(t=>t.q==="Q30"));
+ if(!parkGroup||!concertGroup||parkGroup===concertGroup)throw Error("Expected separate forest and concert groups");
+ const originalGroup=allGroups.find(g=>g.topics.some(t=>t.q==="Q46"));
+ if(originalGroup!==concertGroup){
+   const moved=originalGroup?.topics.find(t=>t.q==="Q46");
+   if(!moved)throw Error("Missing Q46 to move");
+   originalGroup.topics=originalGroup.topics.filter(t=>t.q!=="Q46");
+   const before=concertGroup.topics.findIndex(t=>t.q==="Q48");
+   concertGroup.topics.splice(before<0?concertGroup.topics.length:before,0,moved);
+ }
+ parkGroup.title="广州湖边森林公园：骑行、摄影、推荐";
+ parkGroup.memory="Q02 午后骑行炎热；Q16/Q47 清晨租车沿湖骑行，拍照看湖面倒影、听鸟叫；Q19 Claire 喜欢拍照。";
+ if(!/改变想法/.test(concertGroup.title))concertGroup.title+=" / 改变想法";
+ items.get("Q16").chain="广州湖边森林公园 → 清晨与朋友租自行车 → 湖边骑行、拍照 → 青山、高树、鸟叫、湖面倒影 → 凉爽放松 → 因为喜欢自然和运动所以常去";
+ items.get("Q47").chain="广州郊外森林公园 → 周末与朋友骑车 → 湖边小路、树影倒影、拍照、鸟叫 → 可以骑车或散步 → 推荐清晨去，放松又适合朋友和家人";
+ items.get("Q56").chain="温哥华看加拿大对美国女子冰球 → 注意到加拿大女队队长 → 快节奏、指挥队友 → 获得奥运金牌 → 帮助孩子参与运动 → 冷静、团队精神";
+ items.get("Q56").keywords=["captain of Canada's women's ice hockey team","Vancouver","puck","teammates","Olympic gold medals","children","calm under pressure"];
+ const updates={
+  Q16:[
+   "我想介绍广州的一座大型森林公园，里面有一个湖。它是我在这座城市里最喜欢的自然地点之一。",
+   "一个周末早上，我和朋友在入口附近租自行车，沿湖边小路骑行。我们想停下拍照、欣赏风景时就可以停。",
+   "周围有绿色山坡、高树和安静的小路。我们能听见鸟叫，在树荫下感到凉爽。我最喜欢湖面，因为天气平静时水里会映出树影。",
+   "我通常在不太热的周末早上和好友一起去。她喜欢拍湖面和小路。我们一般待一两个小时，不需要安排一整天。",
+   "我喜欢这里，因为不用离开广州就能一边运动、一边亲近自然。比起热闹的商场，这里更让人放松。累的时候也有地方坐下来看看风景。"
+  ],
+  Q47:[
+   "我想推荐广州郊外一座有湖的大型森林公园。我和朋友曾在周末专门去那里玩一天。",
+   "一个周末早上，我和朋友在入口附近租自行车，沿湖边小路骑行。我们想停下拍照、欣赏风景时就可以停。",
+   "周围有绿色山坡、高树和安静的小路。我们能听见鸟叫，在树荫下感到凉爽。我最喜欢湖面，因为天气平静时水里会映出树影。",
+   "附近也有可以坐下休息的地方，不想骑车的人同样可以看风景。这里安静，和平时广州繁忙的商业区很不一样。",
+   "我喜欢这里，因为不用离开广州就能一边运动、一边亲近自然。比起热闹的商场，这里更让人放松。",
+   "我建议早上天气凉爽时去。朋友和家人可以拍照、散步，看看广州安静自然的一面。"
+  ],
+  Q56:[
+   "我想介绍一位我钦佩的运动员：加拿大女子冰球队的队长。我第一次在温哥华看比赛时注意到她。",
+   "那是加拿大对美国的比赛，也是我第一次现场看女子冰球。冰球移动太快了，我几乎跟不上比赛。朋友在现场给我解释了几条简单规则。",
+   "她非常活跃，一直给队友指示。即使美国队进了更多球，她也保持专注，努力组织进攻。",
+   "后来我了解到，她获得过三枚奥运金牌。比赛之外，她支持帮助儿童接触体育的项目。我欣赏她不仅关心自己的职业发展，也关心年轻运动员。采访中她看起来很冷静，经常谈队伍，而不是只说自己。我觉得她是很好的队长。",
+   "我钦佩她，因为即使落后，她也能在压力下保持冷静，鼓励队友。我也希望自己遇到困难时能保持这种积极态度。"
+  ]
+ };
+ for(const [q,parts] of Object.entries(updates)){
+   if(parts.length!==items.get(q).reviewed.length)throw Error("Translation count mismatch "+q);
+   zh[q]=parts.join("\n");
+   window.P2_2026Q4_ZH_PARAGRAPHS[q]=parts;
+ }
+ // Keep one source of truth; the overview already puts Q46 in the concert story.
+ window.P2_2026Q4_EDITORIAL_VERSION='2026-11-06-v42';
 })();
