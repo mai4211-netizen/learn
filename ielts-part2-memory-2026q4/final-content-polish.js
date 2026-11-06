@@ -43,6 +43,14 @@
  swap("Q52","I like this tall building because the offices above the shops make it stand out, and the art exhibitions inside make it more interesting than a normal mall.","The offices above the shops make the building easy to recognise. I also like its art exhibitions. They make it more interesting than an ordinary mall.");
  swap("Q02","I'd like to talk about a short trip I often make to a large forest park with a lake in Guangzhou, although I don't really enjoy it.","I'd like to talk about a short trip to a forest park in Guangzhou. It has a large lake, but I don't always enjoy visiting it.");
  swap("Q03","I don't mind busy places when there is something special to see, but that day the crowds made the whole visit feel more stressful than enjoyable.","I don't mind a busy place if there is something special to see. But that day, the crowds made everything stressful.");
+ const q03Sentence="I remember thinking that a short visit had taken much more time than I planned.";
+ const q03Replacement="A short visit took much longer than I expected.";
+ const q03=items.get("Q03");
+ let q03Changed=false;
+ for(const part of (q03?.reviewed||[])){
+   if(part.text.includes(q03Sentence)){part.text=part.text.replace(q03Sentence,q03Replacement);q03Changed=true;}
+ }
+ if(!q03Changed)throw Error("Q03 complex sentence was not found");
  swap("Q40","I think the video was worth watching because it showed me that traditional pottery can be colourful and modern.","I liked the video because it changed my opinion of pottery. I used to think it was old-fashioned, but now I find it creative.");
 
  // A stable Band-6 answer should be easy to say without holding a long
@@ -130,6 +138,15 @@
    return result;
  }
  for(const q of items.keys())if(!window.P2_2026Q4_ZH_PARAGRAPHS[q])window.P2_2026Q4_ZH_PARAGRAPHS[q]=summaryParagraphs(q);
+ const q03Zh=[
+  "我想介绍广州中心的 K11，一家位于市中心的购物中心。",
+  "一个周末下午，我和朋友去了那里。扶梯和餐饮区附近非常拥挤。我们只能慢慢走，也很难找到座位。",
+  "我们一层层逛，但很多店都是以前见过的连锁店。有些区域也在装修，所以能看的东西比预期少。",
+  "我们待了将近两个小时，却几乎什么都没买。最后只买了咖啡就离开了。短短一次逛街却花了比预期更多的时间。连咖啡区都坐满了，我们点单前还要等。人声也让聊天变得困难。我不介意热闹的地方，但那天拥挤让整个体验充满压力。",
+  "对我来说，K11 在周末下午太拥挤了，所以我更喜欢工作日早上去。"
+ ];
+ zh.Q03=q03Zh.join("\n");
+ window.P2_2026Q4_ZH_PARAGRAPHS.Q03=q03Zh;
  // Remove any obsolete optional extension from topic data so all consumers agree.
  for(const item of items.values())item.flex={};
 
@@ -160,10 +177,10 @@
  ]);
  keep("Q56",[
    "I'd like to talk about the captain of Canada's women's ice hockey team. I first noticed her at a match in Vancouver.",
-   "It was Canada against the United States, and it was my first time watching women's ice hockey live. The puck moved so fast that I could hardly follow the game. My friend explained a few basic rules to me during the match.",
-   "She was very active and kept giving directions to her teammates. Even as the US scored more goals, she stayed focused and tried to organise attacks.",
-   "Later, I learned that she has won three Olympic gold medals. Outside matches, she supports programmes that help children try sport. I admire that she cares about young players as well as her own career. In interviews, she seems calm and often talks about the team rather than only herself. I think she is a good example of a team leader.",
-   "I admire her because she stays calm under pressure and encourages her teammates, even when they are losing. I'd like to be that positive when things get difficult."
+   "It was Canada against the United States, and it was my first time watching women's ice hockey live. The puck moved so fast that I could hardly follow the game. My friend explained a few basic rules to me.",
+   "At first, I watched the puck and tried to understand which team was attacking. Then I noticed one Canadian player who was very active. She kept giving directions to her teammates and tried to organise attacks. Even when the US scored more goals, she stayed focused and encouraged the team.",
+   "Canada eventually lost, but the captain still impressed me. I later learned that she had led the national team for years. I don't know much about her life outside hockey. She did not stop supporting her teammates just because the score was against them.",
+   "I admire her because she stayed calm under pressure and kept the team working together. For me, that is an important quality in a captain."
  ]);
  const parkGroup=allGroups.find(g=>g.topics.some(t=>t.q==="Q16"));
  const concertGroup=allGroups.find(g=>g.topics.some(t=>t.q==="Q30"));
@@ -181,8 +198,8 @@
  if(!/改变想法/.test(concertGroup.title))concertGroup.title+=" / 改变想法";
  items.get("Q16").chain="广州湖边森林公园 → 清晨与朋友租自行车 → 湖边骑行、拍照 → 青山、高树、鸟叫、湖面倒影 → 凉爽放松 → 因为喜欢自然和运动所以常去";
  items.get("Q47").chain="广州郊外森林公园 → 周末与朋友骑车 → 湖边小路、树影倒影、拍照、鸟叫 → 可以骑车或散步 → 推荐清晨去，放松又适合朋友和家人";
- items.get("Q56").chain="温哥华看加拿大对美国女子冰球 → 注意到加拿大女队队长 → 快节奏、指挥队友 → 获得奥运金牌 → 帮助孩子参与运动 → 冷静、团队精神";
- items.get("Q56").keywords=["captain of Canada's women's ice hockey team","Vancouver","puck","teammates","Olympic gold medals","children","calm under pressure"];
+ items.get("Q56").chain="温哥华看加拿大对美国女子冰球 → 第一次现场看比赛、冰球速度很快 → 注意到加拿大队长积极指挥队友 → 加拿大队最终落败 → 了解到她担任队长多年 → 欣赏她在压力下仍支持团队";
+ items.get("Q56").keywords=["captain of Canada's women's ice hockey team","match in Vancouver","Canada against the United States","first time watching women's ice hockey live","puck moved so fast","giving directions to her teammates","organise attacks","stayed focused","encouraged the team","Canada eventually lost","led the national team for years","life outside hockey","calm under pressure","team working together"];
  const updates={
   Q16:[
    "我想介绍广州的一座大型森林公园，里面有一个湖。它是我在这座城市里最喜欢的自然地点之一。",
@@ -200,11 +217,11 @@
    "我建议早上天气凉爽时去。朋友和家人可以拍照、散步，看看广州安静自然的一面。"
   ],
   Q56:[
-   "我想介绍一位我钦佩的运动员：加拿大女子冰球队的队长。我第一次在温哥华看比赛时注意到她。",
-   "那是加拿大对美国的比赛，也是我第一次现场看女子冰球。冰球移动太快了，我几乎跟不上比赛。朋友在现场给我解释了几条简单规则。",
-   "她非常活跃，一直给队友指示。即使美国队进了更多球，她也保持专注，努力组织进攻。",
-   "后来我了解到，她获得过三枚奥运金牌。比赛之外，她支持帮助儿童接触体育的项目。我欣赏她不仅关心自己的职业发展，也关心年轻运动员。采访中她看起来很冷静，经常谈队伍，而不是只说自己。我觉得她是很好的队长。",
-   "我钦佩她，因为即使落后，她也能在压力下保持冷静，鼓励队友。我也希望自己遇到困难时能保持这种积极态度。"
+   "我想介绍加拿大女子冰球队的队长。我第一次注意到她，是在温哥华看一场比赛时。",
+   "那场比赛是加拿大对美国，也是我第一次现场看女子冰球。冰球移动得太快，我几乎跟不上比赛。朋友给我解释了几条基本规则。",
+   "一开始，我主要看着冰球，努力弄清楚哪队在进攻。后来我注意到一位加拿大球员，她非常活跃。她不断给队友指示，努力组织进攻。即使美国队进了更多球，她仍然保持专注，并鼓励队友。",
+   "加拿大队最后输了，但这位队长仍然给我留下了深刻印象。后来我了解到，她已经担任国家队队长多年。我不太了解她在冰球以外的生活。即使比分落后，她也没有停止支持队友。",
+   "我钦佩她，因为她在压力下仍能保持冷静，让队伍继续合作。对我来说，这是队长很重要的品质。"
   ]
  };
  for(const [q,parts] of Object.entries(updates)){
@@ -213,5 +230,5 @@
    window.P2_2026Q4_ZH_PARAGRAPHS[q]=parts;
  }
  // Keep one source of truth; the overview already puts Q46 in the concert story.
- window.P2_2026Q4_EDITORIAL_VERSION='2026-11-06-v42';
+ window.P2_2026Q4_EDITORIAL_VERSION='2026-11-06-v43';
 })();
