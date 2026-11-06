@@ -179,7 +179,7 @@
    "I'd like to talk about the captain of Canada's women's ice hockey team. I first noticed her at a match in Vancouver.",
    "It was Canada against the United States, and it was my first time watching women's ice hockey live. The puck moved so fast that I could hardly follow the game. My friend explained a few basic rules to me.",
    "At first, I watched the puck and tried to understand which team was attacking. Then I noticed one Canadian player who was very active. She kept giving directions to her teammates and tried to organise attacks. Even when the US scored more goals, she stayed focused and encouraged the team.",
-   "Canada eventually lost, but the captain still impressed me. I later learned that she had led the national team for years. I don't know much about her life outside hockey. She did not stop supporting her teammates just because the score was against them.",
+   "Canada eventually lost, but the captain still impressed me. I later learned that she had been the team captain for years. I don't know much about her life outside hockey. She did not give up when the game became difficult. That made me respect her even more.",
    "I admire her because she stayed calm under pressure and kept the team working together. For me, that is an important quality in a captain."
  ]);
  const parkGroup=allGroups.find(g=>g.topics.some(t=>t.q==="Q16"));
@@ -199,7 +199,7 @@
  items.get("Q16").chain="广州湖边森林公园 → 清晨与朋友租自行车 → 湖边骑行、拍照 → 青山、高树、鸟叫、湖面倒影 → 凉爽放松 → 因为喜欢自然和运动所以常去";
  items.get("Q47").chain="广州郊外森林公园 → 周末与朋友骑车 → 湖边小路、树影倒影、拍照、鸟叫 → 可以骑车或散步 → 推荐清晨去，放松又适合朋友和家人";
  items.get("Q56").chain="温哥华看加拿大对美国女子冰球 → 第一次现场看比赛、冰球速度很快 → 注意到加拿大队长积极指挥队友 → 加拿大队最终落败 → 了解到她担任队长多年 → 欣赏她在压力下仍支持团队";
- items.get("Q56").keywords=["captain of Canada's women's ice hockey team","match in Vancouver","Canada against the United States","first time watching women's ice hockey live","puck moved so fast","giving directions to her teammates","organise attacks","stayed focused","encouraged the team","Canada eventually lost","led the national team for years","life outside hockey","calm under pressure","team working together"];
+ items.get("Q56").keywords=["captain of Canada's women's ice hockey team","match in Vancouver","Canada against the United States","first time watching women's ice hockey live","puck moved so fast","giving directions to her teammates","organise attacks","stayed focused","encouraged the team","Canada eventually lost","had been the team captain for years","life outside hockey","did not give up when the game became difficult","respect her even more","calm under pressure","team working together"];
  const updates={
   Q16:[
    "我想介绍广州的一座大型森林公园，里面有一个湖。它是我在这座城市里最喜欢的自然地点之一。",
@@ -220,7 +220,7 @@
    "我想介绍加拿大女子冰球队的队长。我第一次注意到她，是在温哥华看一场比赛时。",
    "那场比赛是加拿大对美国，也是我第一次现场看女子冰球。冰球移动得太快，我几乎跟不上比赛。朋友给我解释了几条基本规则。",
    "一开始，我主要看着冰球，努力弄清楚哪队在进攻。后来我注意到一位加拿大球员，她非常活跃。她不断给队友指示，努力组织进攻。即使美国队进了更多球，她仍然保持专注，并鼓励队友。",
-   "加拿大队最后输了，但这位队长仍然给我留下了深刻印象。后来我了解到，她已经担任国家队队长多年。我不太了解她在冰球以外的生活。即使比分落后，她也没有停止支持队友。",
+   "加拿大队最后输了，但这位队长仍然给我留下了深刻印象。后来我了解到，她已经担任国家队队长多年。我不太了解她在冰球以外的生活。即使比赛变得艰难，她也没有放弃。这让我更加敬佩她。",
    "我钦佩她，因为她在压力下仍能保持冷静，让队伍继续合作。对我来说，这是队长很重要的品质。"
   ]
  };
