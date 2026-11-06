@@ -327,12 +327,14 @@
     if (!window.crypto?.subtle || !window.TextEncoder) {
       verificationNote='当前环境不能安全校验录音版本，请使用 HTTPS 网页重新打开';
       status.textContent=verificationNote;
+      root.classList.add('speech-error');
       ui();
       return;
     }
     if (Object.keys(versions).length !== 58) {
       verificationNote='录音索引尚未同步，联网刷新后再试';
       status.textContent=verificationNote;
+      root.classList.add('speech-error');
       ui();
       return;
     }
@@ -363,6 +365,7 @@
     isReady=false;
     verificationNote='核对录音版本失败，请联网刷新页面';
     status.textContent=verificationNote;
+    root.classList.add('speech-error');
     ui();
   });
 })();
