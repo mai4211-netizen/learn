@@ -18,7 +18,7 @@ for (const script of scripts) {
 }
 // The live page applies this final data patch after app.js. Run it here too,
 // with a minimal document stub, so MP3 hashes match the text actually spoken.
-const lateContentPatches = ['quality-alignment-v44.js'];
+const lateContentPatches = ['quality-alignment-v44.js', 'final-answers-v2.js'];
 for (const script of lateContentPatches) {
   vm.runInContext(fs.readFileSync(path.join(folder, script), 'utf8'), ctx, { filename: script, timeout: 10000 });
 }
