@@ -15,9 +15,20 @@ h1{font-size:29px;line-height:1.3;margin:0 0 10px;letter-spacing:-.02em}h2{font-
 section{margin:0 0 33px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.section-head p{margin:0;color:var(--muted);font-size:12px}
 .panel{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:20px 21px;box-shadow:0 5px 18px #202c2110}
 .table-wrap{overflow-x:auto}.phrases{width:100%;border-collapse:collapse;text-align:left;min-width:630px}.phrases th{background:#f5f5f1;color:#6f746f;font-size:12px;font-weight:600;padding:10px 11px}.phrases td{padding:11px;border-bottom:1px solid var(--line);vertical-align:top;font-size:12.5px}.phrases tr:last-child td{border-bottom:0}.phrases .sentence{font-weight:680;color:#234e3b;white-space:nowrap}.phrases .example{color:#56645c}
+.framework-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.framework{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.framework-head{padding:13px 15px 10px;background:#f6f8f5;border-bottom:1px solid var(--line)}
+.framework-head h3{margin:0 0 3px;color:#234e3b}
+.framework-head p{margin:0;color:var(--muted);font-size:11.5px}
+.framework-list{padding:10px 15px 13px;display:grid;gap:8px}
+.framework-step{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:start;font-size:12.5px}
+.framework-step b{color:#738078;font-size:11px;font-weight:650}
+.framework-step span{color:#234e3b;font-weight:650}
+.framework-step small{display:block;color:#707970;font-size:11px;font-weight:400;margin-top:2px}
+.framework-note{margin:13px 2px 0;color:var(--muted);font-size:12px}
 .filter{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 18px}.filter button{border:1px solid var(--line);border-radius:30px;background:#fff;color:#5a665d;padding:8px 12px;cursor:pointer;font:inherit;font-size:12px}.filter button[aria-pressed="true"]{background:#2a5140;color:white;border-color:#2a5140}.searchrow{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin:0 0 16px}.searchrow input{width:min(340px,100%);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:13px}.count{font-size:12px;color:var(--muted)}
 .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.story{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}.story-head{padding:15px 17px 12px}.story-head h3{font-size:15px;margin:3px 0 6px}.category{font-size:11px;color:#64806b}.desc{font-size:12.5px;color:#566159;margin:0}.story summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 17px;border-top:1px solid #edf0ea;color:#38624c;font-weight:650;font-size:12px}.story summary::-webkit-details-marker{display:none}.story summary:after{content:"⌄";font-size:19px;line-height:1}.story[open] summary:after{transform:rotate(180deg)}.topic-list{padding:0 15px 15px;display:grid;gap:6px}.topic{display:grid;grid-template-columns:minmax(0,1fr);align-items:start;gap:2px;background:#f8faf8;border-radius:9px;padding:9px 11px}.topic a{display:inline-flex;gap:7px;align-items:baseline;font-size:12.5px;font-weight:650}.topic b{font-size:11px;color:#327258}.topic p{margin:0 0 0 32px;color:#66726a;font-size:12px}.footnote{margin-top:22px;border-top:1px solid var(--line);padding-top:17px;color:#70776e;font-size:12px}.footnote strong{color:#56655b}
-@media(max-width:740px){.shell{padding:18px 14px 55px}.cards{grid-template-columns:1fr}.panel{padding:14px 10px}.nav{margin-bottom:22px}h1{font-size:24px}.phrases td{padding:9px}.story-head{padding:13px 14px}.searchrow input{width:100%}}
+@media(max-width:740px){.shell{padding:18px 14px 55px}.cards{grid-template-columns:1fr}.framework-grid{grid-template-columns:1fr}.framework-step{grid-template-columns:66px minmax(0,1fr)}.panel{padding:14px 10px}.nav{margin-bottom:22px}h1{font-size:24px}.phrases td{padding:9px}.story-head{padding:13px 14px}.searchrow input{width:100%}}
 @media print{body{background:white}.shell{max-width:none;padding:0}.nav,.filter,.searchrow{display:none!important}.cards{grid-template-columns:1fr 1fr}.story{break-inside:avoid}.story details{display:block}.story .topic-list{display:block}.panel{box-shadow:none}}
 </style>
 <link rel="stylesheet" href="site-tabs.css?v=modules-v33">
@@ -31,18 +42,69 @@ section{margin:0 0 33px}.section-head{display:flex;align-items:end;justify-conte
 <a href="./overview.html" class="active" aria-current="page">概述</a>
 </nav>
 <div class="overview-nav-group">全局概述</div>
-<a class="overview-quicklink" href="#phrases">通用句型</a>
+<a class="overview-quicklink" href="#templates">四类答题框架</a>
+<a class="overview-quicklink" href="#phrases">通用衔接句</a>
 <a class="overview-quicklink" href="#stories">故事与 58 题对照</a>
 </aside><main class="overview-main"><div class="shell">
 
-<header><h1>全局概述</h1><p class="lead">把要重复使用的句子放在一起，把 58 道题按故事内容归类。不同题可以复用人物和句型；只要求每一道题内部贴题、连贯、容易说。这里不标注模板类型，也不提供背诵清单。</p><div class="meta"><span>58 道题</span><span>15 张故事卡</span><span>通用句型 · 12 句</span></div></header>
-<section id="phrases"><div class="section-head"><div><h2>通用句型</h2><p>直接复用的短句开头，按表达作用整理；不要求每篇硬塞全部句型。</p></div></div><div class="panel table-wrap"><table class="phrases"><thead><tr><th>用途</th><th>通用句子</th><th>适合放在哪</th><th>例子</th></tr></thead><tbody id="phrasesRows"></tbody></table></div></section>
+<header><h1>全局概述</h1><p class="lead">58 题按四类答题框架组织，故事卡负责复用事实，题目决定要强调的角度。先切题，再复用；不为提高复用率而强行改写故事。</p><div class="meta"><span>58 道题</span><span>4 套答题框架</span><span>12 张故事卡</span><span>4 个一次性故事</span><span>9 个通用衔接句</span></div></header>
+<section id="templates">
+<div class="section-head"><div><h2>四类答题框架</h2><p>先判断题目类型，再调用对应结构。六步是组织思路，不是每篇都要逐字套满。</p></div></div>
+<div class="framework-grid">
+  <article class="framework">
+    <div class="framework-head"><h3>A · 人物题（18 题）</h3><p>是谁 → 特点 → 具体例子 → 习惯 → 我的看法</p></div>
+    <div class="framework-list">
+      <div class="framework-step"><b>1 开头</b><div><span>The person I'd like to talk about is ___. We met ___.</span><small>名字、怎么认识</small></div></div>
+      <div class="framework-step"><b>2 是谁</b><div><span>She is ___ and ___. She ___.</span><small>两个特点、工作或身份</small></div></div>
+      <div class="framework-step"><b>3 例子</b><div><span>For example, ___. What I remember most is ___.</span><small>一件具体的事</small></div></div>
+      <div class="framework-step"><b>4 习惯</b><div><span>She usually ___. / One thing she does is ___.</span><small>日常做法</small></div></div>
+      <div class="framework-step"><b>5 看法</b><div><span>I like her because ___.</span><small>一个直接原因</small></div></div>
+      <div class="framework-step"><b>6 结尾</b><div><span>So I think she is ___ because ___.</span><small>回扣题目问的特点</small></div></div>
+    </div>
+  </article>
+  <article class="framework">
+    <div class="framework-head"><h3>B · 事件题（20 题）</h3><p>事件背景 → 起因 → 经过 → 难点或高潮 → 结果 → 感受</p></div>
+    <div class="framework-list">
+      <div class="framework-step"><b>1 开头</b><div><span>I'd like to talk about ___. It happened ___. I went with ___.</span><small>事件、时间地点、同行人</small></div></div>
+      <div class="framework-step"><b>2 起因</b><div><span>It started when ___. / I wanted to ___ because ___.</span><small>为什么发生或为什么参与</small></div></div>
+      <div class="framework-step"><b>3 经过</b><div><span>First, ___. Then ___. After that, ___.</span><small>按顺序说动作</small></div></div>
+      <div class="framework-step"><b>4 难点 / 高潮</b><div><span>The problem was ___. / What I remember most is ___.</span><small>一个关键节点即可</small></div></div>
+      <div class="framework-step"><b>5 结果</b><div><span>In the end, ___.</span><small>事情如何结束</small></div></div>
+      <div class="framework-step"><b>6 感受</b><div><span>I felt ___ because ___. / It taught me ___.</span><small>感受及直接原因</small></div></div>
+    </div>
+  </article>
+  <article class="framework">
+    <div class="framework-head"><h3>C · 地点题（7 题）</h3><p>地点与位置 → 环境特点 → 看到什么 → 做什么 → 喜欢的原因</p></div>
+    <div class="framework-list">
+      <div class="framework-step"><b>1 开头</b><div><span>I'd like to talk about ___, in ___.</span><small>地点、城市</small></div></div>
+      <div class="framework-step"><b>2 是什么</b><div><span>It is a ___ with ___.</span><small>类型和主要特点</small></div></div>
+      <div class="framework-step"><b>3 环境</b><div><span>There are ___. It feels ___.</span><small>看到什么、整体感受</small></div></div>
+      <div class="framework-step"><b>4 活动</b><div><span>I usually go with ___ and we ___.</span><small>同行人和活动</small></div></div>
+      <div class="framework-step"><b>5 原因</b><div><span>I like / don't like it because ___.</span><small>一个最重要的原因</small></div></div>
+      <div class="framework-step"><b>6 结尾</b><div><span>For me, ___ is ___ because ___.</span><small>一句话总结</small></div></div>
+    </div>
+  </article>
+  <article class="framework">
+    <div class="framework-head"><h3>D · 物与想法题（13 题）</h3><p>介绍对象 → 来源或原因 → 特点与例子 → 好处或问题 → 评价</p></div>
+    <div class="framework-list">
+      <div class="framework-step"><b>1 开头</b><div><span>I'd like to talk about ___. / One ___ I know is ___.</span><small>物品、作品、想法或制度</small></div></div>
+      <div class="framework-step"><b>2 是什么</b><div><span>It is ___. It is about ___.</span><small>用简单句说明</small></div></div>
+      <div class="framework-step"><b>3 来源 / 原因</b><div><span>I first heard about it ___. / I chose it because ___.</span><small>怎么知道、为什么选择</small></div></div>
+      <div class="framework-step"><b>4 特点</b><div><span>What I like is ___. For example, ___.</span><small>特点加一个具体例子</small></div></div>
+      <div class="framework-step"><b>5 好处 / 问题</b><div><span>It helps ___. / The problem is ___.</span><small>按题目选择一个角度</small></div></div>
+      <div class="framework-step"><b>6 结尾</b><div><span>I think ___ because ___.</span><small>回扣题目</small></div></div>
+    </div>
+  </article>
+</div>
+<p class="framework-note">同一故事组可以共用事实和衔接方式，但每道题只保留与题目有关的部分。先保证切题、自然和好说，再考虑复用。</p>
+</section>
+<section id="phrases"><div class="section-head"><div><h2>通用衔接句</h2><p>补充原因、例子、背景、感受、结果和转折；按需要使用，不为凑数而硬加。</p></div></div><div class="panel table-wrap"><table class="phrases"><thead><tr><th>用途</th><th>通用句子</th><th>适合放在哪</th><th>例子</th></tr></thead><tbody id="phrasesRows"></tbody></table></div></section>
 <section id="stories"><div class="section-head"><div><h2>故事与题目对照</h2><p>先看故事事实，再看每道题要突出什么；按故事分类，不按题号堆在一起。</p></div></div><div class="filter" id="filters" aria-label="故事分类筛选"></div><div class="searchrow"><input id="search" type="search" placeholder="搜索题号、故事、关键词" aria-label="搜索故事与题目"><span id="count" class="count" role="status"></span></div><div class="cards" id="cards"></div><p class="footnote"><strong>仍待提供真实细节：</strong>Q11 想做艺术平台的确切时长、Q31 观看电影的时间与地点。Q53 目前实际熟悉的是《疯狂动物城》电影；网站使用插画故事书改编的练习设定，不能当成已读原著的事实。</p></section>
 </div></main></div>
 <script>
 const STORIES=[{"category":"人物与关系","title":"Claire｜十多年好友","qs":["Q11","Q28","Q33","Q35","Q36","Q39","Q43","Q50","Q51","Q54"],"core":"学校认识十多年；喜欢画画、旅行、种番茄；性格随和。用电脑列简短待办，英语看《老友记》并聊天，日语用 App。经营线上艺术平台，支持预览画挂在墙上的效果。已工作，忙时把运动改到下午。","focus":["我的线上艺术平台目标：她提供灵感","受欢迎：善于规划旅行，也听别人建议","有条理：简单清单和日常小目标","喜欢拜访但不想住：有植物、有画，但空间小","擅长语言：英语聊天与日语 App","种菜：阳台番茄和日常照料","快乐的人：第一批番茄长出来就发照片","成功创业者：在线艺术平台与预览功能","儿时好友：学校相识、画画和聊天","健康作息：晨练，工作忙时改下午"]},{"category":"人物与关系","title":"陶艺朋友｜现代陶艺","qs":["Q04","Q06","Q10","Q18","Q32","Q40","Q42","Q57"],"core":"先在社交媒体刷到现代陶艺市集视频，后来去工作室体验课认识她。她比我年长几岁，喜欢研究中国传统陶艺；用黏土手工塑形、窑烧，制作彩色杯子与小雕塑。教我时让我自己改错。","focus":["喜欢历史：研究旧器型与图案","尊敬年长者：耐心指导、不替我修","本地新闻：陶艺市集短视频","教新技能：兔子做得像熊的泥塑体验","听无聊的话：听技术说明，喜欢作品但不懂术语","有趣视频：和 Q10 同一条视频","擅长手工：塑形与窑烧","有创造力：工作坊认识；传统与现代结合"]},{"category":"人物与关系","title":"妹妹｜独自旅行","qs":["Q34","Q44","Q55"],"core":"妹妹高中毕业后想独自赴韩国参加 K-pop 见面会，却担心机场、酒店和路线。我帮她查签证、选酒店、记路线；她靠地图完成出行，抵达后报平安，回来更自信。","focus":["克服困难：第一次独自出国","完成难事：从犹豫到顺利出行","帮助他人：我帮她安排关键事项"]},{"category":"人物与关系","title":"Claire｜想当医生","qs":["Q12"],"core":"这一题用 Claire 讲想当医生的故事：看韩剧后对医学感兴趣，参加社区健康志愿活动，开始了解课程和资格。","focus":["想从医的人：动机、志愿经历、未来计划"]},{"category":"旅行与地点","title":"广州 K11｜商场与建筑","qs":["Q01","Q03","Q13","Q52"],"core":"广州市中心，楼下商铺、楼上办公；艺术展、彩色灯光与设计陈列。工作日早上清静适合看展喝咖啡；周六下午扶梯和餐饮区拥挤，店铺重复、部分区域维修，逛了很久几乎没买东西。","focus":["喜欢的建筑：工作日看展、设计灵感","拥挤的地方：周六下午非常挤","无聊的地方：重复商铺，逛很久没收获","高建筑：楼下商铺楼上办公室"]},{"category":"旅行与地点","title":"大夫山｜湖边骑行的两面","qs":["Q02","Q16"],"core":"广州大夫山森林公园，有湖、青山、高树和鸟鸣；与朋友租自行车沿湖骑行。同一地点可以有不同感受：早上较凉爽、轻松；午饭后很热、骑久会累。","focus":["经常但不喜欢的短途：午饭后热、疲惫仍陪朋友","城市自然地点：早上凉爽、有树荫、看湖听鸟"]},{"category":"旅行与地点","title":"日本小岛｜摄影与改变想法","qs":["Q19","Q46"],"core":"与喜欢拍照的朋友去安静的日本小岛，错过公交后改租自行车，沿海岸小路骑行。朋友喜欢自然光，拍海、小街和路牌；我虽累，却发现骑车旅行很自由。","focus":["爱拍照的人：光线、细节、旅行相册","改变想法：骑车虽累，却比公交更自由"]},{"category":"旅行与地点","title":"奈良山顶｜日落与小鹿","qs":["Q47"],"core":"日本奈良购物后带着包坐车上山，为到真正的山顶继续往上走。高处有草坡、小鹿和漂亮日落，喂鹿、合影，虽然很累但值得。保留独立故事，不与小岛强行合并。","focus":["推荐的旅行地：真正山顶、草坡、小鹿、日落"]},{"category":"演出与活动","title":"香港演唱会｜三人同行","qs":["Q07","Q23","Q25","Q27","Q30","Q38","Q45","Q48"],"core":"我、最好的朋友和另一位负责酒店的朋友，共三人去香港看 K-pop 演唱会。原本周末加班，后来请假；高铁没票改订早班机，凌晨三点起床；二手票卖家失联，换卖家买到；酒店也有备用方案；现场大家合唱。","focus":["嘈杂：全场欢呼和合唱","等待回复：二手票卖家失联超过一小时","团队合作：分工订票、订酒店、备选","早起：凌晨三点出发","愉快夜晚：晚饭、演唱会、回酒店聊天","改变计划：加班改为请假看演唱会","满意决定：去了不后悔","重要决定：不轻易错过难再来的机会"]},{"category":"演出与活动","title":"中秋冰皮月饼｜家庭制作","qs":["Q05","Q15","Q49"],"core":"小时候中秋在家，妈妈教做冰皮月饼：准备馅料、包饼皮、用模具压花纹。第一次太用力，形状不均；家人一起笑，晚饭后配茶吃。实际人数尚未明确，不编数字。","focus":["童年技能：妈妈教、压模太用力","难忘聚会：家人一起制作；人数待补","特殊食物：节日、软甜、亲手做"]},{"category":"演出与活动","title":"温哥华女子冰球｜队长与现场","qs":["Q37","Q56"],"core":"旅行时在温哥华看到海报去看加拿大对美国女子冰球。球速很快，冰球很小，现场气氛热烈。加拿大最终输了，但队长一直鼓励并指挥队友；不强行记人名和职业联赛细节。","focus":["现场比赛：气氛、速度、结果","钦佩运动员：加拿大队长顶住压力"]},{"category":"日常与科技","title":"智能手表｜买表、使用与故障","qs":["Q09","Q14","Q20","Q29","Q58"],"core":"大约一年前为了记录运动与睡眠攒钱买智能手表，Apple Store 店员先问需求、介绍便宜型号并帮助设置；开始图标、活动圆环和睡眠报告难找；后来逐渐熟悉。一次突然关机，通过网上建议更新系统解决。最近才开始规律查看运动与睡眠。","focus":["科技问题：突然关机、网上找解决方法","近期改变：最近更规律使用手表","攒钱买东西：固定存钱、少网购","好服务：店员询问需求，介绍便宜款","难用的科技产品：图标和睡眠报告难找"]},{"category":"媒体与内容","title":"疯狂动物城｜动物故事","qs":["Q22","Q31","Q53"],"core":"兔子 Judy 想当警察、狐狸 Nick 被刻板印象影响；两人克服误解、合作破案。第一部令人喜欢，第二部信息更复杂。Q53 是故事书改编设定：用户已看过电影，但不应说自己读完原著。","focus":["动物故事：兔子、狐狸、偏见与合作","不喜欢的电影：续集更复杂；观影时间地点待核实","开心的书：插画故事书版本，明确先看电影"]},{"category":"媒体与内容","title":"刷社交媒体｜时间浪费","qs":["Q17"],"core":"下班后看 K-pop 更新、艺术设计短视频，一刷就接近两小时。偶尔刷到有意义的陶艺市集视频，但大多时候重复滑动，原本可以运动或练英语。","focus":["浪费时间的活动：容易一直滑、占用运动学习时间"]},{"category":"媒体与内容","title":"K-pop 中秋联名广告","qs":["Q24"],"core":"喜欢的 K-pop 中国成员参与中秋咖啡与月饼联名，短视频里教做冰皮月饼；我跟着试做，还买了联名咖啡。","focus":["名人广告：代言人、产品、自己为什么看完"]},{"category":"媒体与内容","title":"Soyeon 采访｜重新出发","qs":["Q41"],"core":"2022 年 (G)I-DLE 回归前经历成员离队，队长 Soyeon 谈准备新专辑像重新出道；她直面压力，使我更佩服她。","focus":["名人采访：困难、重新出发、我对她的看法"]},{"category":"环保与法律","title":"塑料瓶回收｜真实制度与拟议奖励","qs":["Q08","Q21","Q26"],"core":"德国已有饮料瓶押金返还制度：购买部分饮料先付押金，退瓶取回。Q08/Q26 是拟议的回收积分或购物优惠，不会减少买瓶装饮料的选择；真实押金与拟议奖励不能混为一谈。","focus":["想引入环保法：回收积分，减少塑料垃圾","现有环保法：德国押金返还机制","想引入新法律：小习惯有奖励、公众愿支持"]}];
 const TITLES={"Q01":"喜欢的公共建筑","Q02":"不喜欢的短途出行","Q03":"拥挤的地方","Q04":"喜欢历史的人","Q05":"小时候学到的技能","Q06":"尊敬的年长者","Q07":"嘈杂的地方","Q08":"想颁布的环保法律","Q09":"科技问题","Q10":"本地新闻","Q11":"长期目标","Q12":"想从事医疗的人","Q13":"无聊的地方","Q14":"近期改变","Q15":"难忘的聚会","Q16":"城市自然地点","Q17":"浪费时间的活动","Q18":"教技能的人","Q19":"爱拍照的人","Q20":"攒钱买物品","Q21":"保护环境的法律","Q22":"动物故事","Q23":"久等回复","Q24":"名人广告","Q25":"团队合作","Q26":"想颁布的新法律","Q27":"早起","Q28":"受欢迎的人","Q29":"好的购物服务","Q30":"愉快的夜晚","Q31":"不喜欢的电影","Q32":"听不感兴趣的内容","Q33":"有条理的人","Q34":"克服困难的人","Q35":"喜欢拜访但不想住的家","Q36":"擅长语言的人","Q37":"现场比赛","Q38":"改变计划","Q39":"种菜的人","Q40":"有趣视频","Q41":"名人采访","Q42":"手工好的人","Q43":"快乐的人","Q44":"克服困难并成功的人","Q45":"满意的决定","Q46":"改变想法","Q47":"推荐旅行地","Q48":"重要决定","Q49":"节日食物","Q50":"成功的生意人","Q51":"发小","Q52":"高建筑","Q53":"开心的书","Q54":"健康习惯","Q55":"帮助别人","Q56":"钦佩的运动员","Q57":"有创造力的朋友","Q58":"难用的科技产品"};
-const PHRASES=[["介绍人物","The person I'd like to talk about is ___.","先交代是谁","The person I'd like to talk about is my friend Claire."],["介绍经历 / 事物","I'd like to talk about ___.","开头直入主题","I'd like to talk about a concert trip."],["原因","That's because ___.","说明一个直接原因","That's because it was too hot."],["举例","For example, ___.","补一个小场景","For example, she grows tomatoes on her balcony."],["感受","So I felt ___.","说当时的感受","So I felt really tired."],["背景","At that time, ___.","交代背景","At that time, I was very busy."],["结果","In the end, ___.","自然交代结果","In the end, I found another seller."],["回顾","Looking back, ___.","结尾复盘","Looking back, I'm glad I went."],["意外","It turned out that ___.","与预想不同","It turned out that the watch just needed an update."],["让步","Even though ___, I still ___.","转折但继续","Even though I was tired, I still enjoyed it."],["预期落差","I didn't expect ___, but ___.","解释态度变化","I didn't expect to like pottery, but I did."],["概括原因","The main reason is ___.","一句话总结","The main reason is that she listens to others."]];
+const PHRASES=[["原因","That's because ___.","补充一个直接原因","That's because it was too hot."],["举例","For example, ___.","补一个具体场景","For example, she grows tomatoes on her balcony."],["感受","So I felt ___.","说明当时的感受","So I felt really tired."],["背景","At that time, ___.","交代当时情况","At that time, I was very busy."],["回顾","Looking back, ___.","确有变化或结果时用于结尾","Looking back, I'm glad I went."],["意外结果","It turned out that ___.","结果与原先预想不同","It turned out that the watch just needed an update."],["让步","Even though ___, I still ___.","承认困难，但说明仍然做了什么","Even though I was tired, I still enjoyed it."],["预期落差","I didn't expect ___, but ___.","解释态度变化","I didn't expect to like pottery, but I did."],["概括原因","The main reason is ___.","总结一个主要原因","The main reason is that she listens to others."]];
 const root=document.getElementById("cards"),filter=document.getElementById("filters"),count=document.getElementById("count"),search=document.getElementById("search");
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 // Second reuse pass: group story cards by facts the learner can actually share.
