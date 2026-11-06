@@ -53,3 +53,8 @@
  .p2-page #speechPlayer .speech-player-actions button{flex:1 1 calc(25% - 6px);min-width:60px}
  .p2-page .p2-module-header h1{font-size:25px}
 }
+
+/* Fix desktop collapse: this ID-scoped flex rule must not keep the sidebar visible. */
+@media (min-width:851px){
+  .p2-page .app.sidebar-collapsed #topicSidebar.sidebar{display:none}
+}
