@@ -3,6 +3,38 @@
   const groups = window.P2_2026Q4_GROUPS || [];
   const byQ = new Map(groups.flatMap(g => (g.topics || []).map(t => [t.q, t])));
 
+  // Q56: use the role, not a hard-to-recall athlete's name; simplify the long explanation.
+  const q56 = byQ.get("Q56");
+  if (q56?.reviewed?.[0]) {
+    q56.reviewed[0].text = q56.reviewed[0].text.replace(
+      /Marie-Philip Poulin/g,
+      "the captain of Canada's women's ice hockey team"
+    );
+  }
+  if (q56?.reviewed?.[3]) {
+    q56.reviewed[3].text =
+      "She has won three Olympic gold medals. Outside matches, she supports programmes that help children try sport. I admire that she cares about young players as well as her own career. In interviews, she seems calm and focused. She often talks about the team, not just herself. I respect her because she takes responsibility for her teammates.";
+  }
+  if (window.P2_2026Q4_ZH_TRANSLATIONS?.Q56) {
+    window.P2_2026Q4_ZH_TRANSLATIONS.Q56 =
+      window.P2_2026Q4_ZH_TRANSLATIONS.Q56
+        .replace(/Marie-Philip Poulin/g, "加拿大女子冰球队的队长")
+        .replace(/Poulin/g, "这位队长");
+  }
+
+  // Keep recall cues tied to the actual story beats in the user's K11 sample.
+  if (typeof IELTS_RECALL_CUES !== "undefined") {
+    IELTS_RECALL_CUES.Q03 = [
+      "crowded shopping centre","weekend afternoon","very crowded",
+      "near the escalators","food area","walk slowly","hard to find a seat",
+      "chain stores","closed for renovation","less to look at",
+      "nearly two hours","bought almost nothing","coffee and left",
+      "café area was full","wait before we could order",
+      "difficult to have a proper conversation","crowds made everything stressful",
+      "prefer visiting on weekday mornings"
+    ];
+  }
+
   // Q03: keep the idea, remove the unstable "remember thinking" construction.
   const q03 = byQ.get("Q03");
   if (q03?.reviewed) {
