@@ -47,7 +47,7 @@ const IELTS_RECALL_CUES={
    "puck moved so fast","hardly follow the game","basic rules",
    "which team was attacking","very active","giving directions to her teammates",
    "organise attacks","stayed focused","encouraged the team","Canada eventually lost",
-   "led the national team for years","life outside hockey","supporting her teammates",
+   "had been the team captain for years","life outside hockey","did not give up when the game became difficult","respect her even more",
    "calm under pressure","team working together","important quality in a captain"
  ],
  Q16:["green hills","tall trees","quiet paths","hear birds","cool air under the trees","water reflects the trees","relaxing than a busy shopping centre"],
