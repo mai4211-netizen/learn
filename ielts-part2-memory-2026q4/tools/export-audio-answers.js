@@ -9,11 +9,17 @@ const folder = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(folder, 'index.html'), 'utf8');
 const scripts = [...html.matchAll(/<script\s+src="([^"]+)"\s*>\s*<\/script>/g)]
   .map(m => m[1].split('?')[0]);
-const ctx = vm.createContext({ window: {}, console });
+const ctx = vm.createContext({ window: {}, console, document: { addEventListener() {} } });
 for (const script of scripts) {
   if (script === 'app.js') break;
   // Browser dependencies are after app.js; skip generated audio manifests.
   if (script.startsWith('audio/')) continue;
+  vm.runInContext(fs.readFileSync(path.join(folder, script), 'utf8'), ctx, { filename: script, timeout: 10000 });
+}
+// The live page applies this final data patch after app.js. Run it here too,
+// with a minimal document stub, so MP3 hashes match the text actually spoken.
+const lateContentPatches = ['quality-alignment-v44.js'];
+for (const script of lateContentPatches) {
   vm.runInContext(fs.readFileSync(path.join(folder, script), 'utf8'), ctx, { filename: script, timeout: 10000 });
 }
 const groups = ctx.window.P2_2026Q4_GROUPS || [];
