@@ -16,7 +16,7 @@ if(linkedQuestion){
   const matched=GROUPS.find(g=>g.topics.some(t=>t.q===linkedQuestion));
   if(matched){selectedGroup=matched.id;selectedQ=linkedQuestion}
 }
-let boldOnly=false,boldSource=storage.get('p2-2026q4-bold-source')||'mine',selectionInfo=null,boldState={},selectionTimer=null;
+let boldOnly=false,boldSource=storage.get('p2-2026q4-bold-source')||'mine',selectionInfo=null,boldState={},selectionTimer=null,selectionToolsMutedUntil=0;
 try{boldState=JSON.parse(storage.get(BOLD_KEY)||'{}')||{}}catch(e){boldState={}}
 
 function group(){return GROUPS.find(g=>g.id===selectedGroup)||GROUPS[0]}
@@ -298,14 +298,18 @@ try{
     const selected=window.getSelection();
     const word=(selected?.toString().match(/[A-Za-z]+(?:['’-][A-Za-z]+)*/)||[])[0];
     if(!word||!window.speechSynthesis||!window.SpeechSynthesisUtterance)return;
+    selectionToolsMutedUntil=Date.now()+500;
     clearTimeout(selectionTimer);hideTools();
     const voice=new SpeechSynthesisUtterance(word);
     voice.lang='en-US';voice.rate=0.9;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(voice);
-    selected?.removeAllRanges();
   });
-  document.addEventListener('selectionchange',()=>{const s=window.getSelection();if(s&&!s.isCollapsed)scheduleTools(200)});
+  document.addEventListener('selectionchange',()=>{
+    if(Date.now()<selectionToolsMutedUntil)return;
+    const s=window.getSelection();
+    if(s&&!s.isCollapsed)scheduleTools(200);
+  });
   $('#boldToggle').addEventListener('mousedown',e=>e.preventDefault());$('#boldToggle').addEventListener('click',()=>toggleBold(selectionInfo));
   document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='b'){const info=captureSelection();if(info){e.preventDefault();toggleBold(info)}}});
   document.addEventListener('mousedown',e=>{if(!e.target.closest('#selectionTools')&&!e.target.closest('#answer'))hideTools()});
