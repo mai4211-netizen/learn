@@ -46,43 +46,55 @@
   display:block!important;min-height:0;max-height:none;padding:4px 2px;
   font-size:11px;color:#9a4a36;
 }
-.p2-page .speaking-sticky-mini[hidden]{display:none!important}
 .p2-page .reuse-pattern{
   text-decoration:underline;text-decoration-style:dotted;
   text-decoration-thickness:1px;text-decoration-color:rgba(89,104,100,.40);
   text-underline-offset:3px;
 }
-.speaking-sticky-mini[hidden]{display:none!important}
+
+/* The fixed bar now mirrors the current story and its Q buttons. */
+.story-sticky-mini[hidden]{display:none!important}
 @media(max-width:850px){
-  .speaking-sticky-mini{
-    position:fixed;top:0;left:0;right:0;z-index:50;
-    display:flex;align-items:center;gap:10px;
-    height:48px;min-height:48px;padding:4px 10px;
-    border-bottom:1px solid #dfe8e1;
+  .story-sticky-mini{
+    position:fixed;z-index:50;top:0;left:0;right:0;
+    display:flex;flex-direction:column;gap:4px;
+    padding:6px 12px 7px;
+    border-bottom:1px solid #e0e9e3;
     background:rgba(255,255,255,.97);
-    box-shadow:0 2px 10px #1f32250b;
+    box-shadow:0 3px 12px rgba(20,54,35,.08);
     backdrop-filter:blur(10px);
   }
-  .speaking-sticky-mini .speaking-sticky-name{
-    color:#20352b;font-size:11px;font-weight:750;white-space:nowrap;
-    letter-spacing:-.02em;flex-shrink:0;
+  .story-sticky-heading{
+    color:#17241f;font-size:14px;font-weight:800;line-height:1.2;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
-  .speaking-sticky-mini .sticky-mini-tabs{
-    flex:1;min-width:0;display:grid!important;
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:2px;padding:2px;margin:0!important;
-    border-radius:9px;
+  .story-sticky-switches{
+    display:flex;align-items:center;gap:5px;max-width:100%;
+    overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
   }
-  .speaking-sticky-mini .sticky-mini-tabs a{
-    min-height:34px;padding:4px 1px;font-size:11px;
+  .story-sticky-switches::-webkit-scrollbar{display:none}
+  .story-sticky-topic{
+    flex:none;min-height:25px;padding:4px 8px;
+    border:1px solid #e1e8e3;border-radius:20px;
+    background:#fff;color:#43554a;
+    font-size:11px;font-weight:650;line-height:1.25;
+    white-space:nowrap;cursor:pointer;
   }
-  html{scroll-padding-top:54px}
+  .story-sticky-topic.on{
+    background:#147d58;border-color:#147d58;color:#fff;
+  }
+  .story-sticky-topic:focus-visible{
+    outline:2px solid #147d58;outline-offset:2px;
+  }
+  html{scroll-padding-top:67px}
   .p2-page #speechPlayer .speech-inline-main #speechPlay{min-width:90px}
   .p2-page #speechPlayer .speech-inline-main{gap:5px}
   .p2-page #speechPlayer .speech-control-label select{max-width:122px}
 }
 @media(max-width:390px){
-  .speaking-sticky-mini{gap:5px;padding-inline:7px}
-  .speaking-sticky-mini .speaking-sticky-name{font-size:10px;max-width:70px;white-space:normal;line-height:1.15}
+  .story-sticky-mini{padding:5px 8px 6px}
+  .story-sticky-heading{font-size:13px}
+  .story-sticky-topic{font-size:10px;padding:4px 7px}
   .p2-page #speechPlayer .speech-inline-main{flex-wrap:wrap}
 }

@@ -1,9 +1,9 @@
 /* Offline shell and MP3 caching for the IELTS Part 2 Jenny player. */
-const CACHE_NAME = "ielts-part2-q4-offline-v44";
+const CACHE_NAME = "ielts-part2-q4-offline-v45";
 const AUDIO_CACHE = "ielts-part2-q4-mp3-v2";
 const LEGACY_AUDIO_CACHE = "ielts-part2-q4-mp3-v1";
 const APP_SHELL = [
-  "./", "./index.html", "./overview.html", "./practice.html", "./site-tabs.css?v=modules-v33", "./feedback-v41.css?v=41", "./compact-v43.css?v=43", "./style.css?v=templates-v26",
+  "./", "./index.html", "./overview.html", "./practice.html", "./site-tabs.css?v=modules-v33", "./feedback-v41.css?v=41", "./compact-v43.css?v=45", "./style.css?v=templates-v26",
   "./manifest.webmanifest", "./icon.svg",
   "./data.js", "./patch-ui-v2.js", "./patch-ui-v3.js",
   "./patch-ui-v4.js", "./patch-ui-v5.js",
@@ -20,7 +20,7 @@ const APP_SHELL = [
   "./approved-topic-edits-nov.js?v=approved-v23",
   "./consistent-templates-nov.js?v=templates-v26",
   "./reuse-pass-nov.js?v=reuse-v36", "./topic-fit-review-nov.js?v=fit-v36", "./content-length-review-nov.js?v=length-v38", "./quality-review-nov.js?v=qa-v40", "./final-content-polish.js?v=42", "./audio/audio-manifest.js?v=follow-v36", "./app.js?v=42", "./recall-ui-v43.js?v=43",
-  "./sidebar-controls.js?v=shared-v30", "./speech-player.js?v=44", "./sticky-tabs-v43.js?v=43"
+  "./sidebar-controls.js?v=shared-v30", "./speech-player.js?v=44", "./sticky-tabs-v43.js?v=45"
 ];
 
 self.addEventListener("install",event => {
