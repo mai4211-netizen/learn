@@ -15,11 +15,9 @@
     q56.reviewed[3].text =
       "She has won three Olympic gold medals. Outside matches, she supports programmes that help children try sport. I admire that she cares about young players as well as her own career. In interviews, she seems calm and focused. She often talks about the team, not just herself. I respect her because she takes responsibility for her teammates.";
   }
-  if (window.P2_2026Q4_ZH_TRANSLATIONS?.Q56) {
+  if (window.P2_2026Q4_ZH_TRANSLATIONS) {
     window.P2_2026Q4_ZH_TRANSLATIONS.Q56 =
-      window.P2_2026Q4_ZH_TRANSLATIONS.Q56
-        .replace(/Marie-Philip Poulin/g, "加拿大女子冰球队的队长")
-        .replace(/Poulin/g, "这位队长");
+      "我想介绍一位我很钦佩的运动员——加拿大女子冰球队的队长。我第一次注意到她，是在温哥华看加拿大对美国的比赛时。那也是我第一次现场看女子冰球。冰球移动得太快，我几乎跟不上，但这位队长一直很活跃，不断给队友指示。即使美国队进球更多，她仍然专注地组织进攻。后来我了解到，她获得过三枚奥运金牌。比赛之外，她也支持帮助儿童接触运动的项目。我欣赏她关心年轻球员，也认真对待自己的职业生涯。采访中，她显得冷静而专注，谈论的常常是团队，而不只是自己。我钦佩她，因为她会为队友承担责任。即使球队落后，她也能在压力下保持冷静，并鼓励队友。";
   }
 
   // Keep recall cues tied to the actual story beats in the user's K11 sample.
