@@ -154,6 +154,8 @@
     nextBtn.disabled = !started || cursor + 1 >= queue.length;
     nextBtn.hidden = scope.value === 'single';
     scope.disabled = !isReady;
+    // Seeking is unavailable until the answer/MP3 pair has passed verification.
+    progress.disabled = !isReady || invalidAudio.has(topic().q);
   }
   function stop(message='已停止', reset=true) {
     started = false;
