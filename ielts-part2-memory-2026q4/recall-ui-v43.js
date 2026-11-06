@@ -1,7 +1,7 @@
 /* Recommended recall cues: facts/objects/outcomes, not isolated verbs.
    Faint underlines show templates that can be reused across Cue Cards. */
 function weakReuseMarkup(segment){
-  const patterns=/\b(?:The person I'd like to talk about|I'd like to talk about|I first noticed|One weekend morning|We could stop whenever we wanted to|I met at school more than ten years ago|more than ten years ago|I had originally planned|In the end|At first|After a while|For example|For me|I think|I was worried|I used to think|I realised|I would recommend|It was my first time|I felt|That is why|That's why|It reminded me|I really enjoyed|I still remember)\b/gi;
+  const patterns=/\b(?:The person I'd like to talk about is|The person I'd like to talk about|I'd like to talk about|One thing I know is|We met|She is|She usually|One thing she does is|For example|What I remember most is|I like her because|So I think she is|It happened|I went with|It started when|I wanted to|First|Then|After that|The problem was|In the end|I felt|It taught me|It is a|There are|It feels|I usually go with|I like it because|For me|I first heard about|I chose it because|What I like is|It helps|The main reason is|I first noticed|One weekend morning|We could stop whenever we wanted to|I met at school more than ten years ago|more than ten years ago|I had originally planned|At first|After a while|I was worried|I used to think|I realised|I would recommend|It was my first time|That is why|That's why|It reminded me|I really enjoyed|I still remember)\b/gi;
   let html='',last=0,m;
   while((m=patterns.exec(segment))){
     html+=esc(segment.slice(last,m.index))+'<span class="reuse-pattern">'+esc(m[0])+'</span>';
@@ -22,6 +22,14 @@ const IELTS_RECALL_NOUNS=new Set((
 +"prize awards achievements gold silver technology trip village road countryside airplane airport weather rain sun training skill skills tradition history water birds air market reporter makers"
 ).split(/\s+/));
 const IELTS_RECALL_CUES={
+ Q03:[
+   "crowded shopping centre","weekend afternoon","near the escalators","food area",
+   "walk slowly","hard to find a seat","chain stores","closed for renovation",
+   "less to look at","nearly two hours","bought almost nothing","coffee and left",
+   "café area was full","wait before we could order","difficult to have a proper conversation",
+   "short visit took much longer than I expected","crowds made everything stressful",
+   "too crowded on weekend afternoons","weekday mornings"
+ ],
  Q10:[
    "pottery market","social media","old-fashioned","shaping clay",
    "colourful cups","small sculptures","traditional crafts","sell their work",
@@ -35,12 +43,12 @@ const IELTS_RECALL_CUES={
  ],
  Q56:[
    "captain of Canada's women's ice hockey team","match in Vancouver",
-   "Canada against the United States","women's ice hockey live",
-   "puck moved so fast","basic rules","giving directions to her teammates",
-   "organise attacks","three Olympic gold medals","help children try sport",
-   "young players","calm and focused","talks about the team",
-   "good example of a team leader","stays calm under pressure",
-   "encourages her teammates","positive when things get difficult"
+   "Canada against the United States","first time watching women's ice hockey live",
+   "puck moved so fast","hardly follow the game","basic rules",
+   "which team was attacking","very active","giving directions to her teammates",
+   "organise attacks","stayed focused","encouraged the team","Canada eventually lost",
+   "led the national team for years","life outside hockey","supporting her teammates",
+   "calm under pressure","team working together","important quality in a captain"
  ],
  Q16:["green hills","tall trees","quiet paths","hear birds","cool air under the trees","water reflects the trees","relaxing than a busy shopping centre"],
  Q47:["green hills","tall trees","quiet paths","hear birds","cool air under the trees","water reflects the trees","relaxing than a busy shopping centre"],
