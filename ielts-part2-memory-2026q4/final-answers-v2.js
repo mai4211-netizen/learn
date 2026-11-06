@@ -79,7 +79,7 @@
   window.P2_2026Q4_ZH_PARAGRAPHS = window.P2_2026Q4_ZH_PARAGRAPHS || {};
   for (const [q, parts] of Object.entries(translations)) {
     window.P2_2026Q4_ZH_PARAGRAPHS[q] = parts;
-    window.P2_2026Q4_ZH_TRANSLATIONS[q] = parts.join('\\n');
+    window.P2_2026Q4_ZH_TRANSLATIONS[q] = parts.join('\n');
   }
   window.P2_2026Q4_EDITORIAL_VERSION = '2026-11-07-v2';
   if (typeof selectedQ !== 'undefined' && selectedQ === 'Q47' && typeof selectedGroup !== 'undefined') selectedGroup = naraGroup.id;
