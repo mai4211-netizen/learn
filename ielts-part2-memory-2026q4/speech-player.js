@@ -43,12 +43,21 @@
     return Math.floor(n/60)+':'+String(n%60).padStart(2,'0');
   };
   const duration = () => Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0;
+  const speed = () => Math.max(.5,Number(rate.value)||1);
+  function setPlaybackRate(){
+    // Setting both is important on Safari: reload/metadata can reset the
+    // media playbackRate, even though the menu already shows a new value.
+    audio.defaultPlaybackRate=speed();
+    audio.playbackRate=speed();
+    const d=duration();
+    if(d) displayProgress(audio.currentTime/d,audio.currentTime);
+  }
   function displayProgress(fraction, seconds=null) {
     const value = Math.round(Math.max(0,Math.min(1,fraction))*1000);
     progress.value = String(value);
     progress.style.setProperty('--speech-played',(value / 10)+'%');
     const time = seconds === null ? value / 1000 * duration() : seconds;
-    progressText.textContent = duration() ? fmt(time) + ' / ' + fmt(duration()) : Math.round(value/10)+'%';
+    progressText.textContent = duration() ? fmt(time/speed()) + ' / ' + fmt(duration()/speed()) : Math.round(value/10)+'%';
     syncReading();
   }
   // Existing immutable Jenny MP3 files contain no word-boundary timestamps.
@@ -139,10 +148,6 @@
     if(readingFrameId)cancelAnimationFrame(readingFrameId);
     readingFrameId=0;
   }
-  const syncHint=document.createElement('p');
-  syncHint.className='speech-sync-hint';
-  syncHint.textContent='正文逐词浅灰高亮（按播放进度估算；MP3 没有逐词时间戳）。';
-  status.insertAdjacentElement('afterend',syncHint);
 
   function ui() {
     playBtn.disabled = !isReady || (started && !audio.paused) || (!started && invalidAudio.has(topic().q));
@@ -188,7 +193,7 @@
   function announce() {
     const item = queue[cursor];
     if (!item) return;
-    status.textContent = 'Jenny 女声 · '+(audio.paused?'准备播放':'正在播放')+' '+(cursor+1)+' / '+queue.length+' · '+item.t.q+' '+item.t.zh;
+    status.textContent = (audio.paused?'已准备':'正在播放')+' · '+item.t.q+' · '+(cursor+1)+'/'+queue.length;
     ui();
   }
   function playAudio() {
@@ -217,7 +222,8 @@
     if (invalidAudio.has(item.t.q)) return stop(item.t.q+' 的音频与英文原稿版本不一致，已停止播放；请联网刷新');
     // The file name is immutable for this exact answer text and voice settings.
     audio.src = './audio/'+item.t.q+'-'+encodeURIComponent(hash)+'.mp3';
-    audio.playbackRate = Number(rate.value) || 1;
+    audio.defaultPlaybackRate=speed();
+    audio.playbackRate=speed();
     audio.load();
     displayProgress(0,0);
     announce();
@@ -262,9 +268,15 @@
     if (!started) { status.textContent='点击播放后朗读'+scope.options[scope.selectedIndex].text; return; }
     begin(); // Resume at the selected Q using the new scope.
   });
-  rate.addEventListener('change',()=> { audio.playbackRate=Number(rate.value)||1; });
+  rate.addEventListener('input',setPlaybackRate);
+  rate.addEventListener('change',setPlaybackRate);
+  audio.addEventListener('ratechange',()=>{
+    const d=duration();
+    if(d)displayProgress(audio.currentTime/d,audio.currentTime);
+  });
 
   audio.addEventListener('loadedmetadata', () => {
+    setPlaybackRate();
     const d = duration();
     if (pendingSeek !== null && d) {
       audio.currentTime = Math.max(0,Math.min(d-0.05,d*pendingSeek));
@@ -288,7 +300,7 @@
     const fraction=Number(progress.value)/1000;
     progress.style.setProperty('--speech-played',Number(progress.value)/10+'%');
     progressText.textContent=duration()
-      ? fmt(fraction*duration())+' / '+fmt(duration())
+      ? fmt(fraction*duration()/speed())+' / '+fmt(duration()/speed())
       : Math.round(fraction*100)+'%';
   });
   progress.addEventListener('change', () => {
@@ -340,7 +352,7 @@
     isReady=true;
     verificationNote=invalidAudio.size
       ? invalidAudio.size+' 篇录音版本与当前答案不同，已阻止播放这些篇章；请联网刷新页面'
-      : 'Jenny Neural 女声 · MP3 · 可按实际音频时间拖动';
+      : '';
     status.textContent=verificationNote;
     ui();
   }

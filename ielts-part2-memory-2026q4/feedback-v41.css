@@ -1,0 +1,55 @@
+/* Nov 6 editorial + listening refinement, scoped to Part 2. */
+@media(min-width:851px){
+ .p2-page #topicSidebar.sidebar{
+   overflow:hidden;display:flex;flex-direction:column;
+ }
+ .p2-page #topicSidebar .nav{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+ .p2-page #topicSidebar .brand,
+ .p2-page #topicSidebar .site-tabs{flex:0 0 auto}
+}
+.p2-page #topicSidebar .brand{padding:0 4px 8px}
+.p2-page #topicSidebar .brand h1{font-size:19px;line-height:1.16;margin:5px 0 0;letter-spacing:-.02em}
+.p2-page #topicSidebar .brand .eyebrow{font-size:10px;letter-spacing:.09em}
+.p2-page #topicSidebar .site-tabs{margin:9px 0 8px}
+.p2-page #topicSidebar .site-tabs a{min-height:32px}
+.p2-page #topicSidebar .backup-tools button{min-height:30px;padding:5px 8px}
+.p2-page #topicSidebar .backup-status{min-height:0;margin-bottom:3px}
+.p2-page #topicSidebar .region-tabs{margin:3px 0 8px}
+.p2-page #topicSidebar .region-tab{padding:5px 3px}
+.p2-page #topicSidebar .search{padding-bottom:6px}
+.p2-page #topicSidebar .search input{height:38px}
+.p2-page .p2-module-header{margin-bottom:11px}
+.p2-page .p2-module-header h1{font-size:clamp(23px,2.6vw,33px);margin:0 0 2px}
+.p2-page .head{padding-top:17px;padding-bottom:12px}
+.p2-page .topic-wrap{padding-top:14px;padding-bottom:15px}
+.p2-page .answer-box{padding-top:16px}
+.p2-page .answer-head{margin-bottom:10px}
+/* Repeated speaking templates are visible but are not recall keywords. */
+.p2-page #answer .reuse-pattern{
+  text-decoration:underline;text-decoration-color:rgba(100,112,125,.35);
+  text-decoration-thickness:1px;text-underline-offset:3px;
+  color:inherit;
+}
+/* One-to-one Chinese paragraph display where available. Older short summaries
+   use separate sentences rather than pretending to be a long English paragraph. */
+.p2-page #zhTranslation{white-space:normal;line-height:1.75;padding:9px 12px;margin-bottom:13px}
+.p2-page #zhTranslation p{padding:0;margin:0 0 7px}
+.p2-page #zhTranslation p:last-child{margin-bottom:0}
+/* More compact player without voice tag and repetitive technical text. */
+.p2-page #speechPlayer{gap:5px;padding:9px 11px;margin-bottom:12px}
+.p2-page #speechPlayer .speech-player-options,
+.p2-page #speechPlayer .speech-player-actions{gap:6px;flex-wrap:wrap}
+.p2-page #speechPlayer .speech-label{font-size:11px;margin-right:3px}
+.p2-page #speechPlayer .speech-control-label{font-size:11px;gap:4px}
+.p2-page #speechPlayer .speech-control-label select{min-height:29px;padding:4px 7px}
+.p2-page #speechPlayer .speech-player-actions button{min-height:30px;padding:5px 9px}
+.p2-page #speechPlayer .speech-status{font-size:10px;line-height:1.35;min-height:0;max-height:16px;overflow:hidden}
+.p2-page #speechPlayer .speech-status:empty{display:none}
+.p2-page #speechPlayer .speech-progress-row{justify-content:flex-end;font-size:10px;line-height:1.2}
+.p2-page #speechPlayer #speechProgress{height:16px}
+@media(max-width:850px){
+ .p2-page #topicSidebar.sidebar{overflow:visible}
+ .p2-page #topicSidebar .brand h1{font-size:19px}
+ .p2-page #speechPlayer .speech-player-actions button{flex:1 1 calc(25% - 6px);min-width:60px}
+ .p2-page .p2-module-header h1{font-size:25px}
+}
