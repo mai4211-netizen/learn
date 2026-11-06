@@ -7,9 +7,7 @@
   const scope = el('speechScope');
   const rate = el('speechRate');
   const playBtn = el('speechPlay');
-  const pauseBtn = el('speechPause');
   const nextBtn = el('speechNext');
-  const stopBtn = el('speechStop');
   const progress = el('speechProgress');
   const progressText = el('speechProgressText');
   const status = el('speechStatus');
@@ -150,11 +148,11 @@
   }
 
   function ui() {
-    playBtn.disabled = !isReady || (started && !audio.paused) || (!started && invalidAudio.has(topic().q));
-    playBtn.textContent = started && audio.paused ? '▶ 继续' : '▶ 播放';
-    pauseBtn.disabled = !started || audio.paused;
+    playBtn.disabled = !isReady || (!started && invalidAudio.has(topic().q));
+    playBtn.textContent = started ? (audio.paused ? '▶ 继续' : '❚❚ 暂停') : '▶ 播放';
+    playBtn.setAttribute('aria-pressed',String(started && !audio.paused));
     nextBtn.disabled = !started || cursor + 1 >= queue.length;
-    stopBtn.disabled = !started;
+    nextBtn.hidden = scope.value === 'single';
     scope.disabled = !isReady;
   }
   function stop(message='已停止', reset=true) {
@@ -169,6 +167,7 @@
     if (reset) displayProgress(0,0);
     ui();
     status.textContent = message;
+    root.classList.toggle('speech-error',/失败|无法|不同|未生成|阻止|刷新|问题/.test(message));
   }
   function showTopic(item,scroll) {
     if (selectedGroup !== item.g.id || selectedQ !== item.t.q) {
@@ -193,7 +192,8 @@
   function announce() {
     const item = queue[cursor];
     if (!item) return;
-    status.textContent = (audio.paused?'已准备':'正在播放')+' · '+item.t.q+' · '+(cursor+1)+'/'+queue.length;
+    status.textContent = '';
+    root.classList.remove('speech-error');
     ui();
   }
   function playAudio() {
@@ -204,10 +204,12 @@
         status.textContent = err?.name === 'NotAllowedError'
           ? '浏览器阻止自动播放，请点击继续'
           : '无法播放音频，请检查网络或离线缓存';
+        root.classList.add('speech-error');
         ui();
       });
     } catch (_) {
       status.textContent = '无法播放音频，请检查浏览器';
+      root.classList.add('speech-error');
       ui();
     }
   }
@@ -253,20 +255,16 @@
     loadCurrent(true);
   }
   playBtn.addEventListener('click', () => {
-    if (started && audio.paused) { playAudio(); return; }
-    if (!started) begin();
-  });
-  pauseBtn.addEventListener('click', () => {
-    if (!started) return;
+    if (!started) { begin(); return; }
+    if (audio.paused) { playAudio(); return; }
     audio.pause();
-    status.textContent='已暂停 · '+(cursor+1)+' / '+queue.length+' · '+queue[cursor].t.q;
+    status.textContent='已暂停 · '+(cursor+1)+'/'+queue.length;
     ui();
   });
   nextBtn.addEventListener('click',advance);
-  stopBtn.addEventListener('click',()=>stop());
   scope.addEventListener('change',()=> {
-    if (!started) { status.textContent='点击播放后朗读'+scope.options[scope.selectedIndex].text; return; }
-    begin(); // Resume at the selected Q using the new scope.
+    if (!started) { status.textContent=''; ui(); return; }
+    begin();
   });
   rate.addEventListener('input',setPlaybackRate);
   rate.addEventListener('change',setPlaybackRate);
@@ -354,6 +352,7 @@
       ? invalidAudio.size+' 篇录音版本与当前答案不同，已阻止播放这些篇章；请联网刷新页面'
       : '';
     status.textContent=verificationNote;
+    root.classList.toggle('speech-error',Boolean(verificationNote));
     ui();
   }
 

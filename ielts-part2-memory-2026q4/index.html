@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="style.css?v=templates-v26">
 <link rel="stylesheet" href="site-tabs.css?v=modules-v33">
 <link rel="stylesheet" href="feedback-v41.css?v=41">
+<link rel="stylesheet" href="compact-v43.css?v=43">
 </head>
 <body class="p2-page">
 <div class="app">
@@ -79,10 +80,11 @@
             <button class="filter-btn" id="boldOnlyToggle" type="button">只看加粗</button>
           </div>
         </div>
-        <section class="speech-player" id="speechPlayer" aria-label="英文答案朗读">
-          <div class="speech-player-options">
-            <strong class="speech-label">英文朗读</strong>
-            <label class="speech-control-label" for="speechScope">播放范围
+        <section class="speech-player speech-inline" id="speechPlayer" aria-label="英文答案朗读">
+          <div class="speech-inline-main">
+            <button class="speech-primary" type="button" id="speechPlay" aria-pressed="false">▶ 播放</button>
+            <button type="button" id="speechNext" disabled>下一篇</button>
+            <label class="speech-control-label" for="speechScope">范围
               <select id="speechScope" aria-label="朗读范围">
                 <option value="single">当前题</option>
                 <option value="group">当前故事组</option>
@@ -92,25 +94,17 @@
             </label>
             <label class="speech-control-label" for="speechRate">语速
               <select id="speechRate" aria-label="朗读语速">
-                <option value="0.75">0.75×</option>
-                <option value="0.9">0.9×</option>
-                <option value="1" selected>1.0×</option>
-                <option value="1.15">1.15×</option>
+                <option value="0.75">0.75×</option><option value="0.9">0.9×</option>
+                <option value="1" selected>1.0×</option><option value="1.15">1.15×</option>
                 <option value="1.25">1.25×</option>
               </select>
             </label>
           </div>
-          <div class="speech-player-actions">
-            <button class="speech-primary" type="button" id="speechPlay">▶ 播放</button>
-            <button type="button" id="speechPause" disabled>暂停</button>
-            <button type="button" id="speechNext" disabled>下一篇</button>
-            <button type="button" id="speechStop" disabled>停止</button>
+          <div class="speech-seek">
+            <input type="range" id="speechProgress" min="0" max="1000" step="1" value="0" aria-label="当前英文音频播放时间轴，可拖动跳转">
+            <span id="speechProgressText" aria-live="off">0:00 / 0:00</span>
           </div>
-          <div class="speech-progress-row">
-            <span id="speechProgressText">0:00 / 0:00</span>
-          </div>
-          <input type="range" id="speechProgress" min="0" max="1000" step="1" value="0" aria-label="当前英文音频播放时间轴，可拖动跳转">
-          <div class="speech-status" id="speechStatus" role="status" aria-live="polite">英文朗读准备就绪</div>
+          <div class="speech-status" id="speechStatus" role="status" aria-live="polite"></div>
           <audio id="speechAudio" preload="metadata" hidden></audio>
         </section>
         <div class="zh-translation" id="zhTranslation" lang="zh-CN" aria-label="中文翻译"></div>
@@ -188,8 +182,9 @@
 <script src="final-content-polish.js?v=42"></script>
 <script src="audio/audio-manifest.js?v=follow-v36"></script>
 <script src="app.js?v=42"></script>
-<script src="recall-ui-v41.js?v=41"></script>
+<script src="recall-ui-v43.js?v=43"></script>
 <script src="sidebar-controls.js?v=shared-v30"></script>
-<script src="speech-player.js?v=41"></script>
+<script src="speech-player.js?v=43"></script>
+<script src="sticky-tabs-v43.js?v=43"></script>
 </body>
 </html>
