@@ -1,0 +1,97 @@
+name: Regenerate IELTS Part 2 Jenny MP3s
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ielts-part2-memory-2026q4/final-answers-v2.js'
+      - 'ielts-part2-memory-2026q4/tools/export-audio-answers.js'
+      - 'ielts-part2-memory-2026q4/tools/build-jenny-audio.py'
+      - '.github/workflows/generate-ielts-part2-audio.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate final answer source
+        shell: bash
+        run: |
+          node --check ielts-part2-memory-2026q4/final-answers-v2.js
+          node --check ielts-part2-memory-2026q4/tools/export-audio-answers.js
+          node <<'NODE'
+          const { execFileSync } = require('node:child_process');
+          const path = 'ielts-part2-memory-2026q4/tools/export-audio-answers.js';
+          const result = JSON.parse(execFileSync('node', [path], { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 }));
+          const ids = Object.keys(result.items).sort();
+          if (ids.length !== 58) throw new Error('Expected 58 answers, got ' + ids.length);
+          for (let n = 1; n <= 58; n++) {
+            const q = 'Q' + String(n).padStart(2, '0');
+            if (!result.items[q]) throw new Error('Missing ' + q);
+            const words = (result.items[q].text.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g) || []).length;
+            if (words < 150 || words > 205) throw new Error(q + ' word count out of range: ' + words);
+          }
+          if (result.voice !== 'en-US-JennyNeural' || result.rate !== '-5%') {
+            throw new Error('Unexpected voice/rate: ' + result.voice + ' / ' + result.rate);
+          }
+          console.log('Validated 58 final answers; Jenny Neural at -5%.');
+          NODE
+
+      - name: Install MP3 generation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install edge-tts mutagen
+
+      - name: Generate and duration-check all final MP3s
+        run: python ielts-part2-memory-2026q4/tools/build-jenny-audio.py
+
+      - name: Verify manifest and generated files
+        shell: python
+        run: |
+          import json, pathlib, re
+          root = pathlib.Path('ielts-part2-memory-2026q4/audio')
+          source = (root / 'audio-manifest.js').read_text(encoding='utf-8')
+          match = re.search(r'window\.P2_2026Q4_AUDIO\s*=\s*(\{.*\});', source)
+          if not match:
+              raise SystemExit('Audio manifest could not be parsed')
+          manifest = json.loads(match.group(1))
+          versions = manifest.get('versions', {})
+          if len(versions) != 58:
+              raise SystemExit(f'Expected 58 manifest entries, got {len(versions)}')
+          for q, version in versions.items():
+              path = root / f'{q}-{version[:16]}.mp3'
+              if not path.exists() or path.stat().st_size < 8000:
+                  raise SystemExit(f'Missing or invalid MP3: {path.name}')
+          print('Manifest and all 58 versioned MP3 files verified.')
+
+      - name: Commit generated MP3s and manifest
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ielts-part2-memory-2026q4/audio
+          if git diff --cached --quiet; then
+            echo 'All final MP3s are already current.'
+            exit 0
+          fi
+          git commit -m 'Regenerate Jenny MP3s for final IELTS Part 2 answers'
+          git push origin main
