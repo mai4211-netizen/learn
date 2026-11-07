@@ -93,16 +93,27 @@
     };
   }
 
-  // Double-click still selects the word. Speak it without clearing the native
-  // selection or hiding the selection toolbar.
+  // Optional word pronunciation, separate from the Jenny full-answer player.
+  // Preserve native text selection and the user's bold-selection toolbar.
+  const wordSpeechToggle = document.getElementById("wordSpeechToggle");
+  const wordSpeechKey = "p2-2026q4-word-speech";
+  if (wordSpeechToggle) {
+    try {
+      const saved = localStorage.getItem(wordSpeechKey);
+      if (saved !== null) wordSpeechToggle.checked = saved === "on";
+    } catch (_) { /* Private browsing may block storage. */ }
+    wordSpeechToggle.addEventListener("change", () => {
+      try { localStorage.setItem(wordSpeechKey, wordSpeechToggle.checked ? "on" : "off"); } catch (_) {}
+      if (!wordSpeechToggle.checked) window.speechSynthesis?.cancel();
+    });
+  }
   document.addEventListener("dblclick", event => {
+    if (!wordSpeechToggle?.checked) return;
     const paragraph = event.target.closest?.("#answer .answer-paragraph");
     if (!paragraph) return;
     const selected = window.getSelection();
     const word = (selected?.toString().match(/[A-Za-z]+(?:['’-][A-Za-z]+)*/)||[])[0];
     if (!word || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
-    event.stopImmediatePropagation();
-    event.stopPropagation();
     const utterance = new SpeechSynthesisUtterance(word);
     utterance.lang = "en-US";
     utterance.rate = 0.9;
