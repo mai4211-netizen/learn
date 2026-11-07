@@ -58,3 +58,12 @@
 @media (min-width:851px){
   .p2-page .app.sidebar-collapsed #topicSidebar.sidebar{display:none}
 }
+
+/* Optional double-click pronunciation; stays in the existing player row. */
+.p2-page #speechPlayer .word-speech-toggle{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer;font-size:11px;user-select:none}
+.p2-page #speechPlayer .word-speech-toggle input{position:absolute;opacity:0;width:1px;height:1px}
+.p2-page #speechPlayer .word-toggle-track{display:inline-block;width:30px;height:18px;border-radius:999px;background:#bac5be;position:relative;transition:background .15s}
+.p2-page #speechPlayer .word-toggle-track::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0002;transition:transform .15s}
+.p2-page #speechPlayer .word-speech-toggle input:checked + .word-toggle-track{background:#13855f}
+.p2-page #speechPlayer .word-speech-toggle input:checked + .word-toggle-track::after{transform:translateX(12px)}
+.p2-page #speechPlayer .word-speech-toggle input:focus-visible + .word-toggle-track{outline:2px solid #1b6b50;outline-offset:2px}
