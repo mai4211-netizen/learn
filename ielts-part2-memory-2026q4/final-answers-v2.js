@@ -86,7 +86,7 @@
     window.P2_2026Q4_ZH_PARAGRAPHS[q] = parts;
     window.P2_2026Q4_ZH_TRANSLATIONS[q] = parts.join('\n');
   }
-  window.P2_2026Q4_EDITORIAL_VERSION = '2026-11-07-v3';
+  window.P2_2026Q4_EDITORIAL_VERSION = '2026-11-07-v4';
   if (typeof selectedQ !== 'undefined' && selectedQ === 'Q47' && typeof selectedGroup !== 'undefined') selectedGroup = naraGroup.id;
   if (typeof render === 'function') render();
 })();
