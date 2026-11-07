@@ -95,7 +95,9 @@
 
   // Optional word pronunciation, separate from the Jenny full-answer player.
   // Preserve native text selection and the user's bold-selection toolbar.
-  const wordSpeechToggle = document.getElementById("wordSpeechToggle");
+  const wordSpeechToggle = typeof document !== "undefined" && typeof document.getElementById === "function"
+    ? document.getElementById("wordSpeechToggle")
+    : null;
   const wordSpeechKey = "p2-2026q4-word-speech";
   if (wordSpeechToggle) {
     try {
