@@ -293,18 +293,6 @@ try{
   $('#importBold').addEventListener('click',()=>$('#importBoldFile').click());
   $('#importBoldFile').addEventListener('change',async e=>{const f=e.target.files?.[0];e.target.value='';try{await importBold(f)}catch(err){$('#backupStatus').textContent=err.message;$('#backupStatus').classList.add('error')}});
   $('#answer').addEventListener('mouseup',()=>scheduleTools(0));$('#answer').addEventListener('touchend',()=>scheduleTools(300),{passive:true});
-  $('#answer').addEventListener('dblclick',e=>{
-    if(!e.target.closest('.answer-paragraph'))return;
-    const selected=window.getSelection();
-    const word=(selected?.toString().match(/[A-Za-z]+(?:['’-][A-Za-z]+)*/)||[])[0];
-    if(!word||!window.speechSynthesis||!window.SpeechSynthesisUtterance)return;
-    selectionToolsMutedUntil=Date.now()+500;
-    clearTimeout(selectionTimer);hideTools();
-    const voice=new SpeechSynthesisUtterance(word);
-    voice.lang='en-US';voice.rate=0.9;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(voice);
-  });
   document.addEventListener('selectionchange',()=>{
     if(Date.now()<selectionToolsMutedUntil)return;
     const s=window.getSelection();
