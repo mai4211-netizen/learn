@@ -38,6 +38,9 @@
     const old = Array.isArray(t.reviewed) ? t.reviewed : [];
     const targetCount = old.length || entry.paragraphs.length;
     const paragraphs = rebalance(entry.paragraphs, targetCount);
+    // Preserve source paragraph boundaries for semantic bold anchors when display paragraphs merge.
+    // This metadata does not change the displayed text or the user's saved bold positions.
+    t.recallSourceParagraphs = entry.paragraphs;
     t.reviewed = paragraphs.map((text, i) => ({
       text,
       type: old[i]?.type || ((i === 0 || i === paragraphs.length - 1) ? 'own' : 'shared'),
