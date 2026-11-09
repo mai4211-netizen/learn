@@ -74,6 +74,12 @@
     -webkit-overflow-scrolling:touch;
   }
   .story-sticky-switches::-webkit-scrollbar{display:none}
+  /* Expose a small draggable scrollbar to mouse users in narrow desktop windows. */
+  @media(hover:hover) and (pointer:fine){
+    .story-sticky-switches{min-width:0;width:100%;scrollbar-width:thin;scrollbar-color:#a6c0b0 transparent;padding-bottom:3px}
+    .story-sticky-switches::-webkit-scrollbar{display:block;height:4px}
+    .story-sticky-switches::-webkit-scrollbar-thumb{background:#a6c0b0;border-radius:4px}
+  }
   .story-sticky-topic{
     flex:none;min-height:25px;padding:4px 8px;
     border:1px solid #e1e8e3;border-radius:20px;
