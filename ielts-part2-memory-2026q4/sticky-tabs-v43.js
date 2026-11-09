@@ -46,6 +46,17 @@
         switches.scrollLeft=left+selected.offsetWidth-switches.clientWidth;
     }
   }
+  // Narrow desktop windows may have no touch gestures. Let the mouse wheel
+  // scroll the overflowing topic row; trackpad horizontal scrolling stays native.
+  switches.addEventListener('wheel',e=>{
+    if(bar.hidden || switches.scrollWidth<=switches.clientWidth+1)return;
+    if(e.ctrlKey || e.metaKey || e.altKey)return;
+    if(Math.abs(e.deltaY)<=Math.abs(e.deltaX))return;
+    const previous=switches.scrollLeft;
+    switches.scrollLeft+=e.deltaY;
+    if(switches.scrollLeft!==previous)e.preventDefault();
+  },{passive:false});
+
   bar.addEventListener('click',e=>{
     const control=e.target.closest('button[data-q]');
     if(!control||!bar.contains(control))return;
