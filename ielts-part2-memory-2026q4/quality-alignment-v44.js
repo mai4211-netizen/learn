@@ -76,7 +76,7 @@
    "comfortable uncomfortable boring bored interesting interested relaxing relaxed peaceful impressed meaningful " +
    "memorable beautiful creative modern fun difficult challenging surprised surprising successful friendly " +
    "patient tiring tired exhausted afraid grateful stressful confusing practical awkward old-fashioned " +
-   "easy hard useful special positive personal realistic skilled important").split(/\s+/));
+   "easy hard useful positive personal realistic skilled important").split(/\s+/));
   const actions=new Set(("visited rented rode cycled watched saw took bought walked climbed helped taught learned discovered " +
    "found created designed explained solved decided chose prepared organised organized shared supported " +
    "encouraged practised practiced grew planted watered cooked ate read wrote tried paid returned recycled " +
@@ -127,7 +127,7 @@
           if(next&&nouns.has(next.w)&&line.slice(w.b,next.a)===" ")add(w.a,next.b,25);
         }
         if(feelings.has(w.w)){
-          add(w.a,w.b,21);
+          add(w.a,w.b,/(?:\b(?:feel|feels|felt|seems|seemed|made me)\b)/i.test(line)?34:21);
           if(next&&nouns.has(next.w)&&line.slice(w.b,next.a)===" ")add(w.a,next.b,26);
           if(next&&/^(?:about|with|under)$/.test(next.w)&&n2&&n2.b-w.a<=38)add(w.a,n2.b,24);
         }
@@ -142,7 +142,7 @@
           add(w.a,w.b,16);
           if(next&&/^[A-Z][a-z]+$/.test(next.s))add(w.a,next.b,28);
           if(next&&n2&&/^[A-Z][a-z]+$/.test(next.s)&&/^[A-Z][a-z]+$/.test(n2.s))add(w.a,n2.b,30);
-          if(next&&n2&&n3&&/^[A-Z][a-z]+$/.test(next.s)&&/^[A-Z][a-z]+$/.test(n2.s)&&/^[A-Z][a-z]+$/.test(n3.s))add(w.a,n3.b,32);
+          if(next&&n2&&n3&&/^[A-Z][a-z]+$/.test(next.s)&&/^[A-Z][a-z]+$/.test(n2.s)&&/^[A-Z][a-z]+$/.test(n3.s))add(w.a,n3.b,40);
         }
       }
       for(const rule of [/\bgo back\b/gi,/\bcome back\b/gi,/\bgive up\b/gi,/\blook forward\b/gi,/\bchanged my mind\b/gi]){
