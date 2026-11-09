@@ -57,41 +57,103 @@
     return html + (typeof esc === "function" ? esc(segment.slice(last)) : segment.slice(last));
   };
 
-  // Keep the existing phrase selection, but make sure a sentence's feeling is
-  // not lost behind nouns/actions when it is useful for recalling the answer.
-  const previousRanges = window.recommendedRanges;
-  if (typeof previousRanges === "function" && typeof window.sentenceSpans === "function") {
-    window.recommendedRanges = function(text, topic) {
-      const ranges = previousRanges(text, topic) || [];
-      const feelings = new Set([
-        "happy","proud","excited","worried","nervous","relieved","calm","confident",
-        "upset","disappointed","frustrated","anxious","stressed","embarrassed",
-        "comfortable","uncomfortable","boring","bored","interesting","interested",
-        "enjoyable","relaxing","relaxed","peaceful","impressed","meaningful",
-        "memorable","lovely","beautiful","creative","modern","fun","difficult",
-        "challenging","surprising","successful","friendly","patient","tiring",
-        "tired","exhausting","inspiring","scary","afraid","pleasant","satisfied",
-        "grateful","thankful","stressful","confusing","valuable","practical",
-        "fascinating","awkward","old-fashioned","traditional"
-      ]);
-      const additions = [];
-      for (const [start, end] of window.sentenceSpans(text)) {
-        const sentence = text.slice(start, end);
-        const words = [...sentence.matchAll(/[A-Za-z]+(?:['’-][A-Za-z]+)*/g)];
-        const hasFeeling = ranges.some(([a,b]) => a >= start && b <= end &&
-          [...text.slice(a,b).toLowerCase().matchAll(/[a-z]+/g)].some(m => feelings.has(m[0])));
-        if (hasFeeling) continue;
-        const candidate = words.find(m => feelings.has(m[0].toLowerCase()));
-        if (!candidate) continue;
-        const a = start + candidate.index, b = a + candidate[0].length;
-        const overlaps = ranges.some(([x,y]) => a < y + 3 && x < b + 3);
-        if (!overlaps) additions.push([a,b]);
+
+  // Recommended: usually one short cue per sentence, focused on a thing, action or feeling.
+  // "My highlights" remains independent and is not changed.
+  const nouns=new Set(("building buildings centre mall shop shops offices art artists brands exhibition exhibitions displays design " +
+   "park forest lake mountain hills trees paths bikes bicycle cycling photos birds view water sunset deer " +
+   "k11 guangzhou japan nara tokyo vancouver canada germany city transport street " +
+   "concert music group singer fans stage lights hotel airport flight train ticket tickets trip journey bus taxi " +
+   "watch smartwatch phone battery screen app technology exercise sleep steps functions data settings " +
+   "pottery clay studio cups sculpture sculptures crafts market video film movie book characters judy nick zootopia " +
+   "mooncakes mooncake dough filling mould mother sister family children coffee drink restaurant " +
+   "bottle bottles deposit refund machine recycling plastic waste environment law discount reward points " +
+   "tomatoes tomato plants balcony leaves fruit sunlight garden painting paintings platform website business customers " +
+   "team captain player players match game puck hockey sport sports competition medal medals " +
+   "project plan interview message work salary job morning evening afternoon weekend hour hours " +
+   "problem solution pressure history culture tradition floor floors place places change changes attitude reason result").split(/\s+/));
+  const feelings=new Set(("happy proud excited worried nervous relieved calm confident upset disappointed stressed frustrated " +
+   "comfortable uncomfortable boring bored interesting interested relaxing relaxed peaceful impressed meaningful " +
+   "memorable beautiful creative modern fun difficult challenging surprised surprising successful friendly " +
+   "patient tiring tired exhausted afraid grateful stressful confusing practical awkward old-fashioned " +
+   "easy hard useful special positive personal realistic skilled important").split(/\s+/));
+  const actions=new Set(("visited rented rode cycled watched saw took bought walked climbed helped taught learned discovered " +
+   "found created designed explained solved decided chose prepared organised organized shared supported " +
+   "encouraged practised practiced grew planted watered cooked ate read wrote tried paid returned recycled " +
+   "collected waited joined played travelled traveled stayed changed noticed enjoyed admired preferred " +
+   "recorded saved won lost finished met started left visited").split(/\s+/));
+  const modifiers=new Set(("modern traditional local small large tall quiet green cool colourful colorful beautiful busy " +
+   "bright new old young national international public shopping plastic natural online simple soft sweet fresh " +
+   "different favourite favorite expensive daily positive realistic").split(/\s+/));
+  const weak=new Set(("i we he she it they this that these those my our his her their the a an " +
+   "overall finally however therefore also very really quite just only most more good nice things thing " +
+   "someone something one people person friend friends family place places time times day days year years " +
+   "story stories experience experiences situation situations said thought felt liked wanted have had has " +
+   "do does did could would should can will was were is are because about with from into and but to for").split(/\s+/));
+  const tokens=s=>[...s.matchAll(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g)].map(m=>({w:m[0].toLowerCase(),s:m[0],a:m.index,b:m.index+m[0].length}));
+  window.recommendedRanges=function(text,topic){
+    if(!text)return[];
+    const spans=typeof window.sentenceSpans==="function"?window.sentenceSpans(text):[[0,text.length]];
+    const hints=[...(typeof IELTS_RECALL_CUES!=="undefined"?IELTS_RECALL_CUES[topic?.q]||[]:[]),...(topic?.keywords||[])];
+    const output=[];
+    for(const [start,end] of spans){
+      const line=text.slice(start,end),ws=tokens(line),pool=[],lower=line.toLowerCase();
+      const add=(a,b,score)=>{
+        if(a<0||a>=b||b>line.length)return;
+        const phrase=line.slice(a,b),pieces=tokens(phrase);
+        if(!pieces.length||pieces.length>4||phrase.length>38||weak.has(pieces[0].w))return;
+        if(pieces.every(x=>weak.has(x.w)))return;
+        if(pieces.length>1&&pieces.length<4)score+=3;
+        if(pieces.length===4)score-=3;
+        if(pieces.some(x=>weak.has(x.w)))score-=2;
+        pool.push({a:start+a,b:start+b,score});
+      };
+      // Prefer concise, topic-specific cues when present in the exact final sentence.
+      for(const raw of hints){
+        const word=String(raw||"").trim(),parts=tokens(word);
+        if(!parts.length||parts.length>4||word.length>38||weak.has(parts[0].w))continue;
+        let from=0,at;
+        while((at=lower.indexOf(word.toLowerCase(),from))>=0){
+          if(!/[a-z0-9]/.test(lower[at-1]||"")&&!/[a-z0-9]/.test(lower[at+word.length]||""))
+            add(at,at+word.length,parts.length>1?26:17);
+          from=at+word.length;
+        }
       }
-      return typeof window.normalizeRanges === "function"
-        ? window.normalizeRanges([...ranges, ...additions], text.length)
-        : [...ranges, ...additions];
-    };
-  }
+      for(let i=0;i<ws.length;i++){
+        const w=ws[i],prev=ws[i-1],next=ws[i+1],n2=ws[i+2],n3=ws[i+3];
+        if(nouns.has(w.w)){
+          add(w.a,w.b,weak.has(w.w)?7:15);
+          if(prev&&(modifiers.has(prev.w)||nouns.has(prev.w)||/^\d+$/.test(prev.w))&&line.slice(prev.b,w.a)===" ")add(prev.a,w.b,22);
+          if(next&&nouns.has(next.w)&&line.slice(w.b,next.a)===" ")add(w.a,next.b,25);
+        }
+        if(feelings.has(w.w)){
+          add(w.a,w.b,21);
+          if(next&&nouns.has(next.w)&&line.slice(w.b,next.a)===" ")add(w.a,next.b,26);
+          if(next&&/^(?:about|with|under)$/.test(next.w)&&n2&&n2.b-w.a<=38)add(w.a,n2.b,24);
+        }
+        if(actions.has(w.w)){
+          if(next&&nouns.has(next.w))add(w.a,next.b,21);
+          if(next&&/^(?:a|an|the|my|our|some)$/.test(next.w)&&n2&&nouns.has(n2.w))add(w.a,n2.b,21);
+          add(w.a,w.b,10);
+        }
+        if(/^(?:\d+|one|two|three|four|five|nearly|almost)$/.test(w.w)&&next&&/^(?:hours?|days?|years?|minutes?|friends?|tickets?|floors?|times?)$/.test(next.w))add(w.a,next.b,23);
+        if(/\d/.test(w.s))add(w.a,w.b,18);
+        if(i>0&&/^[A-Z][a-z]+$/.test(w.s)&&!weak.has(w.w)){
+          add(w.a,w.b,16);
+          if(next&&/^[A-Z][a-z]+$/.test(next.s))add(w.a,next.b,28);
+          if(next&&n2&&/^[A-Z][a-z]+$/.test(next.s)&&/^[A-Z][a-z]+$/.test(n2.s))add(w.a,n2.b,30);
+          if(next&&n2&&n3&&/^[A-Z][a-z]+$/.test(next.s)&&/^[A-Z][a-z]+$/.test(n2.s)&&/^[A-Z][a-z]+$/.test(n3.s))add(w.a,n3.b,32);
+        }
+      }
+      for(const rule of [/\bgo back\b/gi,/\bcome back\b/gi,/\bgive up\b/gi,/\blook forward\b/gi,/\bchanged my mind\b/gi]){
+        for(const m of line.matchAll(rule))add(m.index,m.index+m[0].length,27);
+      }
+      // A weak sentence may have no mark. Never label "This", "Overall" or fillers.
+      pool.sort((a,b)=>b.score-a.score||a.a-b.a||(a.b-a.a)-(b.b-b.a));
+      if(pool[0]&&pool[0].score>7)output.push([pool[0].a,pool[0].b]);
+    }
+    return typeof window.normalizeRanges==="function"?window.normalizeRanges(output,text.length):output;
+  };
 
   // Optional word pronunciation, separate from the Jenny full-answer player.
   // Preserve native text selection and the user's bold-selection toolbar.
