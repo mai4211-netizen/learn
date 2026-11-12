@@ -126,7 +126,7 @@ body.p2-page.nice-skin .head{
 body.p2-page.nice-skin .head .kicker{color:#858585!important;font-size:11px!important;letter-spacing:.08em;}
 body.p2-page.nice-skin .head .category{border:0!important;background:transparent!important;color:#858585!important;padding:0!important;border-radius:0!important;}
 body.p2-page.nice-skin .head #title{
-  font-size:clamp(17px,1.9vw,25px)!important;letter-spacing:-.02em;
+  font-size:clamp(13px,1.15vw,16px)!important;letter-spacing:-.02em;
   line-height:1.4!important;font-weight:700!important;
   margin:8px 0 0!important;color:#222!important;
 }
