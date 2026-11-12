@@ -1,10 +1,10 @@
 /* Offline shell and MP3 caching for the IELTS Part 2 Jenny player. */
-const CACHE_NAME = "ielts-part2-q4-offline-v69";
+const CACHE_NAME = "ielts-part2-q4-offline-v70";
 const AUDIO_CACHE = "ielts-part2-q4-mp3-v2";
 const LEGACY_AUDIO_CACHE = "ielts-part2-q4-mp3-v1";
 const APP_SHELL = [
   "./", "./index.html", "./overview.html", "./practice.html", "./site-tabs.css?v=modules-v33", "./feedback-v41.css?v=43", "./compact-v43.css?v=46", "./style.css?v=templates-v26",
-  "./manifest.webmanifest", "./icon.svg",
+  "./manifest.webmanifest", "./icon.svg", "./nice-editorial.css?v=skin-v1", "./nice-editorial.js?v=skin-v1",
   "./data.js", "./patch-ui-v2.js", "./patch-ui-v3.js",
   "./patch-ui-v4.js", "./patch-ui-v5.js",
   "./reviewed-a.js", "./reviewed-b1.js", "./reviewed-b2.js",
