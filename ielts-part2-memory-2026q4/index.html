@@ -21,7 +21,7 @@
 /* Apply the remembered appearance before rendering to prevent a flash of old UI. */
 try {
   const requestedSkin = new URLSearchParams(location.search).get('skin');
-  if (requestedSkin === 'nice' || (requestedSkin !== 'classic' && localStorage.getItem('p2-2026q4-theme-skin') === 'nice')) {
+  if (requestedSkin === 'nice' || (requestedSkin !== 'classic' && localStorage.getItem('p2-2026q4-theme-skin') !== 'classic')) {
     document.body.classList.add('nice-skin');
   }
 } catch (_) { /* Keep the classic skin when storage is unavailable. */ }
@@ -203,6 +203,6 @@ try {
 <script src="sidebar-controls.js?v=shared-v30"></script>
 <script src="speech-player.js?v=45"></script>
 <script src="sticky-tabs-v43.js?v=46"></script>
-<script src="nice-editorial.js?v=skin-v3"></script>
+<script src="nice-editorial.js?v=skin-v4"></script>
 </body>
 </html>

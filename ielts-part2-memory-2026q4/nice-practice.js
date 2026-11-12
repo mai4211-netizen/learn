@@ -15,7 +15,7 @@
   const safeSet = value => { try { localStorage.setItem(STORAGE_KEY,value); } catch (_) {} };
   const params = new URLSearchParams(location.search);
   const requested = params.get('skin');
-  const initial = requested==='nice' ? 'nice' : (requested==='classic' ? 'classic' : (safeGet()==='nice'?'nice':'classic'));
+  const initial = requested==='nice' ? 'nice' : (requested==='classic' ? 'classic' : (safeGet()==='classic'?'classic':'nice'));
   const sessionSeed = (() => {
     try { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0]; }
     catch (_) { return Math.floor(Math.random()*4294967295); }
@@ -77,6 +77,31 @@
   access.setAttribute('aria-label','打开皮肤切换菜单');
   body.append(access);
 
+  // Fixed question controls match Part 2, while classic controls remain unchanged.
+  const pager=document.createElement('nav');
+  pager.className='nice-practice-pager';
+  pager.setAttribute('aria-label','逐题导航');
+  pager.innerHTML=
+    '<button type="button" id="nicePracticePrevQuestion" class="nice-practice-pager-btn">← 上一题</button>'+
+    '<span id="nicePracticePagerProgress" class="nice-practice-pager-progress" aria-live="polite">— / —</span>'+
+    '<button type="button" id="nicePracticeNextQuestion" class="nice-practice-pager-btn">下一题 →</button>';
+  body.append(pager);
+  const pagerPrev=document.getElementById('nicePracticePrevQuestion');
+  const pagerNext=document.getElementById('nicePracticeNextQuestion');
+  const pagerProgress=document.getElementById('nicePracticePagerProgress');
+  function updatePager(){
+    const status=window.IELTSPracticePager?.getState?.();
+    if(!status)return;
+    const index=status.index, total=status.total;
+    pagerPrev.disabled=index<=0;
+    pagerNext.disabled=index<0||index>=total-1;
+    pagerProgress.textContent=index<0?'0 / '+total+' 题':(index+1)+' / '+total+' 题';
+    pagerPrev.title=index<=0?'已经是第一题':'上一题';
+    pagerNext.title=index<0||index>=total-1?'已经是最后一题':'下一题';
+  }
+  pagerPrev.addEventListener('click',()=>window.IELTSPracticePager?.step?.(-1));
+  pagerNext.addEventListener('click',()=>window.IELTSPracticePager?.step?.(1));
+
   const menuButton=document.getElementById('nicePracticeMenuButton');
   const appearance=document.getElementById('nicePracticeAppearance');
   function closeDrawer() {
@@ -123,6 +148,7 @@
     lastCoverKey='';
     if(nice)updateCover();
     else document.title='IELTS Speaking 2026 Q4 · 大陆 Part 1 + Part 3';
+    updatePager();
   }
   context.addEventListener('click',event=>{
     const button=event.target.closest('button[data-skin]');
@@ -297,13 +323,14 @@
   const watch=new MutationObserver(()=>{
     if(updatePending)return;
     updatePending=true;
-    requestAnimationFrame(()=>{updatePending=false;updateCover();});
+    requestAnimationFrame(()=>{updatePending=false;updateCover();updatePager();});
   });
   watch.observe(contentArea,{childList:true,subtree:false});
   applySkin(initial);
   window.IELTSPracticeNiceSkin={
     get:()=>body.classList.contains('nice-skin')?'nice':'classic',
     set:applySkin,
-    refresh:()=>{lastCoverKey='';updateCover();}
+    refresh:()=>{lastCoverKey='';updateCover();updatePager();},
+    updatePager
   };
 })();

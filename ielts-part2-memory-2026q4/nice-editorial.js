@@ -12,7 +12,7 @@
   const getSaved = () => { try { return localStorage.getItem(SKIN_KEY); } catch (_) { return null; } };
   const saveSkin = name => { try { localStorage.setItem(SKIN_KEY, name); } catch (_) {} };
   const urlSkin = new URLSearchParams(location.search).get('skin');
-  const initialSkin = urlSkin === 'nice' ? 'nice' : (urlSkin === 'classic' ? 'classic' : getSaved() === 'nice' ? 'nice' : 'classic');
+  const initialSkin = urlSkin === 'nice' ? 'nice' : (urlSkin === 'classic' ? 'classic' : getSaved() === 'classic' ? 'classic' : 'nice');
   const sessionSeed = (() => {
     try { const data = new Uint32Array(1); crypto.getRandomValues(data); return data[0]; }
     catch (_) { return (Math.random() * 4294967295) >>> 0; }

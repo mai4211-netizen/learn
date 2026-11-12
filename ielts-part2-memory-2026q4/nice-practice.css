@@ -448,3 +448,44 @@ body.practice-page .nice-practice-context-menu button[data-selected="true"]::aft
  body.practice-page.nice-skin .layout .sidebar,
  body.practice-page.nice-skin .nice-practice-backdrop{transition:none!important;}
 }
+
+/* Question footer matches Part 2's fixed editorial pager. */
+body.practice-page .nice-practice-pager{display:none;}
+body.practice-page.nice-skin .nice-practice-pager{
+  display:flex!important;position:fixed!important;
+  bottom:0;left:0;right:0;z-index:90;
+  width:100%!important;max-width:none!important;
+  min-height:70px;padding:0 clamp(18px,5vw,76px)!important;
+  align-items:center!important;justify-content:space-between!important;gap:8px;
+  background:#fff!important;border-top:1px solid #151515!important;
+  box-shadow:none!important;border-radius:0!important;
+  padding-bottom:env(safe-area-inset-bottom,0px)!important;
+}
+body.practice-page.nice-skin .nice-practice-pager-btn{
+  background:transparent!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;color:#161616!important;
+  min-width:110px;padding:13px 2px!important;
+  font:800 13px/1.4 Arial,Helvetica,"PingFang SC",sans-serif!important;
+  letter-spacing:.01em;white-space:nowrap;cursor:pointer;
+}
+body.practice-page.nice-skin .nice-practice-pager-btn:hover:not(:disabled){
+  text-decoration:underline!important;
+}
+body.practice-page.nice-skin .nice-practice-pager-btn:disabled{
+  opacity:.24!important;cursor:default!important;
+}
+body.practice-page.nice-skin .nice-practice-pager-progress{
+  font:500 11px/1.4 Arial,Helvetica,sans-serif!important;
+  color:#888!important;white-space:nowrap;font-variant-numeric:tabular-nums;
+}
+body.practice-page.nice-skin .focusnav{display:none!important;}
+@media(max-width:600px){
+  body.practice-page.nice-skin .nice-practice-pager{
+    min-height:60px;padding:0 18px!important;
+    padding-bottom:env(safe-area-inset-bottom,0px)!important;
+  }
+  body.practice-page.nice-skin .nice-practice-pager-btn{
+    min-width:89px;padding:11px 0!important;font-size:12px!important;
+  }
+  body.practice-page.nice-skin .nice-practice-pager-progress{font-size:10px!important;}
+}
