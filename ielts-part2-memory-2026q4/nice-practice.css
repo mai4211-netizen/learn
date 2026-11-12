@@ -1,0 +1,450 @@
+/* Part 1 + Part 3 editorial skin; same reversible theme setting as Part 2. */
+/* The added masthead, hero and drawer controls stay out of the classic skin. */
+body.practice-page .nice-practice-masthead,
+body.practice-page .nice-practice-hero,
+body.practice-page .nice-practice-backdrop,
+body.practice-page .nice-practice-drawer-close,
+body.practice-page .nice-practice-context-menu,
+body.practice-page .nice-practice-access{display:none;}
+body.practice-page .nice-practice-context-menu.is-open{display:block;}
+body.practice-page:not(.nice-skin) .nice-practice-access{
+  display:block;position:fixed;right:16px;bottom:18px;z-index:99;
+  padding:8px 12px;background:#fff;color:#333;border:1px solid #dedede;
+  border-radius:12px;font-size:12px;cursor:pointer;box-shadow:0 3px 14px #0001;
+}
+body.practice-page.nice-skin{
+  --bg:#fff;--panel:#fff;--text:#191919;--muted:#777;--subtle:#999;
+  --line:#dedede;--green:#191919;--mint:#fff;--shadow:none;--radius:0;
+  background:#fff!important;color:#191919!important;
+  font-family:Arial,Helvetica,"PingFang SC","Microsoft Yahei",sans-serif!important;
+}
+body.practice-page.nice-skin .shell{
+  width:100%!important;max-width:none!important;padding:0 0 90px!important;margin:0!important;
+}
+body.practice-page.nice-skin .layout,
+body.practice-page.nice-skin .layout.sidebar-collapsed{
+  display:block!important;grid-template-columns:none!important;
+  width:100%!important;max-width:none!important;min-height:0!important;
+  gap:0!important;padding:0!important;margin:0!important;background:#fff!important;
+}
+body.practice-page.nice-skin .content{
+  width:calc(100% - clamp(40px,10vw,160px))!important;
+  max-width:1320px!important;margin:0 auto!important;
+  padding:0!important;background:#fff!important;min-width:0;
+}
+body.practice-page.nice-skin .header{display:none!important;}
+body.practice-page.nice-skin .sidebar-collapse,
+body.practice-page.nice-skin .sidebar-expand,
+body.practice-page.nice-skin .sidebar-resizer{display:none!important;}
+/* The editorial masthead is intentionally identical in rhythm to Part 2. */
+body.practice-page.nice-skin .nice-practice-masthead{
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  position:sticky;top:0;z-index:100;
+  min-height:90px;padding:11px clamp(20px,4vw,58px);
+  border-bottom:1px solid #e2e2e2;background:rgba(255,255,255,.98);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+body.practice-page.nice-skin .nice-practice-mast-left,
+body.practice-page.nice-skin .nice-practice-mast-right{
+  display:flex;align-items:center;gap:18px;min-width:0;
+}
+body.practice-page.nice-skin .nice-practice-mast-right{justify-content:flex-end;}
+body.practice-page.nice-skin .nice-practice-masthead button{
+  background:transparent!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;color:#151515!important;
+  font:700 12px/1.3 Arial,Helvetica,sans-serif!important;
+  cursor:pointer!important;
+}
+body.practice-page.nice-skin .nice-practice-menu-button{
+  display:flex;align-items:center;gap:10px;padding:10px 0;
+}
+body.practice-page.nice-skin .nice-practice-hamburger{
+  width:21px;height:13px;display:block;flex:none;position:relative;
+  border-top:2px solid #111;border-bottom:2px solid #111;
+}
+body.practice-page.nice-skin .nice-practice-hamburger::after{
+  content:"";position:absolute;left:0;top:5px;width:21px;border-top:2px solid #111;
+}
+body.practice-page.nice-skin .nice-practice-smallmeta{
+  color:#767676;font-size:11px;letter-spacing:.04em;white-space:nowrap;
+}
+body.practice-page.nice-skin .nice-practice-wordmark{
+  font-family:Impact,"Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  font-size:clamp(25px,3vw,39px);font-stretch:condensed;font-weight:900;
+  line-height:1;letter-spacing:-.065em;white-space:nowrap;
+  transform:scaleX(.9);color:#141414;
+}
+body.practice-page.nice-skin .nice-practice-masthead .nice-practice-appearance{
+  border-bottom:1px solid #111!important;padding:8px 0;white-space:nowrap;
+}
+/* The editorial headline and artwork are decorative; actual topic cards follow below. */
+body.practice-page.nice-skin .nice-practice-hero{
+  display:grid;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);
+  gap:clamp(26px,4.8vw,80px);align-items:center;
+  width:100%;max-width:1510px;
+  padding:48px clamp(20px,5vw,76px) 64px;margin:0 auto;background:#fff!important;
+}
+body.practice-page.nice-skin .nice-practice-hero-copy{min-width:0;}
+body.practice-page.nice-skin .nice-practice-kicker{
+  display:flex;flex-wrap:wrap;align-items:center;gap:12px;
+  font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  margin-bottom:24px;color:#222;
+}
+body.practice-page.nice-skin .nice-practice-category{background:#eae1ff;color:#4b21a9;padding:5px 9px;}
+body.practice-page.nice-skin .nice-practice-headline{
+  font:800 clamp(42px,5.1vw,82px)/.99 Arial,Helvetica,sans-serif!important;
+  letter-spacing:-.056em;overflow-wrap:anywhere;
+  margin:0 0 28px!important;max-width:760px;color:#161616!important;
+}
+body.practice-page.nice-skin .nice-practice-hero.variant-1 .nice-practice-headline{
+  font-weight:900!important;font-size:clamp(43px,5.5vw,89px)!important;
+}
+body.practice-page.nice-skin .nice-practice-hero.variant-2 .nice-practice-headline{
+  font-size:clamp(40px,4.9vw,75px)!important;letter-spacing:-.045em!important;
+}
+body.practice-page.nice-skin .nice-practice-subline{
+  max-width:520px;font-size:clamp(15px,1.45vw,20px);line-height:1.55;color:#4a4a4a;
+}
+body.practice-page.nice-skin .nice-practice-hero-meta{
+  border-top:1px solid #111;display:flex;flex-wrap:wrap;
+  justify-content:space-between;gap:12px;
+  margin:32px 0 0;padding:14px 0 0;color:#777;font-size:11px;
+}
+body.practice-page.nice-skin .nice-practice-visuals{
+  position:relative;min-width:0;padding-bottom:28px;
+}
+body.practice-page.nice-skin .nice-practice-main-art{
+  display:block;width:100%;aspect-ratio:1.26;object-fit:cover;
+  background:#f5f5f5;border:0;border-radius:0;box-shadow:none;
+}
+body.practice-page.nice-skin .nice-practice-small-art{
+  position:absolute;right:-2%;bottom:0;width:29%;aspect-ratio:.76;object-fit:cover;
+  display:block;border:10px solid #fff;background:#eee;border-radius:0;box-shadow:none;
+}
+body.practice-page.nice-skin .nice-practice-art-caption{
+  display:flex;justify-content:space-between;max-width:67%;
+  padding-top:8px;font-size:11px;color:#777;
+}
+body.practice-page.nice-skin .nice-practice-hero.variant-1 .nice-practice-main-art{aspect-ratio:1.01;}
+body.practice-page.nice-skin .nice-practice-hero.variant-2 .nice-practice-main-art{aspect-ratio:1.62;}
+/* Clear editorial controls: practice actions and previous/next stay usable. */
+body.practice-page.nice-skin .mainbar{
+  display:flex!important;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin:0 0 23px!important;
+  padding:22px 0!important;border-top:1px solid #151515;border-bottom:1px solid #dedede;
+  background:#fff!important;
+}
+body.practice-page.nice-skin .mainbar .barleft,
+body.practice-page.nice-skin .mainbar .modes{
+  display:flex;gap:9px;flex-wrap:wrap;align-items:center;
+}
+body.practice-page.nice-skin button.btn,
+body.practice-page.nice-skin button.tinybtn,
+body.practice-page.nice-skin button.filterbtn,
+body.practice-page.nice-skin .note-toggle,
+body.practice-page.nice-skin button.mobilemenu{
+  border:1px solid #1c1c1c!important;border-radius:0!important;
+  background:#fff!important;box-shadow:none!important;
+  color:#181818!important;font-size:12px;font-weight:700;
+  min-height:37px;padding:8px 14px!important;
+}
+body.practice-page.nice-skin button.btn.primary,
+body.practice-page.nice-skin .mainbar button.btn.active{
+  background:#181818!important;border-color:#181818!important;color:#fff!important;
+}
+body.practice-page.nice-skin button.btn.active:not(.primary){
+  background:#181818!important;color:#fff!important;
+}
+body.practice-page.nice-skin button.btn:hover,
+body.practice-page.nice-skin button.tinybtn:hover{
+  background:#eee!important;color:#111!important;
+}
+body.practice-page.nice-skin button.btn.primary:hover{background:#353535!important;color:#fff!important;}
+body.practice-page.nice-skin button:focus-visible,
+body.practice-page.nice-skin a:focus-visible{
+  outline:2px solid #171717!important;outline-offset:3px!important;
+}
+/* Actual part/topic titles sit in the article, not the decorative headline. */
+body.practice-page.nice-skin .contenthead{
+  padding:22px 0 27px!important;border:0!important;
+  border-bottom:1px solid #151515!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+}
+body.practice-page.nice-skin .topicheadtop{align-items:center;gap:12px;}
+body.practice-page.nice-skin .topicbadge,
+body.practice-page.nice-skin .topicbadge.new{
+  border:0!important;background:transparent!important;
+  color:#222!important;padding:0!important;border-radius:0!important;
+  font-size:11px;letter-spacing:.08em;font-weight:700;
+}
+body.practice-page.nice-skin .topicheadtop small{font-size:11px;color:#888;}
+body.practice-page.nice-skin .contenthead h2{
+  font:800 clamp(28px,3.6vw,49px)/1.08 Arial,Helvetica,"PingFang SC",sans-serif!important;
+  letter-spacing:-.045em;color:#111!important;margin:18px 0 10px!important;
+}
+body.practice-page.nice-skin .contenthead .english{
+  font-size:16px!important;line-height:1.6;color:#555!important;
+}
+body.practice-page.nice-skin .contenthead .topicexpl{
+  max-width:850px;color:#888!important;line-height:1.7;
+  padding:0!important;margin-top:16px!important;font-size:12px!important;
+}
+body.practice-page.nice-skin .topicfooter{
+  border-top:1px solid #dedede!important;padding:16px 0 0!important;
+  margin:22px 0 0!important;display:flex!important;
+}
+body.practice-page.nice-skin .topicfooter .tiny{font-size:11px;color:#777!important;}
+body.practice-page.nice-skin .questions{
+  display:grid!important;gap:0!important;margin:0!important;
+}
+body.practice-page.nice-skin .qcard,
+body.practice-page.nice-skin .qcard.focuscard{
+  border:0!important;border-radius:0!important;border-bottom:1px solid #dedede!important;
+  background:#fff!important;box-shadow:none!important;
+  padding:36px 0 30px!important;margin:0!important;min-height:0!important;
+}
+body.practice-page.nice-skin .qcard .top{align-items:center;flex-wrap:wrap;gap:12px;}
+body.practice-page.nice-skin .qnum{
+  color:#888!important;font:700 11px/1.5 Arial,Helvetica,sans-serif!important;
+  letter-spacing:.08em!important;
+}
+body.practice-page.nice-skin .qcard .actions{display:flex;gap:8px;flex-wrap:wrap;}
+body.practice-page.nice-skin .qcard .actions .tinybtn{
+  border:0!important;border-bottom:1px solid #111!important;
+  padding:6px 0!important;min-height:32px!important;
+  background:transparent!important;font-size:12px!important;
+}
+body.practice-page.nice-skin .qcard .actions .tinybtn.done{
+  background:transparent!important;color:#111!important;font-weight:900!important;
+}
+body.practice-page.nice-skin .qen{
+  max-width:1100px;font:750 clamp(20px,2.15vw,28px)/1.45 Arial,Helvetica,sans-serif!important;
+  letter-spacing:-.025em!important;margin:21px 0 15px!important;color:#171717!important;
+}
+body.practice-page.nice-skin .focuscard .qen{font-size:clamp(25px,3.5vw,40px)!important;}
+body.practice-page.nice-skin .prompt{
+  display:block!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+  padding:16px 0 10px!important;margin:0!important;
+  max-width:1030px!important;color:#444!important;
+}
+body.practice-page.nice-skin .prompt .cn,
+body.practice-page.nice-skin .prompt .en,
+body.practice-page.nice-skin .prompt .vocab{
+  color:#555!important;font-size:14px!important;line-height:1.85!important;
+  margin:3px 0 9px!important;
+}
+body.practice-page.nice-skin .prompt .en{color:#222!important;}
+body.practice-page.nice-skin .prompt .lab{
+  color:#171717!important;letter-spacing:.075em!important;
+  font-size:10px!important;font-weight:900!important;
+}
+body.practice-page.nice-skin .qnotes{
+  border-top:1px solid #ededed!important;
+  padding-top:13px!important;margin-top:13px!important;
+}
+body.practice-page.nice-skin .qnotes .note-toggle{
+  border:0!important;background:transparent!important;
+  min-height:28px!important;padding:0!important;font-size:12px!important;
+  text-align:left!important;color:#555!important;
+}
+body.practice-page.nice-skin .notearea{
+  border:0!important;border-bottom:1px solid #aaa!important;border-radius:0!important;
+  background:#fff!important;padding:13px 0!important;
+  color:#111!important;box-shadow:none!important;
+}
+body.practice-page.nice-skin .focusnote{
+  margin:20px 0 0!important;color:#777!important;font-size:12px!important;
+}
+body.practice-page.nice-skin .focusnav{
+  display:flex;gap:16px;margin:22px 0 35px!important;
+}
+body.practice-page.nice-skin .focusnav button{min-width:140px;}
+body.practice-page.nice-skin .info,
+body.practice-page.nice-skin .sources{
+  max-width:none;border:0!important;border-radius:0!important;
+  border-top:1px solid #dedede!important;box-shadow:none!important;
+  background:transparent!important;color:#777!important;
+  padding:20px 0!important;margin:30px 0 0!important;font-size:12px!important;
+}
+body.practice-page.nice-skin .sources summary{color:#222!important;}
+body.practice-page.nice-skin .sources a{color:#151515!important;text-decoration:underline;}
+body.practice-page.nice-skin .empty{
+  padding:35px 0!important;border:0!important;
+  background:#fff!important;border-radius:0!important;box-shadow:none!important;
+}
+body.practice-page.nice-skin .toast{
+  color:#fff;background:#111;border-radius:0;box-shadow:none;
+}
+/* The original sidebar becomes the same white slide-out chapter drawer. */
+body.practice-page.nice-skin .layout .sidebar,
+body.practice-page.nice-skin .layout.sidebar-collapsed .sidebar,
+body.practice-page.nice-skin .sidebar#sidebar {
+  display:flex!important;position:fixed!important;
+  left:0!important;top:0!important;bottom:0!important;right:auto!important;
+  width:min(420px,92vw)!important;max-width:92vw!important;
+  height:100dvh!important;max-height:100dvh!important;
+  z-index:205!important;margin:0!important;
+  padding:25px 26px 42px!important;
+  border:0!important;border-right:1px solid #111!important;border-radius:0!important;
+  background:#fff!important;box-shadow:none!important;
+  overflow:auto!important;flex-direction:column!important;
+  transform:translateX(-104%);visibility:hidden;pointer-events:none;
+  transition:transform .24s ease;
+}
+body.practice-page.nice-skin.nice-practice-nav-open .layout .sidebar,
+body.practice-page.nice-skin.nice-practice-nav-open .sidebar#sidebar{
+  transform:translateX(0)!important;visibility:visible!important;pointer-events:auto!important;
+}
+body.practice-page.nice-skin .nice-practice-backdrop{
+  display:block;position:fixed;inset:0;z-index:204;background:rgba(0,0,0,.32);
+  opacity:0;pointer-events:none;transition:opacity .24s ease;
+}
+body.practice-page.nice-skin.nice-practice-nav-open .nice-practice-backdrop{
+  opacity:1;pointer-events:auto;
+}
+body.practice-page.nice-skin .nice-practice-drawer-close{
+  display:block!important;align-self:flex-end;
+  padding:0 5px 8px;border:0;background:none;color:#111;
+  font-size:29px;cursor:pointer;line-height:1;
+}
+body.practice-page.nice-skin .site-brand{border-bottom:1px solid #111!important;padding:0 0 19px!important;}
+body.practice-page.nice-skin .site-brand .eyebrow{color:#777!important;font-size:10px!important;}
+body.practice-page.nice-skin .site-brand h2{
+  padding:0!important;margin:7px 0 0!important;
+  font-size:30px!important;font-weight:900!important;letter-spacing:-.04em;
+  line-height:1.1!important;color:#111!important;
+}
+body.practice-page.nice-skin #globalPartNav .site-tabs{
+  display:flex!important;flex-wrap:wrap!important;gap:0!important;
+  padding:14px 0!important;margin:4px 0!important;
+  border:0!important;border-bottom:1px solid #dedede!important;
+  border-radius:0!important;background:transparent!important;
+}
+body.practice-page.nice-skin #globalPartNav .site-tabs a{
+  border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;color:#161616!important;padding:8px 14px 8px 0!important;
+  font-size:13px!important;font-weight:700!important;text-decoration:none!important;
+}
+body.practice-page.nice-skin #globalPartNav .site-tabs a.active{
+  font-weight:900!important;text-decoration:underline!important;text-underline-offset:3px;
+}
+body.practice-page.nice-skin .searchwrap{margin:18px 0 10px!important;}
+body.practice-page.nice-skin .searchwrap input{
+  background:#fff!important;border:0!important;border-bottom:1px solid #111!important;
+  border-radius:0!important;box-shadow:none!important;
+  padding:0 8px 0 27px!important;color:#171717!important;
+}
+body.practice-page.nice-skin .searchwrap .searchicon{color:#777!important;left:4px!important;}
+body.practice-page.nice-skin .parttabs{
+  display:grid!important;grid-template-columns:1fr 1fr!important;
+  gap:0!important;background:#fff!important;
+  border:0!important;border-radius:0!important;margin:12px 0!important;padding:0!important;
+}
+body.practice-page.nice-skin .parttabs button{
+  border:1px solid #111!important;border-radius:0!important;
+  background:#fff!important;color:#111!important;box-shadow:none!important;
+  padding:9px!important;white-space:nowrap!important;font-size:12px!important;
+}
+body.practice-page.nice-skin .parttabs button+button{border-left:0!important;}
+body.practice-page.nice-skin .parttabs button.active{background:#111!important;color:#fff!important;}
+body.practice-page.nice-skin #filters{
+  gap:0!important;border:0!important;border-bottom:1px solid #dedede!important;
+  padding:8px 0 17px!important;margin-bottom:10px!important;
+}
+body.practice-page.nice-skin #filters button.filterbtn{
+  border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+  font-size:12px!important;padding:8px 12px 8px 0!important;
+  color:#777!important;min-height:32px!important;
+}
+body.practice-page.nice-skin #filters button.filterbtn.active{
+  color:#141414!important;font-weight:900!important;text-decoration:underline!important;
+  text-underline-offset:3px;
+}
+body.practice-page.nice-skin .navsum{
+  color:#777!important;padding:12px 0!important;
+  font-size:12px!important;flex:0 0 auto;
+}
+body.practice-page.nice-skin .navsum .mobilemenu{display:none!important;}
+body.practice-page.nice-skin .topicnav,
+body.practice-page.nice-skin .topicnav.collapsed{
+  display:block!important;max-height:none!important;min-height:130px!important;
+  overflow:auto!important;flex:1 1 auto;
+}
+body.practice-page.nice-skin .topicnav .topicbtn{
+  border:0!important;border-bottom:1px solid #eee!important;border-radius:0!important;
+  background:transparent!important;color:#222!important;
+  box-shadow:none!important;padding:11px 2px!important;margin:0!important;
+}
+body.practice-page.nice-skin .topicnav .topicbtn:hover{background:#f7f7f7!important;}
+body.practice-page.nice-skin .topicnav .topicbtn.active{
+  font-weight:800!important;border-bottom-color:#111!important;
+}
+body.practice-page.nice-skin .topicnum,
+body.practice-page.nice-skin .topiccount,
+body.practice-page.nice-skin .topiclabel small{color:#888!important;}
+body.practice-page.nice-skin .progressbar{
+  background:#eee!important;border-radius:0!important;height:2px!important;
+}
+body.practice-page.nice-skin .progressbar>i{
+  background:#111!important;border-radius:0!important;
+}
+/* Identical right-click skin choices and a fallback access button in classic mode. */
+body.practice-page .nice-practice-context-menu{
+  position:fixed;z-index:300;min-width:204px;
+  padding:7px 0;border:1px solid #171717;border-radius:0;
+  background:#fff;box-shadow:0 8px 30px #0003;color:#111;
+  font-family:Arial,"PingFang SC",sans-serif;
+}
+body.practice-page .nice-practice-context-menu.is-open{display:block;}
+body.practice-page .nice-practice-context-label{
+  display:block;padding:7px 15px 10px;color:#888;
+  font-size:10px;font-weight:700;letter-spacing:.08em;
+}
+body.practice-page .nice-practice-context-menu button{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;min-height:40px;padding:10px 15px;
+  border:0;border-radius:0;background:#fff;color:#111;
+  font-size:13px;font-weight:600;text-align:left;cursor:pointer;
+}
+body.practice-page .nice-practice-context-menu button:hover{background:#f1edfa;}
+body.practice-page .nice-practice-context-menu button[data-selected="true"]::after{content:"✓";}
+@media(max-width:900px){
+ body.practice-page.nice-skin .nice-practice-hero{
+   grid-template-columns:1fr!important;gap:27px!important;
+   padding-top:27px!important;padding-bottom:42px!important;
+ }
+ body.practice-page.nice-skin .nice-practice-visuals{max-width:760px!important;}
+ body.practice-page.nice-skin .nice-practice-main-art{aspect-ratio:1.5!important;}
+ body.practice-page.nice-skin .content{width:calc(100% - 40px)!important;}
+}
+@media(max-width:600px){
+ body.practice-page.nice-skin .nice-practice-masthead{min-height:67px;padding:10px 17px;}
+ body.practice-page.nice-skin .nice-practice-wordmark{font-size:26px;}
+ body.practice-page.nice-skin .nice-practice-smallmeta{display:none;}
+ body.practice-page.nice-skin .nice-practice-masthead .nice-practice-appearance{font-size:11px!important;}
+ body.practice-page.nice-skin .nice-practice-hero{padding:26px 20px 30px!important;gap:20px!important;}
+ body.practice-page.nice-skin .nice-practice-headline,
+ body.practice-page.nice-skin .nice-practice-hero.variant-1 .nice-practice-headline,
+ body.practice-page.nice-skin .nice-practice-hero.variant-2 .nice-practice-headline{
+   font-size:clamp(36px,10vw,57px)!important;line-height:1.05!important;
+ }
+ body.practice-page.nice-skin .nice-practice-kicker{margin-bottom:12px!important;}
+ body.practice-page.nice-skin .nice-practice-hero-meta{margin-top:20px!important;}
+ body.practice-page.nice-skin .nice-practice-small-art{border-width:6px!important;}
+ body.practice-page.nice-skin .mainbar{gap:12px!important;}
+ body.practice-page.nice-skin .mainbar .barleft,
+ body.practice-page.nice-skin .mainbar .modes{gap:7px!important;}
+ body.practice-page.nice-skin .content{width:calc(100% - 40px)!important;}
+ body.practice-page.nice-skin .contenthead h2{font-size:29px!important;}
+ body.practice-page.nice-skin .qcard,
+ body.practice-page.nice-skin .qcard.focuscard{padding:26px 0!important;}
+ body.practice-page.nice-skin .qen{font-size:20px!important;}
+ body.practice-page.nice-skin .focuscard .qen{font-size:27px!important;}
+ body.practice-page.nice-skin .focusnav button{min-width:0!important;flex:1!important;}
+}
+@media(prefers-reduced-motion:reduce){
+ body.practice-page.nice-skin .layout .sidebar,
+ body.practice-page.nice-skin .nice-practice-backdrop{transition:none!important;}
+}

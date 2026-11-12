@@ -18,8 +18,18 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
 <link rel="stylesheet" href="site-tabs.css?v=modules-v33">
+<link rel="stylesheet" href="nice-practice.css?v=practice-skin-v1">
 </head>
 <body class="practice-page">
+<script>
+/* Read the shared P1/P2/P3 skin before the practice page becomes visible. */
+try {
+  const selectedSkin = new URLSearchParams(location.search).get('skin');
+  if (selectedSkin === 'nice' || (selectedSkin !== 'classic' && localStorage.getItem('p2-2026q4-theme-skin') === 'nice')) {
+    document.body.classList.add('nice-skin');
+  }
+} catch (_) { /* Keep the original practice skin without storage. */ }
+</script>
 <div class="shell">
 <div class="layout">
     <aside class="sidebar" id="sidebar">
@@ -143,4 +153,5 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <script src="sidebar-controls.js?v=shared-v30"></script>
+<script src="nice-practice.js?v=practice-skin-v1"></script>
 </body></html>

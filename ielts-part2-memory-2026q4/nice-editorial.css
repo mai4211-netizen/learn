@@ -509,3 +509,14 @@ body.p2-page.nice-skin .nice-cue-details #prompt{
   display:block;padding:8px 0 22px!important;
   background:transparent!important;border:0!important;
 }
+
+/* Word-by-word spoken position: a translucent neutral rectangle, not bold text.
+   Keep my/recommended bold spans unchanged. The CSS Highlight API supplies
+   the text range without modifying paragraph markup or audio synchronization. */
+body.p2-page ::highlight(p2-read-current),
+body.p2-page.nice-skin ::highlight(p2-read-current){
+  background-color:rgba(154,154,154,.31)!important;
+  color:inherit!important;
+  text-shadow:none!important;
+  text-decoration:none!important;
+}
