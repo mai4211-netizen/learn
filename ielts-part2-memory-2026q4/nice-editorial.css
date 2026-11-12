@@ -485,3 +485,27 @@ body.p2-page.nice-skin ::highlight(p2-read-current) {
 /* Editorial cover shapes can change proportions with each reload, not just color. */
 body.p2-page.nice-skin .nice-hero.variant-1 .nice-main-art{aspect-ratio:1.01!important;}
 body.p2-page.nice-skin .nice-hero.variant-2 .nice-main-art{aspect-ratio:1.62!important;}
+
+/* A cue-card disclosure is visually separate from the always-visible question choices. */
+body.p2-page .nice-cue-details{display:none;}
+body.p2-page.nice-skin .nice-cue-details{
+  display:block;margin:0 0 18px;border-top:1px solid #dedede;
+  border-bottom:1px solid #dedede;background:#fff;color:#171717;
+}
+body.p2-page.nice-skin .nice-cue-details>summary{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:14px 0;list-style:none;font:700 12px/1.5 Arial,"PingFang SC",sans-serif;
+  color:#171717;letter-spacing:.04em;cursor:pointer;
+}
+body.p2-page.nice-skin .nice-cue-details>summary::-webkit-details-marker{display:none;}
+body.p2-page.nice-skin .nice-cue-details>summary::after{
+  content:"+";font-size:20px;font-weight:400;line-height:1;
+}
+body.p2-page.nice-skin .nice-cue-details[open]>summary::after{content:"−";}
+body.p2-page.nice-skin .nice-cue-details>summary:focus-visible{
+  outline:2px solid #171717;outline-offset:3px;
+}
+body.p2-page.nice-skin .nice-cue-details #prompt{
+  display:block;padding:8px 0 22px!important;
+  background:transparent!important;border:0!important;
+}

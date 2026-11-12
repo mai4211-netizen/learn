@@ -81,6 +81,7 @@
   const menuToggle = document.getElementById('niceMenuToggle');
   const styleButton = document.getElementById('niceStyleButton');
   let details = null;
+  let cueDetails = null;
   let lastTopic = '';
 
   function closeNav() {
@@ -106,18 +107,35 @@
     if (active && !details) {
       details = document.createElement('details');
       details.className = 'nice-questions';
+      details.open = true; // The questions in this story group are visible by default.
       const summary = document.createElement('summary');
       summary.id = 'niceQuestionSummary';
       summary.textContent = '本组题目 / CHOOSE A QUESTION';
       topics.before(details);
       details.append(summary, topics);
-      details.addEventListener('click', event => {
-        if (event.target.closest('.topic')) details.open = false;
-      });
+      // Keep the question choices open after selection for faster switching.
     } else if (!active && details) {
       details.before(topics);
       details.remove();
       details = null;
+    }
+  }
+
+  function arrangeCueCard(active) {
+    const prompt = document.getElementById('prompt');
+    if (!prompt) return;
+    if (active && !cueDetails) {
+      cueDetails = document.createElement('details');
+      cueDetails.className = 'nice-cue-details';
+      cueDetails.open = false; // Hide the detailed cue-card instructions by default.
+      const summary = document.createElement('summary');
+      summary.textContent = '查看题目要求 / VIEW CUE CARD';
+      prompt.before(cueDetails);
+      cueDetails.append(summary, prompt);
+    } else if (!active && cueDetails) {
+      cueDetails.before(prompt);
+      cueDetails.remove();
+      cueDetails = null;
     }
   }
 
@@ -142,6 +160,7 @@
   function applySkin(name) {
     const isNice = name === 'nice';
     arrangeQuestionMenu(isNice);
+    arrangeCueCard(isNice);
     body.classList.toggle('nice-skin',isNice);
     closeContext();
     closeNav();
@@ -283,10 +302,22 @@
       '</svg>';
     return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(markup);
   }
-  function titleFromCue(question) {
-    const en=String(question||'').replace(/^Describe\s+/i,'').replace(/[.?!]\s*$/,'').trim();
-    return en ? en.charAt(0).toUpperCase()+en.slice(1) : 'Every story starts somewhere';
-  }
+  // Editorial cover copy is decorative. IELTS question titles remain in the article below.
+  // Using independent fictional headlines avoids turning a cue card into an awkward article title.
+  const editorialHeadlines = [
+    ['The beauty of thinking a little differently', 'A colourful invitation to see ordinary things in new ways'],
+    ['Good ideas come in unexpected shapes', 'Where curiosity, imagination and happy accidents meet'],
+    ['There is magic in the everyday', 'An exploration of small surprises and extraordinary possibilities'],
+    ['A joyful world of unusual possibilities', 'Celebrating playful experiments and the art of making'],
+    ['What happens when imagination takes the lead?', 'Curious creations made with colour, character and a sense of fun'],
+    ['How to make the familiar feel surprising', 'Fresh perspectives on the little things we often overlook'],
+    ['Creative chaos can be a beautiful thing', 'Bold forms, bright ideas and the freedom to explore'],
+    ['A different way of looking at everything', 'A collection of creative ideas that refuse to stay ordinary'],
+    ['The wonderful art of getting lost', 'Finding unexpected inspiration in shapes and stories'],
+    ['Why does everything have to make sense?', 'A playful approach to visual storytelling and experimentation'],
+    ['Sometimes strange is exactly what we need', 'A bright and unexpected adventure through the imagination'],
+    ['Big feelings, small details, endless ideas', 'A fresh look at the surprising power of everyday creativity']
+  ];
   function refreshCover() {
     if (!body.classList.contains('nice-skin')) return;
     updatePager();
@@ -305,12 +336,10 @@
     const number=Number(id.replace(/\D/g,''))||1;
     const seed=(sessionSeed^hashText(id+'@'+g.id))>>>0;
     const variant=seed%3;
-    const subject=titleFromCue(t.en||t.zh);
-    const lower=subject.charAt(0).toLowerCase()+subject.slice(1);
-    const headline=variant===0 ? subject : variant===1 ? 'A closer look at '+lower : 'The story behind '+lower;
+    const [headline,subline] = editorialHeadlines[Math.floor(random(seed^0x51ed270b)()*editorialHeadlines.length)];
     hero.className='nice-hero variant-'+variant;
     document.getElementById('niceHeroHeadline').textContent=headline;
-    document.getElementById('niceHeroSubline').textContent=g.title;
+    document.getElementById('niceHeroSubline').textContent=subline;
     document.getElementById('niceCategory').textContent=variant===0?'PROJECTS + STORIES':variant===1?'INSIGHTS + STORIES':'THE CREATIVE ISSUE';
     document.getElementById('niceIssueNum').textContent='IELTS / SPEAKING / PART 02';
     document.getElementById('niceArticleMeta').textContent=id+' / '+number.toString().padStart(2,'0')+' OF 58';
