@@ -292,7 +292,12 @@
     updatePager();
     const selected=document.querySelector('#topics .topic.on b')?.textContent?.trim();
     const id=selected || (typeof selectedQ!=='undefined' ? selectedQ : '');
-    if (!id || lastTopic===id) return;
+    if (!id) return;
+    if (lastTopic===id) {
+      const headline=document.getElementById('niceHeroHeadline')?.textContent;
+      if(headline) document.title=headline+' | IELTS Part 2 · It’s Nice That 风格';
+      return;
+    }
     const g=(typeof GROUPS!=='undefined' ? GROUPS : []).find(item=>item.topics.some(t=>t.q===id));
     const t=g?.topics?.find(item=>item.q===id);
     if (!t) return;

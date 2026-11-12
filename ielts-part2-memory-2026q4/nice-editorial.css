@@ -481,3 +481,7 @@ body.p2-page.nice-skin ::highlight(p2-read-current) {
   text-shadow:.9px 0 currentColor,-.9px 0 currentColor,0 .65px currentColor;
   text-decoration:none;
 }
+
+/* Editorial cover shapes can change proportions with each reload, not just color. */
+body.p2-page.nice-skin .nice-hero.variant-1 .nice-main-art{aspect-ratio:1.01!important;}
+body.p2-page.nice-skin .nice-hero.variant-2 .nice-main-art{aspect-ratio:1.62!important;}
