@@ -1,6 +1,6 @@
 /* Writing Review editorial appearance, based on the sibling P2 "It's Nice That" skin.
    Scope every override to .writing-nice so classic remains untouched. */
-.writing-masthead,.writing-skin-menu,.writing-skin-access{display:none}
+.writing-masthead,.writing-skin-menu,.writing-skin-access,.writing-edition-line{display:none}
 body.writing-nice{
   --bg:#fff;--panel:#fff;--text:#171717;--muted:#737373;--line:#dedede;
   --accent:#6d2ee4;--accent-soft:#fff1b9;--blue-soft:#deebff;
