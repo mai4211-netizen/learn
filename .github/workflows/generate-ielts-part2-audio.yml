@@ -48,7 +48,7 @@ jobs:
             const q = 'Q' + String(n).padStart(2, '0');
             if (!result.items[q]) throw new Error('Missing ' + q);
             const words = (result.items[q].text.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g) || []).length;
-            if (words < 150 || words > 205) throw new Error(q + ' word count out of range: ' + words);
+            if (words < 190 || words > 215) throw new Error(q + ' word count out of range: ' + words);
           }
           if (result.voice !== 'en-US-JennyNeural' || result.rate !== '-5%') {
             throw new Error('Unexpected voice/rate: ' + result.voice + ' / ' + result.rate);
